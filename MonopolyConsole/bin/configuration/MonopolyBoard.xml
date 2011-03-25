@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GameBoard xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MonopolySchema2.xsd">
+	<CellBase ID="1" Name="Go" Buyable="false" Type="Go" Owned="false">
+		<PassToll>-200</PassToll>
+		<LandToll>-400</LandToll>
+	</CellBase>
+	<CellBase ID="2" Name="Melborn" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>200</Price>
+		<LandToll>70</LandToll>
+		<SingleHousePrice>100</SingleHousePrice>
+		<HouseToll>
+			<One>200</One>
+			<Two>300</Two>
+			<Three>400</Three>
+		</HouseToll>
+		<Country Name="Australia"/>
+	</CellBase>
+	<CellBase ID="3" Name="Sydney" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>250</Price>
+		<LandToll>120</LandToll>
+		<SingleHousePrice>120</SingleHousePrice>
+		<HouseToll>
+			<One>250</One>
+			<Two>400</Two>
+			<Three>550</Three>
+		</HouseToll>
+		<Country Name="Australia"/>
+	</CellBase>
+	<CellBase ID="4" Name="Chance" Buyable="false" Type="Chance" Owned="false"/>
+	<CellBase  ID="5" Name="Trans Siberian Train" Buyable="true" Type="Service" Owned="false" xsi:type="Asset">
+		<Price>150</Price>
+		<LandToll>50</LandToll>
+		<Group Name="Transportation"/>
+		<GroupToll>200</GroupToll>
+	</CellBase>
+	<CellBase ID="6" Name="Cordoba" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>120</Price>
+		<LandToll>45</LandToll>
+		<SingleHousePrice>80</SingleHousePrice>
+		<HouseToll>
+			<One>150</One>
+			<Two>200</Two>
+			<Three>250</Three>
+		</HouseToll>
+		<Country Name="Argentina"/>
+	</CellBase>
+	<CellBase ID="7" Name="Mendoza" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>140</Price>
+		<LandToll>50</LandToll>
+		<SingleHousePrice>120</SingleHousePrice>
+		<HouseToll>
+			<One>250</One>
+			<Two>350</Two>
+			<Three>450</Three>
+		</HouseToll>
+		<Country Name="Argentina"/>
+	</CellBase>
+	<CellBase ID="8" Name="Buenos Aires" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>180</Price>
+		<LandToll>65</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>300</One>
+			<Two>400</Two>
+			<Three>550</Three>
+		</HouseToll>
+		<Country Name="Argentina"/>
+	</CellBase>
+	<CellBase ID="9" Name="Community Chest" Buyable="false" Type="Community Chest" Owned="false"/>
+	<CellBase ID="10" Name="Jail (Free Pass)" Buyable="false" Type="Jail" Owned="false"/>
+	<CellBase ID="11" Name="Munich" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>600</Price>
+		<LandToll>230</LandToll>
+		<SingleHousePrice>200</SingleHousePrice>
+		<HouseToll>
+			<One>300</One>
+			<Two>400</Two>
+			<Three>550</Three>
+		</HouseToll>
+		<Country Name="Germany"/>
+	</CellBase>
+	<CellBase ID="12" Name="Berlin" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>530</Price>
+		<LandToll>185</LandToll>
+		<SingleHousePrice>130</SingleHousePrice>
+		<HouseToll>
+			<One>280</One>
+			<Two>370</Two>
+			<Three>500</Three>
+		</HouseToll>
+		<Country Name="Germany"/>
+	</CellBase>
+	<CellBase ID="13" Name="Dusseldorf" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>490</Price>
+		<LandToll>130</LandToll>
+		<SingleHousePrice>120</SingleHousePrice>
+		<HouseToll>
+			<One>250</One>
+			<Two>330</Two>
+			<Three>410</Three>
+		</HouseToll>
+		<Country Name="Germany"/>
+	</CellBase>
+	<CellBase ID="14" Name="FedEx" Buyable="true" Type="Service" Owned="false" xsi:type="Asset">
+		<Price>150</Price>
+		<LandToll>50</LandToll>
+		<Group Name="Services"/>
+		<GroupToll>200</GroupToll>
+	</CellBase>
+	<CellBase ID="15" Name="American Airlines" Buyable="true" Type="Service" Owned="false" xsi:type="Asset">
+		<Price>100</Price>
+		<LandToll>50</LandToll>
+		<Group Name="Transportation"/>
+		<GroupToll>200</GroupToll>
+	</CellBase>
+	<CellBase ID="16" Name="Cape Town" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>130</Price>
+		<LandToll>40</LandToll>
+		<SingleHousePrice>80</SingleHousePrice>
+		<HouseToll>
+			<One>100</One>
+			<Two>170</Two>
+			<Three>230</Three>
+		</HouseToll>
+		<Country Name="South Africa"/>
+	</CellBase>
+	<CellBase ID="17" Name="Johannesburg" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>150</Price>
+		<LandToll>50</LandToll>
+		<SingleHousePrice>90</SingleHousePrice>
+		<HouseToll>
+			<One>120</One>
+			<Two>200</Two>
+			<Three>290</Three>
+		</HouseToll>
+		<Country Name="South Africa"/>
+	</CellBase>
+	<CellBase ID="18" Name="Port Elizabeth" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>130</Price>
+		<LandToll>40</LandToll>
+		<SingleHousePrice>80</SingleHousePrice>
+		<HouseToll>
+			<One>100</One>
+			<Two>170</Two>
+			<Three>230</Three>
+		</HouseToll>
+		<Country Name="South Africa"/>
+	</CellBase>
+	<CellBase ID="19" Name="Parking" Buyable="false" Type="Parking" Owned="false"/>
+	<CellBase ID="20" Name="Shanghai" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>300</Price>
+		<LandToll>200</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>300</One>
+			<Two>400</Two>
+			<Three>500</Three>
+		</HouseToll>
+		<Country Name="China"/>
+	</CellBase>
+	<CellBase ID="21" Name="Beijing" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>280</Price>
+		<LandToll>85</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>170</One>
+			<Two>260</Two>
+			<Three>370</Three>
+		</HouseToll>
+		<Country Name="China"/>
+	</CellBase>
+	<CellBase ID="22" Name="Hong Kong" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>300</Price>
+		<LandToll>90</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>170</One>
+			<Two>260</Two>
+			<Three>370</Three>
+		</HouseToll>
+		<Country Name="China"/>
+	</CellBase>
+	<CellBase ID="23" Name="Community Chest" Buyable="false" Type="Community Chest" Owned="false"/>
+	<CellBase ID="24" Name="Deutsche Bahn" Buyable="true" Type="Service" Owned="false" xsi:type="Asset">
+		<Price>100</Price>
+		<LandToll>50</LandToll>
+		<Group Name="Transportation"/>
+		<GroupToll>200</GroupToll>
+	</CellBase>
+	<CellBase ID="25" Name="New York" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>550</Price>
+		<LandToll>90</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>170</One>
+			<Two>260</Two>
+			<Three>370</Three>
+		</HouseToll>
+		<Country Name="USA"/>
+	</CellBase>
+	<CellBase ID="26" Name="Chicago" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>450</Price>
+		<LandToll>90</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>170</One>
+			<Two>260</Two>
+			<Three>370</Three>
+		</HouseToll>
+		<Country Name="USA"/>
+	</CellBase>
+	<CellBase ID="27" Name="Los Angeles" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>600</Price>
+		<LandToll>190</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>250</One>
+			<Two>360</Two>
+			<Three>470</Three>
+		</HouseToll>
+		<Country Name="USA"/>
+	</CellBase>
+	<CellBase ID="28" Name="Go To Jail!" Buyable="false" Type="GotoJail" Owned="false"/>
+	<CellBase ID="29" Name="Barcelona" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>450</Price>
+		<LandToll>160</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>220</One>
+			<Two>330</Two>
+			<Three>440</Three>
+		</HouseToll>
+		<Country Name="Spain"/>
+	</CellBase>
+	<CellBase ID="30" Name="Madrid" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>440</Price>
+		<LandToll>200</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>290</One>
+			<Two>450</Two>
+			<Three>550</Three>
+		</HouseToll>
+		<Country Name="Spain"/>
+	</CellBase>
+	<CellBase ID="31" Name="Valencia" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>300</Price>
+		<LandToll>90</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>170</One>
+			<Two>260</Two>
+			<Three>370</Three>
+		</HouseToll>
+		<Country Name="Spain"/>
+	</CellBase>
+	<CellBase ID="32" Name="AT&amp;T" Buyable="true" Type="Service" Owned="false" xsi:type="Asset">
+		<Price>150</Price>
+		<LandToll>50</LandToll>
+		<Group Name="Services"/>
+		<GroupToll>200</GroupToll>
+	</CellBase>
+	<CellBase ID="33" Name="Air France (KLM)" Buyable="true" Type="Service" Owned="false" xsi:type="Asset">
+		<Price>100</Price>
+		<LandToll>50</LandToll>
+		<Group Name="Transportation"/>
+		<GroupToll>200</GroupToll>
+	</CellBase>
+	<CellBase ID="34" Name="Moscow" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>300</Price>
+		<LandToll>110</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>170</One>
+			<Two>260</Two>
+			<Three>370</Three>
+		</HouseToll>
+		<Country Name="Russia"/>
+	</CellBase>
+	<CellBase ID="35" Name="Saint Petersburg" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>300</Price>
+		<LandToll>130</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>170</One>
+			<Two>260</Two>
+			<Three>370</Three>
+		</HouseToll>
+		<Country Name="Russia"/>
+	</CellBase>
+	<CellBase ID="36" Name="Novosibirsk" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+		<Price>300</Price>
+		<LandToll>30</LandToll>
+		<SingleHousePrice>150</SingleHousePrice>
+		<HouseToll>
+			<One>170</One>
+			<Two>260</Two>
+			<Three>370</Three>
+		</HouseToll>
+		<Country Name="Russia"/>
+	</CellBase>
+</GameBoard>

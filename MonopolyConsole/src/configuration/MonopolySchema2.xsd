@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 (x64) (http://www.altova.com) by ibd (none) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="GameBoard">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="CellBase" type="CellBase"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="City">
+		<xs:complexContent>
+			<xs:extension base="CellBase">
+				<xs:sequence>
+					<xs:element name="SingleHousePrice" type="xs:int"/>
+					<xs:element name="HouseToll">
+						<xs:complexType>
+							<xs:all>
+								<xs:element name="One" type="xs:int"/>
+								<xs:element name="Two" type="xs:int"/>
+								<xs:element name="Three" type="xs:int"/>
+							</xs:all>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="Country" type="Country"/>
+					<xs:element name="Owner" type="Player" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="HousesNumber" type="xs:int" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="Asset">
+		<xs:complexContent>
+			<xs:extension base="CellBase">
+				<xs:sequence>
+					<xs:element name="Group" type="Assets"/>
+					<xs:element name="GroupToll" type="xs:int"/>
+					<xs:element name="Owner" type="Player" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CellBase">
+		<xs:sequence>
+			<xs:element name="Price" type="xs:int" minOccurs="0"/>
+			<xs:element name="PassToll" type="xs:int" minOccurs="0"/>
+			<xs:element name="LandToll" type="xs:int" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="ID" type="xs:int" use="required"/>
+		<xs:attribute name="Name" type="xs:string" use="required"/>
+		<xs:attribute name="Type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="City"/>
+					<xs:enumeration value="Service"/>
+					<xs:enumeration value="Jail"/>
+					<xs:enumeration value="GotoJail"/>
+					<xs:enumeration value="Parking"/>
+					<xs:enumeration value="Chance"/>
+					<xs:enumeration value="Community Chest"/>
+					<xs:enumeration value="Go"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="Buyable" type="xs:boolean" use="required"/>
+		<xs:attribute name="Owned" type="xs:boolean" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="Player">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="OwnedCells">
+				<xs:complexType>
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="Cell" type="CellBase"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="OwnedCards">
+				<xs:complexType>
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="Card" type="BonusCard"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="Name" type="xs:string" use="required"/>
+		<xs:attribute name="Money" type="xs:int" use="required"/>
+		<xs:attribute name="BoardPosition" type="xs:int" use="required"/>
+		<xs:attribute name="IsInGame" type="xs:boolean" use="required"/>
+	</xs:complexType>
+	<xs:element name="CardsDeck">
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="BonusCard" type="BonusCard"/>
+			</xs:sequence>
+			<xs:attribute name="Type" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Community Chest"/>
+						<xs:enumeration value="Chance"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="BonusCard">
+		<xs:sequence>
+			<xs:element name="Message" type="xs:string"/>
+		</xs:sequence>
+		<xs:attribute name="ID" type="xs:int" use="required"/>
+		<xs:attribute name="Type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Money"/>
+					<xs:enumeration value="Jail Pass"/>
+					<xs:enumeration value="MoveTo"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="Amount" type="xs:int"/>
+		<xs:attribute name="Bank" type="xs:boolean"/>
+		<xs:attribute name="MoveTo">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Chance"/>
+					<xs:enumeration value="Community Chest"/>
+					<xs:enumeration value="Jail (Free Pass)"/>
+					<xs:enumeration value="Go"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="GetGoCash" type="xs:boolean"/>
+	</xs:complexType>
+	<xs:complexType name="Country">
+		<xs:complexContent>
+			<xs:extension base="Group">
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="City" type="CellBase"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="Group">
+		<xs:attribute name="Name" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="Assets">
+		<xs:complexContent>
+			<xs:extension base="Group">
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="Asset" type="CellBase"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>
