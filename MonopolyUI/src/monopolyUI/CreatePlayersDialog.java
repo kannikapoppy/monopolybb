@@ -42,6 +42,8 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 public class CreatePlayersDialog extends JDialog {
 
@@ -110,6 +112,19 @@ public class CreatePlayersDialog extends JDialog {
 			playerNameField.setColumns(10);
 			
 			playerTypeComboBox = new JComboBox();
+			playerTypeComboBox.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					if (playerTypeComboBox.getSelectedIndex() == 1)
+					{
+						playerNameField.setEnabled(false);
+						playerNameField.setText("");
+					}
+					else						
+					{
+						playerNameField.setEnabled(true);
+					}
+				}
+			});
 			playerTypeComboBox.setModel(new DefaultComboBoxModel(new String[] {"Human", "Machine"}));
 			GridBagConstraints gbc_playerTypeComboBox = new GridBagConstraints();
 			gbc_playerTypeComboBox.insets = new Insets(0, 0, 5, 5);
@@ -207,7 +222,7 @@ public class CreatePlayersDialog extends JDialog {
 		{
 			// Human
 			
-			if (playerNameField.getText().trim() == "")
+			if (playerNameField.getText().trim().compareTo("") == 0)
 			{
 				ShowUserNameEmptyError();
 				return;

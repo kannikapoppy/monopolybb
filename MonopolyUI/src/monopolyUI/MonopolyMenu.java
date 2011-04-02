@@ -15,14 +15,6 @@ public class MonopolyMenu extends JMenuBar
         JMenu fileMenu = new JMenu("File");
         this.add (fileMenu);
 
-        JMenuItem exitMenuItem = new JMenuItem(EXIT_STR);
-        fileMenu.add(exitMenuItem);
-        exitMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
-
         JMenuItem newGameMenu = new JMenuItem(NEW_GAME_STR);
         fileMenu.add(newGameMenu);
         newGameMenu.addActionListener(new ActionListener() {
@@ -37,6 +29,14 @@ public class MonopolyMenu extends JMenuBar
 					rootFrame.setVisible(true);
 				}
 				
+			}
+		});
+        
+        JMenuItem exitMenuItem = new JMenuItem(EXIT_STR);
+        fileMenu.add(exitMenuItem);
+        exitMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
 			}
 		});
     }
