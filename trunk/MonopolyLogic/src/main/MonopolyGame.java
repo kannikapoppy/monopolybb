@@ -187,6 +187,15 @@ public class MonopolyGame
 	}
 	
 	/**
+	 * 
+	 * @return Gets the game board
+	 */
+	public GameBoard getGameBoard()
+	{
+		return gameBoard;
+	}
+	
+	/**
 	 * switches the player to next one
 	 */
 	private void switchPlayer()
