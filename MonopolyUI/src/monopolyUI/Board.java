@@ -1,8 +1,11 @@
 package monopolyUI;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -113,13 +116,7 @@ public class Board extends JPanel {
 	}
 
     private JPanel createCellPanel(CellBase cell) {
-        JPanel panel = new JPanel(new BorderLayout()) ;
-        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED));
-        JLabel label = new JLabel(cell.getName());
-        label.setHorizontalAlignment(JLabel.CENTER);
-        label.setVerticalAlignment(JLabel.CENTER);
-        panel.add(label, BorderLayout.CENTER);
-        return panel;
+    	return new DisplayCell(cell);
     }
     
     private JPanel createInnerPanel(String text) {
