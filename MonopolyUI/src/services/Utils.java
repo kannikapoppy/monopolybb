@@ -61,6 +61,11 @@ public class Utils {
         }
         return new ImageIcon(image);
     }
+    
+    public static void ShowError(Component parentComponent, final String msg)
+	{
+		JOptionPane.showMessageDialog(parentComponent, msg); 
+	}
 
     public static void setNativeLookAndFeel() {
         try {

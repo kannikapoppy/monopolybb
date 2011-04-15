@@ -105,6 +105,8 @@ public class Player
     protected boolean isParking;
     @XmlAttribute(name = "auctionsPerformed", required = false)
     protected int auctionsPerformed;
+    @XmlAttribute(name = "playerColor", required = false)
+    protected PlayerColor playerColor;
     
     public boolean canPerformAuction()
     {
@@ -173,6 +175,14 @@ public class Player
 
 	public void setPlayerActions(PlayerActions playerActions) {
 		this.playerActions = playerActions;
+	}
+	
+	public PlayerColor getPlayerColor() {
+		return playerColor;
+	}
+	
+	public void setPlayerColor(PlayerColor newPlayerColor) {
+		playerColor = newPlayerColor;
 	}
 
 	/**

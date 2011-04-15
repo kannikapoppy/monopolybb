@@ -3,47 +3,32 @@ package monopolyUI;
 import javax.swing.JPanel;
 import java.awt.Frame;
 
-import javax.swing.AbstractCellEditor;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
 
 import javax.swing.SwingConstants;
 
 import java.awt.Component;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.swing.JSeparator;
 
 import services.*;
 import objectmodel.AutomaticPlayer;
 import objectmodel.Player;
+import objectmodel.PlayerColor;
+
 import java.awt.Font;
-import javax.swing.JTable;
-import javax.swing.border.Border;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
+import javax.swing.Box;
 
 public class CreatePlayersDialog extends JDialog {
 
@@ -51,12 +36,16 @@ public class CreatePlayersDialog extends JDialog {
 	private JPanel jContentPane = null;
 	private JTextField playerNameField;
 	private JComboBox playerTypeComboBox;
-	private JTable table;
+	private Box playersBox;
+	final private JComboBox playerColorComboBox = new JComboBox();;
+	final private JButton btnAddPlayer = new JButton("Add Player");;
 	
 	private List<Player> playerList = new ArrayList<Player>();
 	private boolean exitedWell = false;
 	
-	private static final String USER_NAME_EMPTY_ERROR_MSG = "User Name Cannot Be Empty"; 
+	private static final String USER_NAME_EMPTY_ERROR_MSG = "User Name Cannot Be Empty";
+	private static final String USER_NAME_ALREADY_EXISTS_ERROR_MSG = "User Name Already Exists";
+	private static final String NOT_ENOUGH_PLAYERS_ERROR_MSG = "Number Of Players Must Be At Least 2. Please Add Players And Try Again To Start.";
 	
 	
 	
@@ -75,8 +64,9 @@ public class CreatePlayersDialog extends JDialog {
 	 * @return void
 	 */
 	private void initialize() {
-		this.setSize(423, 441);
+		this.setSize(423, 400);
 		this.setContentPane(getJContentPane());
+		this.setResizable(false);
 	}
 
 	/**
@@ -87,125 +77,146 @@ public class CreatePlayersDialog extends JDialog {
 	private JPanel getJContentPane() {
 		if (jContentPane == null) {
 			jContentPane = new JPanel();
-			GridBagLayout gbl_jContentPane = new GridBagLayout();
-			gbl_jContentPane.columnWidths = new int[]{67, 86, 64, 78, 81, 0};
-			gbl_jContentPane.rowHeights = new int[]{57, 0, 0, 41, -7, 65, 14, 0};
-			gbl_jContentPane.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-			gbl_jContentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-			jContentPane.setLayout(gbl_jContentPane);
+			jContentPane.setLayout(null);
 			
 			JLabel lblPlayername = new JLabel("Player Name :");
+			lblPlayername.setBounds(4, 11, 122, 14);
 			lblPlayername.setVerticalAlignment(SwingConstants.TOP);
-			GridBagConstraints gbc_lblPlayername = new GridBagConstraints();
-			gbc_lblPlayername.insets = new Insets(0, 0, 5, 5);
-			gbc_lblPlayername.gridx = 0;
-			gbc_lblPlayername.gridy = 0;
-			jContentPane.add(lblPlayername, gbc_lblPlayername);
+			jContentPane.add(lblPlayername);
 			
 			playerNameField = new JTextField();
-			GridBagConstraints gbc_playerNameField = new GridBagConstraints();
-			gbc_playerNameField.anchor = GridBagConstraints.WEST;
-			gbc_playerNameField.insets = new Insets(0, 0, 5, 5);
-			gbc_playerNameField.gridx = 1;
-			gbc_playerNameField.gridy = 0;
-			jContentPane.add(playerNameField, gbc_playerNameField);
+			playerNameField.setBounds(150, 8, 130, 20);
+			jContentPane.add(playerNameField);
 			playerNameField.setColumns(10);
 			
 			playerTypeComboBox = new JComboBox();
-			playerTypeComboBox.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					if (playerTypeComboBox.getSelectedIndex() == 1)
-					{
-						playerNameField.setEnabled(false);
-						playerNameField.setText("");
-					}
-					else						
-					{
-						playerNameField.setEnabled(true);
-					}
-				}
-			});
+			playerTypeComboBox.setBounds(150, 39, 130, 18);
 			playerTypeComboBox.setModel(new DefaultComboBoxModel(new String[] {"Human", "Machine"}));
-			GridBagConstraints gbc_playerTypeComboBox = new GridBagConstraints();
-			gbc_playerTypeComboBox.insets = new Insets(0, 0, 5, 5);
-			gbc_playerTypeComboBox.gridx = 2;
-			gbc_playerTypeComboBox.gridy = 0;
-			jContentPane.add(playerTypeComboBox, gbc_playerTypeComboBox);
-			
-			JButton btnAdd = new JButton("");
-			btnAdd.setVerticalAlignment(SwingConstants.TOP);
-			btnAdd.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					AddPlayer();
-				}
-			});
-			btnAdd.setIcon(new ImageIcon(CreatePlayersDialog.class.getResource("/Images/add32.png")));
-			GridBagConstraints gbc_btnAdd = new GridBagConstraints();
-			gbc_btnAdd.insets = new Insets(0, 0, 5, 0);
-			gbc_btnAdd.gridx = 4;
-			gbc_btnAdd.gridy = 0;
-			jContentPane.add(btnAdd, gbc_btnAdd);
+			jContentPane.add(playerTypeComboBox);
 			
 			JSeparator separator = new JSeparator();
-			GridBagConstraints gbc_separator = new GridBagConstraints();
-			gbc_separator.gridwidth = 5;
-			gbc_separator.insets = new Insets(0, 0, 5, 0);
-			gbc_separator.gridx = 0;
-			gbc_separator.gridy = 1;
-			jContentPane.add(separator, gbc_separator);
+			separator.setBounds(207, 57, 1, 1);
+			jContentPane.add(separator);
 			
 			JLabel lblPlayers = new JLabel("Players");
+			lblPlayers.setBounds(4, 135, 66, 22);
 			lblPlayers.setFont(new Font("Tahoma", Font.BOLD, 18));
-			GridBagConstraints gbc_lblPlayers = new GridBagConstraints();
-			gbc_lblPlayers.insets = new Insets(0, 0, 5, 5);
-			gbc_lblPlayers.gridx = 0;
-			gbc_lblPlayers.gridy = 2;
-			jContentPane.add(lblPlayers, gbc_lblPlayers);
-			
-			table = new JTable();
-			table.setModel(new DefaultTableModel(
-				new Object[][] {
-				},
-				new String[] {
-					"Player Name", "Player Type", ""
-				}
-			) {
-				Class[] columnTypes = new Class[] {
-					String.class, Object.class, Object.class
-				};
-				public Class getColumnClass(int columnIndex) {
-					return columnTypes[columnIndex];
-				}
-				boolean[] columnEditables = new boolean[] {
-					true, true, false
-				};
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
-				}
-			});
-			table.getColumnModel().getColumn(2).setResizable(false);
-			GridBagConstraints gbc_table = new GridBagConstraints();
-			gbc_table.gridheight = 6;
-			gbc_table.gridwidth = 3;
-			gbc_table.insets = new Insets(0, 0, 0, 5);
-			gbc_table.fill = GridBagConstraints.BOTH;
-			gbc_table.gridx = 0;
-			gbc_table.gridy = 3;
-			jContentPane.add(table, gbc_table);
+			jContentPane.add(lblPlayers);
 			
 			JButton btnStartTheGame = new JButton("Start The Game");
+			btnStartTheGame.setBounds(141, 334, 139, 23);
 			btnStartTheGame.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
+					if (playerList.size() < 2)
+					{
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() 
+						    { 
+								ShowNotEnoughPlayersError();
+						    }
+						});	
+						return;
+					}
 					exitedWell = true;
 					dispose();
 				}
 			});
-			GridBagConstraints gbc_btnStartTheGame = new GridBagConstraints();
-			gbc_btnStartTheGame.gridx = 4;
-			gbc_btnStartTheGame.gridy = 8;
-			jContentPane.add(btnStartTheGame, gbc_btnStartTheGame);
+			jContentPane.add(btnStartTheGame);
+			
+			JLabel lblType = new JLabel("Type :");
+			lblType.setBounds(4, 41, 122, 14);
+			jContentPane.add(lblType);
+			
+			JLabel lblColor = new JLabel("Color :");
+			lblColor.setBounds(4, 68, 122, 14);
+			jContentPane.add(lblColor);
+			
+			playerColorComboBox.setModel(new DefaultComboBoxModel(PlayerColor.values()));
+			playerColorComboBox.setBounds(150, 65, 130, 20);
+			jContentPane.add(playerColorComboBox );
+			
+			JSeparator separator_1 = new JSeparator();
+			separator_1.setBounds(4, 127, 401, 14);
+			jContentPane.add(separator_1);
+			
+			btnAddPlayer.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					SwingUtilities.invokeLater(new Runnable() {
+					    public void run() 
+					    { 
+					    	if (playerNameField.getText().trim().compareTo("") == 0)
+							{
+								ShowUserNameEmptyError();
+								return;
+							}
+					    	
+					    	if (IsNameAlreadyExists(playerNameField.getText().trim()))
+					    	{
+					    		ShowUserNameAlreadyExistsError();
+								return;
+					    	}
+					    	
+							Player newPlayer;
+							
+							if (playerTypeComboBox.getSelectedIndex() == 0)
+							{
+								newPlayer = new Player();
+							}
+							else
+							{
+								newPlayer = new AutomaticPlayer();
+							}
+							
+							newPlayer.setName(playerNameField.getText().trim());
+							newPlayer.setPlayerColor((PlayerColor)playerColorComboBox.getSelectedItem());
+							newPlayer.setInputObject(new UIPlayerInput(newPlayer));
+							playerList.add(newPlayer);
+							AddPlayerToVisualList(newPlayer);
+							
+							playerNameField.setText("");
+							playerColorComboBox.removeItem(playerColorComboBox.getSelectedItem());
+							
+							if (playerList.size() == 6)
+							{
+								playerNameField.setEnabled(false);
+								btnAddPlayer.setEnabled(false);
+								playerColorComboBox.setEnabled(false);
+								playerTypeComboBox.setEnabled(false);
+							}
+							else
+							{
+								playerTypeComboBox.setSelectedIndex(0);
+								playerColorComboBox.setSelectedIndex(0);		
+							}
+					    }
+					});
+				}
+			});
+			btnAddPlayer.setBounds(4, 93, 122, 23);
+			jContentPane.add(btnAddPlayer);
+			
+			playersBox = Box.createVerticalBox();
+			playersBox.setBounds(4, 162, 401, 161);
+			jContentPane.add(playersBox);
+
+			JSeparator separator_2 = new JSeparator();
+			separator_2.setBounds(4, 323, 401, 22);
+			jContentPane.add(separator_2);
 		}
 		return jContentPane;
+	}
+	
+	private boolean IsNameAlreadyExists(String newPlayerName) 
+	{
+		for (Player player : playerList)
+		{
+			if (player.getName().compareTo(newPlayerName) == 0)
+			{
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public List<Player> GetPlayers()
@@ -216,45 +227,76 @@ public class CreatePlayersDialog extends JDialog {
 			return playerList;
 	}
 	
-	private void AddPlayer() 
+	private void ShowNotEnoughPlayersError() 
 	{
-		if (playerTypeComboBox.getSelectedIndex() == 0)
-		{
-			// Human
-			
-			if (playerNameField.getText().trim().compareTo("") == 0)
-			{
-				ShowUserNameEmptyError();
-				return;
-			}
-			
-			Player humanPlayer = new Player();
-			humanPlayer.setName(playerNameField.getText().trim());
-			humanPlayer.setInputObject(new UIPlayerInput(humanPlayer));
-			playerList.add(humanPlayer);
-			
-			
-		}
-		else
-		{
-			// Machine
-			Player autoPlayer = new AutomaticPlayer();
-			
-			UUID uuid = UUID.randomUUID();
-			String randomUUIDString = uuid.toString();
-			
-			autoPlayer.setName("Computer" + randomUUIDString);
-			playerList.add(autoPlayer);
-		}
+		Utils.ShowError(this, NOT_ENOUGH_PLAYERS_ERROR_MSG);
 	}
 
 	private void ShowUserNameEmptyError() 
 	{
-		ShowError(USER_NAME_EMPTY_ERROR_MSG);
+		Utils.ShowError(this, USER_NAME_EMPTY_ERROR_MSG);
+	}
+	
+	private void ShowUserNameAlreadyExistsError() 
+	{
+		Utils.ShowError(this, USER_NAME_ALREADY_EXISTS_ERROR_MSG);
 	}
 
-	private void ShowError(String msg) 
+	private void AddPlayerToVisualList(Player player)
 	{
-		JOptionPane.showMessageDialog(this, msg);
+		final Player newPlayer = player;
+		final Box horizontalBox = Box.createHorizontalBox();
+		
+		playersBox.add(horizontalBox);
+		
+		JLabel lblNewLabel_1 = new JLabel(newPlayer.getName());
+		horizontalBox.add(lblNewLabel_1);
+		
+		Component horizontalGlue = Box.createHorizontalGlue();
+		horizontalBox.add(horizontalGlue);
+		
+		JLabel lblNewLabel = new JLabel(newPlayer.getPlayerColor().toString());
+		horizontalBox.add(lblNewLabel);
+		
+		Component horizontalGlue_1 = Box.createHorizontalGlue();
+		horizontalBox.add(horizontalGlue_1);
+		
+		String playerType = "Human";
+		if (newPlayer instanceof AutomaticPlayer)
+		{
+			playerType = "Machine";
+		}
+			
+		JLabel lblType_1 = new JLabel(playerType);
+		horizontalBox.add(lblType_1);
+		
+		Component horizontalGlue_2 = Box.createHorizontalGlue();
+		horizontalBox.add(horizontalGlue_2);
+		
+		JButton btnRemovePlayer = new JButton("Remove Player");
+		btnRemovePlayer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				playerList.remove(newPlayer);
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() 
+				    { 
+						playerColorComboBox.addItem(newPlayer.getPlayerColor());
+						playersBox.remove(horizontalBox);
+						playersBox.validate();
+						playersBox.repaint();
+						
+						btnAddPlayer.setEnabled(true);
+						playerNameField.setEnabled(true);
+						playerColorComboBox.setEnabled(true);
+						playerTypeComboBox.setEnabled(true);
+				    }
+				});	
+			}
+		});
+		
+		horizontalBox.add(btnRemovePlayer);
+		
+		playersBox.validate();
+		playersBox.repaint();
 	}
 }
