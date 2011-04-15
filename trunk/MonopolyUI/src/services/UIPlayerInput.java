@@ -76,23 +76,5 @@ public class UIPlayerInput extends PlayerInput
 	public List<CellBase> getAuctionItem()
 	{
 		return null;
-	}
-	
-	/**
-	 * Reads an integer from the console
-	 * @return the integer read from the console
-	 */
-	private int ReadIntFromConsole()
-	{
-		return 0;
-	}
-	
-	/**
-	 * Gets a Yes/No answer
-	 * @return a boolean translation for (Y/N)
-	 */
-	private boolean GetYesNoAnswer()
-	{
-		return true;
-	}		
+	}	
 }

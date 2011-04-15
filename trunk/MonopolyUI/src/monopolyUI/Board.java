@@ -1,11 +1,8 @@
 package monopolyUI;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,31 +47,52 @@ public class Board extends JPanel {
         });
     }
 
-    public Board() {
+    public Board(List<Player> players) throws Exception {
 		super();
-		PlayerManager playerManager = new PlayerManager();
 		// Create the logic
 		monopolyGame = new MonopolyGame();
 		// Create the event Handler & register to the events 
 		EventHandler eventHandler = new EventHandler();
 		eventHandler.registerEvents(monopolyGame);
 		
-		monopolyGame.initGame(playerManager.CreatePlayers());
+		if (!monopolyGame.initGame(players))
+		{
+			throw new Exception("Error Initializing");
+		}
 		
-		
-        initUI();
+		initUI(players);
 	}
+    public void StartGame() throws Exception
+    {
+    	try
+    	{
+    		if (!monopolyGame.startGame(false))
+    		{
+    			throw new Exception("Unable To Start Game");
+    		}
+    	}
+    	catch (Exception ex)
+    	{
+    		throw ex;
+    	}
+    }
 
-    private void initUI() {
-        //init layout
+    private void initUI(List<Player> players) {
+        // init layout
         this.setLayout(new GridBagLayout());
 
-        List<JComponent> components = new LinkedList<JComponent>();
+        List<DisplayCell> components = new LinkedList<DisplayCell>();
         for (int i=0 ; i < LINE_SIZE * 4 ; i++) {
-            components.add(createCellPanel(monopolyGame.getGameBoard().getCellBase().get(i)));
+        	DisplayCell cell = createCellPanel(monopolyGame.getGameBoard().getCellBase().get(i));
+        	components.add(cell);
         }
+        
+    	for (Player player : players)
+    	{
+    		components.get(0).AddPlayerToPlayersList(player);
+    	}
 
-        Iterator<JComponent> componentIterator = components.iterator();
+        Iterator<DisplayCell> componentIterator = components.iterator();
 
         //Add Panels for Each of the four sides
         for (int sideIndex = 0; sideIndex < 4; sideIndex++) {
@@ -103,7 +121,7 @@ public class Board extends JPanel {
         }
 
         // Main Inner Area Notice Starts at (1,1) and takes up 11x11
-        JPanel innerPanel = createInnerPanel("CENTER");
+        JPanel innerPanel = new CenterBoard(players);//createInnerPanel("CENTER");
         this.add(innerPanel,
             new GridBagConstraints(1,
                     1,
@@ -115,11 +133,11 @@ public class Board extends JPanel {
                     new Insets(0, 0, 0, 0), 0, 0));
 	}
 
-    private JPanel createCellPanel(CellBase cell) {
+    private DisplayCell createCellPanel(CellBase cell) {
     	return new DisplayCell(cell);
     }
     
-    private JPanel createInnerPanel(String text) {
+    /*private JPanel createInnerPanel(String text) {
         JPanel panel = new JPanel(new BorderLayout()) ;
         panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED));
         JLabel label = new JLabel(text);
@@ -127,7 +145,7 @@ public class Board extends JPanel {
         label.setVerticalAlignment(JLabel.CENTER);
         panel.add(label, BorderLayout.CENTER);
         return panel;
-    }
+    }*/
 
     private void addComponent(int gridX, int gridY, JComponent component) {
         GridBagConstraints c = new GridBagConstraints();
