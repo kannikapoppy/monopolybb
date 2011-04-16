@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -16,6 +17,7 @@ import objectmodel.Asset;
 import objectmodel.CellBase;
 import objectmodel.City;
 import objectmodel.Player;
+import objectmodel.PlayerColor;
 
 import services.Utils;
 
@@ -25,6 +27,8 @@ public class DisplayCell extends JPanel {
 	private Image m_bgImage = null;
 	private Box playersBox = Box.createHorizontalBox();
 	private Box secondaryPlayersBox;
+	private JLabel assetOwnerLbl;
+	private Box housesBox = null;
 
 	/**
 	 * This is the default constructor
@@ -43,23 +47,16 @@ public class DisplayCell extends JPanel {
 			assetNameLbl.setIcon(Utils.getImageIcon(city.getCountry().getName() + ".png"));
 			add(assetNameLbl);
 			
-			String ownerStr;
-			if (city.getOwner() == null)
-				ownerStr = "No Owner";
-			else
-				ownerStr = city.getOwner().getName();
-			
-			JLabel assetOwnerLbl = new JLabel("Owner: " + ownerStr);
-			add(assetOwnerLbl);
+			assetOwnerLbl = new JLabel();
+    		add(assetOwnerLbl);
+			SetOwner(city.getOwner());
 
-			Box housesBox = Box.createHorizontalBox();
+			housesBox = Box.createHorizontalBox();
 			
-			int numberOfHouses = 2;//city.getHousesNumber();
+			int numberOfHouses = city.getHousesNumber();
 			for (int i=0;i<numberOfHouses;i++)
 			{
-				JLabel houseLabel = new JLabel();
-				houseLabel.setIcon(Utils.getImageIcon("house.png"));
-				housesBox.add(houseLabel);
+				BuildHouse();
 			}
 			
 			add(housesBox);        	
@@ -74,15 +71,10 @@ public class DisplayCell extends JPanel {
     		assetNameLbl.setIcon(Utils.getImageIcon(service.getGroup().getName() + ".png"));
     		add(assetNameLbl);
     		
-    		String ownerStr;
-    		if (service.getOwner() == null)
-    			ownerStr = "No Owner";
-    		else
-    			ownerStr = service.getOwner().getName();
-    		
-    		JLabel assetOwnerLbl = new JLabel("Owner: " + ownerStr);
+    		assetOwnerLbl = new JLabel();
     		add(assetOwnerLbl);
-
+			SetOwner(service.getOwner());
+    		
     		JLabel assetTypeLbl = new JLabel("Type: " + service.getGroup().getName());
     		add(assetTypeLbl);
         }
@@ -106,6 +98,48 @@ public class DisplayCell extends JPanel {
 		initialize();
 	}
 	
+	public void BuildHouse()
+	{
+		JLabel houseLabel = new JLabel();
+		houseLabel.setIcon(Utils.getImageIcon("house.png"));
+		housesBox.add(houseLabel);
+	}
+	
+	public void SetOwner(Player p)
+	{
+		String ownerStr;
+		if (p == null)
+			ownerStr = "No Owner";
+		else
+		{
+			ownerStr = p.getName();
+			assetOwnerLbl.setForeground(PlayerColorToSystemColor(p.getPlayerColor()));
+		}
+		
+		assetOwnerLbl.setText("Owner: " + ownerStr);
+	}
+	
+	private Color PlayerColorToSystemColor(PlayerColor playerColor)
+	{
+		switch (playerColor)
+		{
+			case Blue:
+				return Color.BLUE;
+			case Green:
+				return Color.GREEN;
+			case Orange:
+				return Color.ORANGE;
+			case Red:
+				return Color.RED;
+			case White:
+				return Color.WHITE;
+			case Yellow:
+				return Color.YELLOW;
+			default:
+				return Color.BLACK;
+		}
+	}
+	
 	public void AddPlayerToPlayersList(Player p)
 	{
 		internalAddPlayer(p, playersBox);
@@ -123,6 +157,9 @@ public class DisplayCell extends JPanel {
 		userLbl.setIcon(Utils.getImageIcon(colorImageName));
 		userLbl.setName(p.getName());
 		box.add(userLbl);
+		
+		box.validate();
+		box.repaint();
 	}
 	
 	public void RemovePlayerFromPlayersList(Player p)
@@ -145,17 +182,20 @@ public class DisplayCell extends JPanel {
 				break;
 			}
 		}
+		
+		box.validate();
+		box.repaint();
 	}
 	
 	private void clearComponents()
 	{
 	    for (Component component : getComponents())
 	    {
-	    	// do not remove the players panel from the cell layout
-	    	//if (component != m_cellPlayersPanel)
-	    	//{
+	    	//do not remove the players panel from the cell layout
+	    	if (component != playersBox && component != secondaryPlayersBox)
+	    	{
 	    	  remove(component);
-	    	//}
+	    	}
 	    }
 	}
 	
@@ -164,6 +204,10 @@ public class DisplayCell extends JPanel {
 	    if (m_bgImage !=null) 
 	    {
 	    	g.drawImage(m_bgImage, 0, 0, getWidth(), getHeight(), this);
+	    }
+	    else
+	    {
+	    	super.paintComponent(g);
 	    }
 	}
 

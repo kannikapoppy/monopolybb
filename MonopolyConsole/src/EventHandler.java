@@ -1,6 +1,6 @@
+import GameStateChangedEvent.GameStateChangedEvent;
 import main.GameStates;
 import main.MonopolyGame;
-import main.StateManager.GameStateChangedEvent;
 import main.StateManager.GameStateChangedEventListener;
 
 /**

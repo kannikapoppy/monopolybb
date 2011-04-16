@@ -195,14 +195,18 @@ public class City
     				if (singleHousePrice < landedPlayer.getMoney() && landedPlayer.getInputObject().buildHouse(this))
     				{
     					landedPlayer.getPlayerActions().payMoneyToBank(singleHousePrice);
-    					StateManager.getStateManager().setCurrentState(this, GameStates.PlayerBuilding, landedPlayer.getName() + " is building a house in " + name);
+    					StateManager.getStateManager().setCurrentStateToPlayerBuilding(this, 
+    							landedPlayer.getName() + " is building a house in " + name,
+    							landedPlayer, this);
     					housesNumber ++;
     				}
     			}
     			// we don't own the country or the city already has 3 houses
     			else
     			{
-    				StateManager.getStateManager().setCurrentState(this, GameStates.PlayerLanded, landedPlayer.getName() + " already owns the city. Houses number: " + housesNumber);
+    				StateManager.getStateManager().setCurrentStateToPlayerLanded(this, 
+    						landedPlayer.getName() + " already owns the city. Houses number: " + housesNumber,
+    						landedPlayer, this);
     			}
     		}
     		// crap! someone else owns the city!
@@ -225,8 +229,10 @@ public class City
     				break;
     			}
     			
-    			StateManager.getStateManager().setCurrentState(this, GameStates.PlayerPaying, landedPlayer.getName() + " has to pay " + payToll + " to " + owner.getName());
     			landedPlayer.getPlayerActions().payToPlayer(owner, payToll);
+    			StateManager.getStateManager().setCurrentStateToPlayerPaying(this, 
+    					landedPlayer.getName() + " has to pay " + payToll + " to " + owner.getName(),
+    					landedPlayer, payToll);
     		}
     	}
     	// no one owns the city
@@ -243,13 +249,17 @@ public class City
     				landedPlayer.getOwnedCells().getCell().add(this);
     				this.owner = landedPlayer;
     				owned = true;
-    				StateManager.getStateManager().setCurrentState(this, GameStates.PlayerBuying, landedPlayer.getName() + " has just bought " + name);
+    				StateManager.getStateManager().setCurrentStateToPlayerBuying(this, 
+    						landedPlayer.getName() + " has just bought " + name,
+    						landedPlayer, this);
     			}
     		}
     		// not enough $$$
     		else
     		{
-    			StateManager.getStateManager().setCurrentState(this, GameStates.PlayerLanded, landedPlayer.getName() + " doesn't have enough money for " + name);
+    			StateManager.getStateManager().setCurrentStateToPlayerLanded(this, 
+    					landedPlayer.getName() + " doesn't have enough money for " + name,
+    					landedPlayer, this);
     		}
     	}
     }

@@ -130,7 +130,8 @@ public class Asset
     		if (this.owner == landedPlayer)
     		{
     			// we own it - nothing to do!
-    			StateManager.getStateManager().setCurrentState(this, GameStates.PlayerLanded, landedPlayer.getName() + " already owns the asset");
+    			StateManager.getStateManager().setCurrentStateToPlayerLanded(this, 
+    					landedPlayer.getName() + " already owns the asset", landedPlayer, this);
     		}
     		// crap! someone else owns the asset!
     		else
@@ -142,8 +143,10 @@ public class Asset
     				payToll = groupToll;
     			}
     					
-    			StateManager.getStateManager().setCurrentState(this, GameStates.PlayerPaying, landedPlayer.getName() + " has to pay " + payToll + " to " + owner.getName());
     			landedPlayer.getPlayerActions().payToPlayer(owner, payToll);
+    			StateManager.getStateManager().setCurrentStateToPlayerPaying(this, 
+    					landedPlayer.getName() + " has to pay " + payToll + " to " + owner.getName(),
+    					landedPlayer, payToll);
     		}
     	}
     	// no one owns the asset
@@ -160,13 +163,16 @@ public class Asset
     				landedPlayer.getOwnedCells().getCell().add(this);
     				this.owner = landedPlayer;
     				owned = true;
-    				StateManager.getStateManager().setCurrentState(this, GameStates.PlayerBuying, landedPlayer.getName() + " has just bought " + name);
+    				StateManager.getStateManager().setCurrentStateToPlayerBuying(this, 
+    						landedPlayer.getName() + " has just bought " + name, landedPlayer, this);
     			}
     		}
     		// not enough $$$
     		else
     		{
-    			StateManager.getStateManager().setCurrentState(this, GameStates.PlayerLanded, landedPlayer.getName() + " doesn't have enough money for " + name);
+    			StateManager.getStateManager().setCurrentStateToPlayerLanded(this, 
+    					landedPlayer.getName() + " doesn't have enough money for " + name,
+    					landedPlayer, this);
     		}
     	}
     }

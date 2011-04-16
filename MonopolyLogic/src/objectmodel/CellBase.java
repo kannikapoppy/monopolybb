@@ -15,6 +15,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
+import objectmodel.Dice.DiceThrowResult;
+
 import main.GameStates;
 import main.StateManager;
 
@@ -272,7 +274,7 @@ public class CellBase {
     /**
      * Checks if the player should move from this cell
      */
-    public boolean shouldMove(Player thePlayer, Dice gameDice)
+    public boolean shouldMove(Player thePlayer, DiceThrowResult throwResult)
     {
     	if (type.equals("Jail") && thePlayer.isInJail())
     	{
@@ -285,16 +287,18 @@ public class CellBase {
     				thePlayer.getOwnedCards().getCard().remove(i);
     				thePlayer.getPlayerActions().returnCardToDeck(card);
     				hasPass = true;
-    				StateManager.getStateManager().setCurrentState(this, GameStates.PlayerMoving, thePlayer.getName() + " is walking out of jail with a jail pass");
     				break;
     			}
     		}
-    		if (!gameDice.isDouble() && !hasPass)
+    		if (!throwResult.isDouble() && !hasPass)
     		{
     			return false;
     		}
     		
     		thePlayer.setInJail(false);
+    		StateManager.getStateManager().setCurrentStateToPlayerGettingOutOfJail(this, 
+					thePlayer.getName() + " is walking out of jail with a jail pass",
+					thePlayer);
     	}
     	
     	return true;
@@ -307,12 +311,16 @@ public class CellBase {
     		if (landToll > 0)
     		{
     			landedPlayer.getPlayerActions().payMoneyToBank(landToll);
-    			StateManager.getStateManager().setCurrentState(this, GameStates.PlayerPaying, landedPlayer.getName() + " is paying " + landToll + " to the bank");
+    			StateManager.getStateManager().setCurrentStateToPlayerPaying(this, 
+    					landedPlayer.getName() + " is paying " + landToll + " to the bank",
+    					landedPlayer, landToll);
     		}
     		else
     		{
     			landedPlayer.getPlayerActions().getMoneyFromBank(-landToll);
-    			StateManager.getStateManager().setCurrentState(this, GameStates.PlayerGotPaid, landedPlayer.getName() + " got " + -landToll + " from the bank");
+    			StateManager.getStateManager().setCurrentStateToPlayerGotPaid(this, 
+    					landedPlayer.getName() + " got " + -landToll + " from the bank",
+    					landedPlayer, -landToll);
     		}
     	}
     	
@@ -326,14 +334,12 @@ public class CellBase {
     	}
     	else if (type.equals("Parking"))
     	{
-    		StateManager.getStateManager().setCurrentState(this, GameStates.PlayerMoving, landedPlayer.getName() + " is parking for a turn");
     		landedPlayer.isParking = true;
     	}
     	else if (type.equals("GotoJail"))
     	{
-    		StateManager.getStateManager().setCurrentState(this, GameStates.PlayerMoving, landedPlayer.getName() + " is going to jail");
     		landedPlayer.isInJail = true;
-    		landedPlayer.getPlayerActions().moveToCell("Jail (Free Pass)", false);
+    		CellBase destination = landedPlayer.getPlayerActions().moveToCell("Jail (Free Pass)", false);    		
     	}
     }
     

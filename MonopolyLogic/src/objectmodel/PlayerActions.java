@@ -58,7 +58,7 @@ public abstract class PlayerActions
 	 * @param cellName - the specific cell's name
 	 * @param getRoadToll - whether to collect/pay toll on the way to that cell
 	 */
-	public abstract void moveToCell(String cellName, boolean getRoadToll);
+	public abstract CellBase moveToCell(String cellName, boolean getRoadToll);
 	/**
 	 * Draw a chance card
 	 */
@@ -78,5 +78,5 @@ public abstract class PlayerActions
 	 * @param sellingItems - the items to be moved to the other player
 	 * @param auctionSuggestions - the items & money this player gets
 	 */
-	public abstract void performAuctionExchange(Player buyer, List<CellBase> sellingItems, AuctionBid auctionSuggestions);
+	//public abstract void performAuctionExchange(Player buyer, List<CellBase> sellingItems, AuctionBid auctionSuggestions);
 }
