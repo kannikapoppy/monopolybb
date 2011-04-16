@@ -161,6 +161,7 @@ public class CreatePlayersDialog extends JDialog {
 							if (playerTypeComboBox.getSelectedIndex() == 0)
 							{
 								newPlayer = new Player();
+								newPlayer.setInputObject(new UIPlayerInput(newPlayer));
 							}
 							else
 							{
@@ -169,7 +170,6 @@ public class CreatePlayersDialog extends JDialog {
 							
 							newPlayer.setName(playerNameField.getText().trim());
 							newPlayer.setPlayerColor((PlayerColor)playerColorComboBox.getSelectedItem());
-							newPlayer.setInputObject(new UIPlayerInput(newPlayer));
 							playerList.add(newPlayer);
 							AddPlayerToVisualList(newPlayer);
 							

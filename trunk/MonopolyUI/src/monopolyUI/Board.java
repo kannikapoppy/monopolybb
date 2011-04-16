@@ -3,6 +3,8 @@ package monopolyUI;
 import javax.swing.*;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,15 +12,18 @@ import java.util.List;
 import main.*;
 import services.*;
 import objectmodel.*;
+import objectmodel.Dice.DiceThrowResult;
 
 public class Board extends JPanel {
 
 	private static final int LINE_SIZE = 9;
+	private CenterBoard innerBoard = null;
 	
 	/**
 	 * The game board representation
 	 */
 	private MonopolyGame monopolyGame;
+	private Hashtable<CellBase, DisplayCell> cellBaseToDisplayCell = new Hashtable<CellBase, DisplayCell> ();
 
 	public static void main(String[] args) {
       //all swing code runs in the EDT so we need to initialize the main container (JFrame) to run inside of the EDT as well
@@ -52,7 +57,7 @@ public class Board extends JPanel {
 		// Create the logic
 		monopolyGame = new MonopolyGame();
 		// Create the event Handler & register to the events 
-		EventHandler eventHandler = new EventHandler();
+		EventHandler eventHandler = new EventHandler(this);
 		eventHandler.registerEvents(monopolyGame);
 		
 		if (!monopolyGame.initGame(players))
@@ -62,6 +67,7 @@ public class Board extends JPanel {
 		
 		initUI(players);
 	}
+    
     public void StartGame() throws Exception
     {
     	try
@@ -83,7 +89,9 @@ public class Board extends JPanel {
 
         List<DisplayCell> components = new LinkedList<DisplayCell>();
         for (int i=0 ; i < LINE_SIZE * 4 ; i++) {
-        	DisplayCell cell = createCellPanel(monopolyGame.getGameBoard().getCellBase().get(i));
+        	CellBase logicCell = monopolyGame.getGameBoard().getCellBase().get(i);
+        	DisplayCell cell = createCellPanel(logicCell);
+        	cellBaseToDisplayCell.put(logicCell, cell);
         	components.add(cell);
         }
         
@@ -121,8 +129,8 @@ public class Board extends JPanel {
         }
 
         // Main Inner Area Notice Starts at (1,1) and takes up 11x11
-        JPanel innerPanel = new CenterBoard(players);//createInnerPanel("CENTER");
-        this.add(innerPanel,
+        innerBoard = new CenterBoard(players);
+        this.add(innerBoard,
             new GridBagConstraints(1,
                     1,
                     6,
@@ -159,4 +167,110 @@ public class Board extends JPanel {
         c.ipady = 3;
         this.add(component, c);
     }
+
+    public void MovePlayer(final Player player, final CellBase origin, final CellBase destination)
+    {
+    	try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() 
+			    { 
+					DisplayCell originDisplayCell = cellBaseToDisplayCell.get(origin);
+			    	originDisplayCell.RemovePlayerFromPlayersList(player);
+			    	
+			    	DisplayCell destinationDisplayCell = cellBaseToDisplayCell.get(destination);
+			    	if (destination.getType().compareTo("Jail") == 0 &&
+			    			player.isInJail())
+			    	{
+			    		destinationDisplayCell.AddPlayerToSecondaryPlayersList(player);
+			    	}
+			    	else
+			    	{
+			    		destinationDisplayCell.AddPlayerToPlayersList(player);
+			    	}
+			    }
+			});
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+    }
+
+    public void GetPlayerOutOfJail(final Player player)
+    {
+    	try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() 
+			    { 
+					CellBase prisonCell = monopolyGame.getGameBoard().getCellBase().get(player.getBoardPosition());
+					
+					DisplayCell prisonDisplayCell = cellBaseToDisplayCell.get(prisonCell);
+					prisonDisplayCell.RemovePlayerFromSecondaryPlayersList(player);
+					prisonDisplayCell.AddPlayerToPlayersList(player);
+			    }
+			});
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+    }
+    
+    public void SimulateDiceThrow(DiceThrowResult diceThrow)
+	{
+    	innerBoard.SimulateDiceThrow(diceThrow);
+	}
+    
+    public void SetCellOwner(CellBase cell, Player owner)
+    {
+    	DisplayCell cellDiaplsyCell = cellBaseToDisplayCell.get(cell);
+    	cellDiaplsyCell.SetOwner(owner);
+    }
+    
+    public void BuildHouse(final City city)
+    {
+    	SwingUtilities.invokeLater(new Runnable() {
+			public void run() 
+			{
+		    	DisplayCell cellDiaplsyCell = cellBaseToDisplayCell.get(city);
+		    	cellDiaplsyCell.BuildHouse();
+		    	cellDiaplsyCell.validate();
+		    	cellDiaplsyCell.repaint();
+			}
+    	});
+    }
+
+    public void UpdateBalance(Player p)
+    {
+    	innerBoard.UpdateBalance(p);
+    }
+    
+    public void UpdatePlayerLost(final Player p)
+    {
+    	try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() 
+			    { 
+					innerBoard.MarkPlayerAsLost(p);
+			    	for (CellBase cell : cellBaseToDisplayCell.keySet())
+			    	{	
+			    		if (cell instanceof Asset)
+			    			cellBaseToDisplayCell.get(cell).SetOwner(((Asset)cell).getOwner());
+			    		if (cell instanceof City)
+			    			cellBaseToDisplayCell.get(cell).SetOwner(((City)cell).getOwner());
+			    	}
+			    }
+			});
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+	}
 }

@@ -14,6 +14,7 @@ public enum GameStates
 	PlayerSelling,
 	PlayerRolling,
 	PlayerMoving,
+	PlayerGettingOutOfJail,
 	PlayerLanded,
 	PlayerBuying,
 	PlayerBidding,

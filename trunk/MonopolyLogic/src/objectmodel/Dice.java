@@ -9,23 +9,49 @@ import java.util.Random;
  */
 public class Dice 
 {
-	private int lastRoll;
-	private int currentRoll;
-	private int dice1;
-	private int dice2;
-	private boolean isDouble;
-	private Random random;
+	public class DiceThrowResult
+	{
+		private int dice1;
+		private int dice2;
+		
+		public DiceThrowResult(int dice1, int dice2)
+		{
+			this.dice1 = dice1;
+			this.dice2 = dice2;
+		}
+		
+		public int sumOfDice()
+		{
+			return dice1 + dice2;
+		}
+		
+		public boolean isDouble()
+		{
+			return dice1 == dice2;
+		}
+		
+		public int getFirstDice()
+		{
+			return dice1;
+		}
+		
+		public int getSecondDice()
+		{
+			return dice2;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return dice1 + ":" + dice2;
+		}
+	}
 	
-	public int getLastRoll() {
-		return lastRoll;
-	}
+	private DiceThrowResult currentRoll;
+	private Random random;
 
-	public int getCurrentRoll() {
+	public DiceThrowResult getCurrentRoll() {
 		return currentRoll;
-	}
-
-	public boolean isDouble() {
-		return isDouble;
 	}
 	
 	public Dice()
@@ -33,13 +59,11 @@ public class Dice
 		random = new Random();
 	}
 	
-	public int roll()
+	public DiceThrowResult roll()
 	{
-		lastRoll = currentRoll;
-		dice1 = random.nextInt(6) + 1;
-		dice2 = random.nextInt(6) + 1;
-		currentRoll = dice1 + dice2;
-		isDouble = (dice1 == dice2);
+		int dice1 = random.nextInt(6) + 1;
+		int dice2 = random.nextInt(6) + 1;
+		currentRoll = new DiceThrowResult(dice1, dice2);
 		
 		return currentRoll;
 	}
@@ -47,6 +71,6 @@ public class Dice
 	@Override
 	public String toString()
 	{
-		return dice1 + ":" + dice2;
+		return currentRoll.toString();
 	}
 }

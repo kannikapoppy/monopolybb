@@ -1,11 +1,13 @@
 package main;
 import javax.xml.bind.*;
+
+import GameStateChangedEvent.GameStateChangedEvent;
 import main.StateManager.GameStartEventListener;
-import main.StateManager.GameStateChangedEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import objectmodel.*; 
+import objectmodel.Dice.DiceThrowResult;
 
 /**
  * The main logic of the monopoly game
@@ -67,7 +69,7 @@ public class MonopolyGame
 		currentPlayerIndex = 0;
 		gameDice = new Dice();
 		registerEvents();
-		getStateManager().setCurrentState(this, GameStates.Uninitialized, "Starting a fresh Monopoly Game");
+		getStateManager().setCurrentStateToUninitialized(this, "Starting a fresh Monopoly Game");
 	}
 	
 	/**
@@ -77,7 +79,7 @@ public class MonopolyGame
 	 */
 	public boolean initGame(List<Player> playerList)
 	{
-		getStateManager().setCurrentState(this, GameStates.Initializing, "Initialzing a new game");
+		getStateManager().setCurrentStateToInitializing(this, "Initialzing a new game");
 		boolean initializedSuccessfully = true;
 		String failMessage = "";
 		this.playerList = playerList;
@@ -121,12 +123,12 @@ public class MonopolyGame
 		// check if all went right so far...
 		if(initializedSuccessfully)
 		{
-			getStateManager().setCurrentState(this, GameStates.Initialized, "The game was initialized successfully");
+			getStateManager().setCurrentStateToInitialized(this, "The game was initialized successfully");
 			isPlaying = true;
 		}
 		else
 		{
-			getStateManager().setCurrentState(this, GameStates.Error, failMessage);
+			getStateManager().setCurrentStateToError(this, failMessage);
 		}
 		
 		return initializedSuccessfully;
@@ -143,13 +145,13 @@ public class MonopolyGame
 		// makes sure the game object are initialized
 		if (gameBoard == null || chanceDeck == null || communityChestDeck == null)
 		{
-			getStateManager().setCurrentState(this, GameStates.Error, "Game started with null objects");
+			getStateManager().setCurrentStateToError(this, "Game started with null objects");
 			return false;
 		}
 		// makes sure the players are all set
 		if (playerList == null || playerList.size() < 2 || playerList.size() > 6)
 		{
-			getStateManager().setCurrentState(this, GameStates.Error, "Can only start a game with 2-6 players!");
+			getStateManager().setCurrentStateToError(this, "Can only start a game with 2-6 players!");
 			return false;
 		}
 		
@@ -159,7 +161,7 @@ public class MonopolyGame
 			@Override
 			public void run()
 			{
-				getStateManager().setCurrentState(this, GameStates.Starting, "Game Starting");
+				getStateManager().setCurrentStateToStarting(this, "Game Starting");
 				gameLoop();
 			}
 		});
@@ -220,7 +222,7 @@ public class MonopolyGame
 			currentPlayerIndex = playerIndex;
 			String cellName = gameBoard.getCellBase().get(nextPlayer.getBoardPosition()).getName();
 			String switchMessage = "It's now " + nextPlayer.getName() + "'s turn. Current Position: " + cellName + ". Balance: " + nextPlayer.getMoney();
-			getStateManager().setCurrentState(this, GameStates.PlayerSwitching, switchMessage);
+			getStateManager().setCurrentStateToPlayerSwitching(this, switchMessage, nextPlayer);
 		}
 	}
 
@@ -241,24 +243,22 @@ public class MonopolyGame
 			if(currentCell.shouldRollTheDice(currentPlayer))
 			{
 				// roll the dice & check if the player should move
-				int moveCells = gameDice.roll();
-				getStateManager().setCurrentState(this, GameStates.PlayerRolling, currentPlayer.getName() + " rolled a " + gameDice);
-				if (currentCell.shouldMove(currentPlayer, gameDice))
+				DiceThrowResult diceResult = gameDice.roll();
+				getStateManager().setCurrentStateToPlayerRolling(this, 
+						currentPlayer.getName() + " rolled a " + gameDice,
+						currentPlayer, diceResult);
+				if (currentCell.shouldMove(currentPlayer, diceResult))
 				{
 					// Move!
-					getStateManager().setCurrentState(this, GameStates.PlayerMoving, currentPlayer.getName() + " is moving " + gameDice.getCurrentRoll() + " steps");
-					movePlayer(currentPlayer, moveCells);
-				}
-				else
-				{
-					// probably in jail, didn't hit a double & doesn't have an out-of-jail card
-					getStateManager().setCurrentState(this, GameStates.PlayerMoving, currentPlayer.getName() + " is staying in place");
+					CellBase destination = movePlayer(currentPlayer, diceResult.sumOfDice());
 				}
 			}
 			else
 			{
 				// probably in parking and can't move
-				getStateManager().setCurrentState(this, GameStates.PlayerRolling, currentPlayer.getName() + " doesn't get to roll the dice");
+//				getStateManager().setCurrentStateToPlayerRolling(this, 
+//						currentPlayer.getName() + " doesn't get to roll the dice",
+//						currentPlayer, new DiceThrowResult(-1, -1));
 			}
 			
 			// finished the turn, next player!
@@ -268,7 +268,8 @@ public class MonopolyGame
 		// Game over!
 		// release the main thread if needed
 		isPlaying = false;
-		getStateManager().setCurrentState(this, GameStates.GameOver, winner.getName() + " has won the game");
+		getStateManager().setCurrentStateToGameOver(this, 
+				winner.getName() + " has won the game", winner);
 	}
 
 	/**
@@ -278,7 +279,7 @@ public class MonopolyGame
 	 * @param cellName - the cell name we want to reach
 	 * @param getRoadToll - whether the player should get/pay road toll while moving
 	 */
-	private void movePlayer(Player movingPlayer, String cellName, boolean getRoadToll)
+	private CellBase movePlayer(Player movingPlayer, String cellName, boolean getRoadToll)
 	{
 		int stepsCount = 1;
 		int currentPlayerPosition = (movingPlayer.getBoardPosition() + stepsCount) % gameBoard.getCellBase().size();
@@ -290,7 +291,7 @@ public class MonopolyGame
 			currentCell = gameBoard.getCellBase().get(currentPlayerPosition);
 		}
 		
-		movePlayer(movingPlayer, stepsCount, getRoadToll);
+		return movePlayer(movingPlayer, stepsCount, getRoadToll);
 	}
 	
 	/**
@@ -298,9 +299,9 @@ public class MonopolyGame
 	 * @param movingPlayer - the player to be moved
 	 * @param stepsCount - the number of cells to advance
 	 */
-	private void movePlayer(Player movingPlayer, int stepsCount)
+	private CellBase movePlayer(Player movingPlayer, int stepsCount)
 	{
-		movePlayer(movingPlayer, stepsCount, true);
+		return movePlayer(movingPlayer, stepsCount, true);
 	}
 	
 	/**
@@ -309,9 +310,11 @@ public class MonopolyGame
 	 * @param stepsCount - the number of cells to advance
 	 * @param getRoadToll - whether the player should get/pay road toll
 	 */
-	private void movePlayer(Player movingPlayer, int stepsCount, boolean getRoadToll)
+	private CellBase movePlayer(Player movingPlayer, int stepsCount, boolean getRoadToll)
 	{
+		CellBase destination = null;
 		int currentPlayerPosition = movingPlayer.getBoardPosition();
+		CellBase origin = gameBoard.getCellBase().get(currentPlayerPosition);
 		// pay/get pass toll for all the cells on the way
 		while (stepsCount > 0)
 		{
@@ -329,10 +332,16 @@ public class MonopolyGame
 			{
 				// Reached the goal
 				movingPlayer.setBoardPosition(currentPlayerPosition);
-				playerLandedOnCell(movingPlayer, gameBoard.getCellBase().get(currentPlayerPosition));
+				destination = gameBoard.getCellBase().get(currentPlayerPosition);
+				getStateManager().setCurrentStateToPlayerMoving(this, 
+						movingPlayer.getName() + " is moving " + gameDice.getCurrentRoll() + " steps",
+						movingPlayer, origin, destination);
+				playerLandedOnCell(movingPlayer, destination);
 			}
 			stepsCount --;
 		}
+		
+		return destination;
 	}
 	
 	/**
@@ -352,13 +361,15 @@ public class MonopolyGame
 			{
 				performMoneyTransaction(passedPlayer, -passToll, true);
 				String message = String.format("%s just received %d dollars for passing through %s", passedPlayer.getName(), -passToll, passedCell.getName());
-				getStateManager().setCurrentState(this, GameStates.PlayerGotPaid, message);
+				getStateManager().setCurrentStateToPlayerGotPaid(this, message,
+						passedPlayer, -passToll);
 			}
 			else
 			{
 				performMoneyTransaction(passedPlayer, passToll, false);
 				String message = String.format("%s just lost %d dollars for passing through %s", passedPlayer.getName(), passToll, passedCell.getName());
-				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
+				getStateManager().setCurrentStateToPlayerPaying(this, message,
+						passedPlayer, passToll);
 			}
 		}
 	}
@@ -370,63 +381,61 @@ public class MonopolyGame
 	 */
 	private void playerLandedOnCell(Player landedPlayer, CellBase landedCell)
 	{
-		getStateManager().setCurrentState(this, GameStates.PlayerLanded, landedPlayer.getName() + " has just landed on " + landedCell.getName());
-		if(landedPlayer.getOwnedCells().getCell().size() > 0 && landedPlayer.getInputObject().doPerformAuction())
-		{
-			performAuction(landedPlayer);
-		}
-		
+		getStateManager().setCurrentStateToPlayerLanded(this, 
+				landedPlayer.getName() + " has just landed on " + landedCell.getName(),
+				landedPlayer, landedCell);
+				
 		landedCell.performPlayerLand(landedPlayer);
 	}
 	
-	/**
-	 * Perform an asset transaction between two players  
-	 * @param sourcePlayer - the player with source assets
-	 * @param destPlayer - the player with destination assets 
-	 * @param sourceAssets - the assets that move from source player to destination player
-	 * @param destAssets - the assets that move from destination player to source player
-	 */
-	private void performAssetTransaction(Player sourcePlayer, Player destPlayer, List<CellBase> sourceAssets, List<CellBase> destAssets)
-	{
-		// used for safety (so that the lists won't be modified as they are being iterated through)
-		List<CellBase> assistingList = new ArrayList<CellBase>();
-		
-		if (sourceAssets != null)
-		{
-			for (CellBase cell : sourceAssets)
-			{
-				String message = cell.getName() + " is moving from " + sourcePlayer.getName() + " to " + destPlayer.getName();
-				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
-				assistingList.add(cell);
-			}
-			
-			for (CellBase cell : assistingList)
-			{
-				sourcePlayer.getOwnedCells().getCell().remove(cell);
-				destPlayer.getOwnedCells().getCell().add(cell);
-				cell.setOwner(destPlayer);
-			}
-		}
-		
-		if (destAssets != null)
-		{
-			assistingList.clear();
-			
-			for (CellBase cell : destAssets)
-			{
-				String message = cell.getName() + " is moving from " + destPlayer.getName() + " to " + sourcePlayer.getName();
-				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
-				assistingList.add(cell);
-			}
-			
-			for (CellBase cell : assistingList)
-			{
-				destPlayer.getOwnedCells().getCell().remove(cell);
-				sourcePlayer.getOwnedCells().getCell().add(cell);
-				cell.setOwner(sourcePlayer);
-			}
-		}
-	}
+//	/**
+//	 * Perform an asset transaction between two players  
+//	 * @param sourcePlayer - the player with source assets
+//	 * @param destPlayer - the player with destination assets 
+//	 * @param sourceAssets - the assets that move from source player to destination player
+//	 * @param destAssets - the assets that move from destination player to source player
+//	 */
+//	private void performAssetTransaction(Player sourcePlayer, Player destPlayer, List<CellBase> sourceAssets, List<CellBase> destAssets)
+//	{
+//		// used for safety (so that the lists won't be modified as they are being iterated through)
+//		List<CellBase> assistingList = new ArrayList<CellBase>();
+//		
+//		if (sourceAssets != null)
+//		{
+//			for (CellBase cell : sourceAssets)
+//			{
+//				String message = cell.getName() + " is moving from " + sourcePlayer.getName() + " to " + destPlayer.getName();
+//				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
+//				assistingList.add(cell);
+//			}
+//			
+//			for (CellBase cell : assistingList)
+//			{
+//				sourcePlayer.getOwnedCells().getCell().remove(cell);
+//				destPlayer.getOwnedCells().getCell().add(cell);
+//				cell.setOwner(destPlayer);
+//			}
+//		}
+//		
+//		if (destAssets != null)
+//		{
+//			assistingList.clear();
+//			
+//			for (CellBase cell : destAssets)
+//			{
+//				String message = cell.getName() + " is moving from " + destPlayer.getName() + " to " + sourcePlayer.getName();
+//				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
+//				assistingList.add(cell);
+//			}
+//			
+//			for (CellBase cell : assistingList)
+//			{
+//				destPlayer.getOwnedCells().getCell().remove(cell);
+//				sourcePlayer.getOwnedCells().getCell().add(cell);
+//				cell.setOwner(sourcePlayer);
+//			}
+//		}
+//	}
 	
 	/**
 	 * Perform a money transaction between two players or between a player and the bank (to player should be null)
@@ -496,30 +505,11 @@ public class MonopolyGame
 		
 		// Triggers the player broke event
 		String message = inDebtPlayer.getName() + " owes " + debtMoney + " to " + toDebtPlayerName;
-		getStateManager().setCurrentState(this, GameStates.PlayerBroke, message);
-		boolean playerHasAssets = (inDebtPlayer.getOwnedCells().getCell().size() > 0); 
+		getStateManager().setCurrentStateToPlayerBroke(this, message, inDebtPlayer);
 		
-		// Perform an auction if possible
-		while (debtMoney > 0 && playerHasAssets && inDebtPlayer.canPerformAuction() && inDebtPlayer.getInputObject().doPerformAuction())
-		{
-			performAuction(inDebtPlayer);
-			
-			if (inDebtPlayer.getMoney() > 0)
-			{
-				int returnedCash = Math.min(debtMoney, inDebtPlayer.getMoney());
-				debtMoney -= returnedCash;
-				message = inDebtPlayer.getName() + " is returning " + returnedCash + " to " + toDebtPlayerName;
-				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
-				performMoneyTransaction(inDebtPlayer, toDebtPlayer, returnedCash);
-			}
-		}
-		
-		// Player is still in debt and cannot sell assets
-		if (debtMoney > 0)
-		{
-			dropPlayer(inDebtPlayer, toDebtPlayer);
-			getStateManager().setCurrentState(this, GameStates.PlayerLost, inDebtPlayer.getName() + " has lost!");
-		}
+		dropPlayer(inDebtPlayer);
+		getStateManager().setCurrentStateToPlayerLost(this, 
+				inDebtPlayer.getName() + " has lost!", inDebtPlayer);
 	}
 	
 	/**
@@ -528,7 +518,7 @@ public class MonopolyGame
 	 * @param droppedPlayer - the player to be dropped
 	 * @param passToPlayer - the player to whom the assets will be transfered to (the bank when null)
 	 */
-	private void dropPlayer(Player droppedPlayer, Player passToPlayer)
+	private void dropPlayer(Player droppedPlayer)
 	{
 		// return cards to the deck
 		for (BonusCard card : droppedPlayer.getOwnedCards().getCard())
@@ -539,39 +529,11 @@ public class MonopolyGame
 		droppedPlayer.setMoney(0);
 		droppedPlayer.setIsInGame(false);
 		
-		// move cells to the other player/bank
-		if (passToPlayer != null)
+		for (CellBase cell : droppedPlayer.getOwnedCells().getCell())
 		{
-			performAssetTransaction(droppedPlayer, passToPlayer, droppedPlayer.getOwnedCells().getCell(), null);
+			cell.returnToBank();
 		}
-		else
-		{
-			for (CellBase cell : droppedPlayer.getOwnedCells().getCell())
-			{
-				cell.returnToBank();
-			}
-			droppedPlayer.getOwnedCells().getCell().clear();
-		}
-	}
-	
-	/**
-	 * Initiate an auction by 'auction player'
-	 * @param auctionPlayer - the player that wants to perform the auction
-	 */
-	private void performAuction(Player auctionPlayer)
-	{
-		getStateManager().setCurrentState(this, GameStates.Auction, auctionPlayer.getName() + " is performing an auction");
-		
-		if (auctionPlayer.getOwnedCells().getCell().size() > 0 && auctionPlayer.canPerformAuction())
-		{
-			auctionPlayer.raiseAuctionPerformed();
-			Auction auction = new Auction(auctionPlayer, playerList);
-			auction.doAuction();
-		}
-		else
-		{
-			getStateManager().setCurrentState(this, GameStates.Auction, auctionPlayer.getName() + " has no items to sell!");
-		}
+		droppedPlayer.getOwnedCells().getCell().clear();
 	}
 	
 	/**
@@ -664,15 +626,16 @@ public class MonopolyGame
 		}
 
 		@Override
-		public void moveToCell(String cellName, boolean getRoadToll)
+		public CellBase moveToCell(String cellName, boolean getRoadToll)
 		{
-			movePlayer((Player) actor, cellName, getRoadToll);
+			return movePlayer((Player) actor, cellName, getRoadToll);
 		}
 
 		@Override
 		public void drawChanceCard() {
 			BonusCard card = chanceDeck.drawCard();
-			getStateManager().setCurrentState(this, GameStates.PlayerDrewCard, card.getMessage());
+			getStateManager().setCurrentStateToPlayerDrewCard(this, 
+					card.getMessage(), (Player) actor, card);
 			
 			if (card.getType().equals("MoveTo"))
 			{
@@ -700,7 +663,8 @@ public class MonopolyGame
 		@Override
 		public void drawCommunityChestCard() {
 			BonusCard card = communityChestDeck.drawCard();
-			getStateManager().setCurrentState(this, GameStates.PlayerDrewCard, card.getMessage());
+			getStateManager().setCurrentStateToPlayerDrewCard(this, 
+					card.getMessage(), (Player) actor, card);
 			
 			if (card.getType().equals("MoveTo"))
 			{
@@ -730,18 +694,18 @@ public class MonopolyGame
 			chanceDeck.returnCard(card);
 		}
 
-		@Override
-		public void performAuctionExchange(Player buyer,
-				List<CellBase> sellingItems, AuctionBid auctionSuggestions)
-		{
-			if (auctionSuggestions.getCash() > 0)
-			{
-				String message = buyer.getName() + " is paying " + auctionSuggestions.getCash() + " to " + ((Player) actor).getName();
-				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
-				buyer.getPlayerActions().payToPlayer((Player) actor, auctionSuggestions.getCash());
-			}
-			
-			performAssetTransaction((Player) actor, buyer, sellingItems, auctionSuggestions.getCells());
-		}
+//		@Override
+//		public void performAuctionExchange(Player buyer,
+//				List<CellBase> sellingItems, AuctionBid auctionSuggestions)
+//		{
+//			if (auctionSuggestions.getCash() > 0)
+//			{
+//				String message = buyer.getName() + " is paying " + auctionSuggestions.getCash() + " to " + ((Player) actor).getName();
+//				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
+//				buyer.getPlayerActions().payToPlayer((Player) actor, auctionSuggestions.getCash());
+//			}
+//			
+//			performAssetTransaction((Player) actor, buyer, sellingItems, auctionSuggestions.getCells());
+//		}
 	}
 }

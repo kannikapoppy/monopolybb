@@ -30,14 +30,14 @@ public class AutomaticPlayer extends Player
 			super(sender);
 		}
 
-		@Override
-		public boolean doPerformAuction() {
-			if (((Player) sender).getMoney() < MAX_CASH_FOR_PERFORMING_AUCTION)
-			{
-				return true;
-			}
-			return false;
-		}
+//		@Override
+//		public boolean doPerformAuction() {
+//			if (((Player) sender).getMoney() < MAX_CASH_FOR_PERFORMING_AUCTION)
+//			{
+//				return true;
+//			}
+//			return false;
+//		}
 
 		@Override
 		public boolean buyCell(CellBase landCell) {
@@ -57,61 +57,61 @@ public class AutomaticPlayer extends Player
 			return false;
 		}
 
-		@Override
-		public AuctionBid getAuctionSuggestion(List<CellBase> auctionCell) {
-			AuctionBid bid = new AuctionBid();
-			if (((Player) sender).getMoney() > AUCTION_SUGGESTION)
-			{
-				bid.setCash(AUCTION_SUGGESTION);
-			}
-			
-			return bid;
-		}
-
-		@Override
-		public Player getAuctionDecision(
-				Dictionary<Player, AuctionBid> auctionResult) {
-			Player highestBidder = null;
-			
-			Enumeration<Player> keys = auctionResult.keys(); 
-			while (keys.hasMoreElements())
-			{
-				Player newBidder = keys.nextElement();
-				if (highestBidder == null)
-				{
-					highestBidder = newBidder;
-				}
-				else
-				{
-					if (auctionResult.get(newBidder).getCash() > auctionResult.get(highestBidder).getCash())
-					{
-						highestBidder = newBidder;
-					}
-				}
-			}
-			
-			return highestBidder;
-		}
-
-		@Override
-		public List<CellBase> getAuctionItem() {
-			Player me = (Player) sender;
-			List<CellBase> sellingList = null;
-			
-			if (!me.getOwnedCells().getCell().isEmpty())
-			{
-				CellBase itemToSell = me.getOwnedCells().getCell().get(0);
-				if (RealEstate.getRealEstate().doesOwnWholeGroup(itemToSell))
-				{
-					sellingList = RealEstate.getRealEstate().getWholeGroup(itemToSell);
-				}
-				else
-				{
-					sellingList = new ArrayList<CellBase>();
-					sellingList.add(itemToSell);
-				}
-			}
-			return sellingList;
-		}
+//		@Override
+//		public AuctionBid getAuctionSuggestion(List<CellBase> auctionCell) {
+//			AuctionBid bid = new AuctionBid();
+//			if (((Player) sender).getMoney() > AUCTION_SUGGESTION)
+//			{
+//				bid.setCash(AUCTION_SUGGESTION);
+//			}
+//			
+//			return bid;
+//		}
+//
+//		@Override
+//		public Player getAuctionDecision(
+//				Dictionary<Player, AuctionBid> auctionResult) {
+//			Player highestBidder = null;
+//			
+//			Enumeration<Player> keys = auctionResult.keys(); 
+//			while (keys.hasMoreElements())
+//			{
+//				Player newBidder = keys.nextElement();
+//				if (highestBidder == null)
+//				{
+//					highestBidder = newBidder;
+//				}
+//				else
+//				{
+//					if (auctionResult.get(newBidder).getCash() > auctionResult.get(highestBidder).getCash())
+//					{
+//						highestBidder = newBidder;
+//					}
+//				}
+//			}
+//			
+//			return highestBidder;
+//		}
+//
+//		@Override
+//		public List<CellBase> getAuctionItem() {
+//			Player me = (Player) sender;
+//			List<CellBase> sellingList = null;
+//			
+//			if (!me.getOwnedCells().getCell().isEmpty())
+//			{
+//				CellBase itemToSell = me.getOwnedCells().getCell().get(0);
+//				if (RealEstate.getRealEstate().doesOwnWholeGroup(itemToSell))
+//				{
+//					sellingList = RealEstate.getRealEstate().getWholeGroup(itemToSell);
+//				}
+//				else
+//				{
+//					sellingList = new ArrayList<CellBase>();
+//					sellingList.add(itemToSell);
+//				}
+//			}
+//			return sellingList;
+//		}
 	}
 }
