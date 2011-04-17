@@ -109,7 +109,7 @@ public class EventHandler
 					    { 
 							JOptionPane.showMessageDialog(null, 
 									drewCardEvent.getCard().getMessage(),
-									drewCardEvent.getCard().getType(), JOptionPane.OK_OPTION);
+									drewCardEvent.getDeck().getType(), JOptionPane.OK_OPTION);
 					    }
 					});
 				} catch (InterruptedException e) {

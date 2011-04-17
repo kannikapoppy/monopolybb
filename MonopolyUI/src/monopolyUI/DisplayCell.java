@@ -59,7 +59,12 @@ public class DisplayCell extends JPanel {
 				BuildHouse();
 			}
 			
-			add(housesBox);        	
+			add(housesBox);  
+			
+			setToolTipText(String.format("<html><body>Price: %d<br>House Price: %d<br>Land Toll: %d<br>One House Toll: %d<br>Two House Toll: %d<br>Three House Toll: %d</body></html>", 
+					city.getPrice(), city.getSingleHousePrice(), city.getLandToll(), 
+					city.getHouseToll().getOne(), city.getHouseToll().getTwo(), 
+					city.getHouseToll().getThree())); 
         }
     	else if (cell instanceof Asset)
         {
@@ -77,6 +82,9 @@ public class DisplayCell extends JPanel {
     		
     		JLabel assetTypeLbl = new JLabel("Type: " + service.getGroup().getName());
     		add(assetTypeLbl);
+    		
+    		setToolTipText(String.format("<html><body>Price: %d<br>Land Toll: %d<br>Group Toll: %d</body></html>", 
+    				service.getPrice(), service.getLandToll(), service.getGroupToll()));
         }
     	else
     	{
@@ -109,7 +117,10 @@ public class DisplayCell extends JPanel {
 	{
 		String ownerStr;
 		if (p == null)
+		{
 			ownerStr = "No Owner";
+			assetOwnerLbl.setForeground(Color.BLACK);
+		}
 		else
 		{
 			ownerStr = p.getName();
@@ -131,8 +142,8 @@ public class DisplayCell extends JPanel {
 				return Color.ORANGE;
 			case Red:
 				return Color.RED;
-			case White:
-				return Color.WHITE;
+			case Gray:
+				return Color.GRAY;
 			case Yellow:
 				return Color.YELLOW;
 			default:
@@ -194,7 +205,7 @@ public class DisplayCell extends JPanel {
 	    	//do not remove the players panel from the cell layout
 	    	if (component != playersBox && component != secondaryPlayersBox)
 	    	{
-	    	  remove(component);
+	    		remove(component);
 	    	}
 	    }
 	}

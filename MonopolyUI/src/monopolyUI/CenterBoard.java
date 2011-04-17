@@ -60,7 +60,7 @@ public class CenterBoard extends JPanel {
 		{
 			JLabel userLbl = new JLabel();
 			playerToLabel.put(player, userLbl);
-			SetPlayerLabelText(player);
+			UpdatePlayerLabelText(player);
 			String colorImageName = "Box" + player.getPlayerColor().toString() + "32.png";
 			userLbl.setIcon(Utils.getImageIcon(colorImageName));
 			playersBox.add(userLbl);
@@ -69,26 +69,19 @@ public class CenterBoard extends JPanel {
 		initialize();
 	}
 	
-	private void SetPlayerLabelText(Player player)
+	public void UpdatePlayerLabelText(Player player)
 	{
 		JLabel lbl = playerToLabel.get(player);
 		lbl.setText(player.getName() + ", " + player.getMoney() + "$");
+		if (!player.isInGame())
+		{
+			lbl.setEnabled(false);
+		}
 	}
 	
 	public void SimulateDiceThrow(DiceThrowResult diceThrow)
 	{
 		dice.SimulateThrow(diceThrow);
-	}
-	
-	public void UpdateBalance(Player p)
-	{
-		SetPlayerLabelText(p);
-	}
-	
-	public void MarkPlayerAsLost(Player p)
-	{
-		JLabel lbl = playerToLabel.get(p);
-		lbl.setEnabled(false);
 	}
 
 	/**

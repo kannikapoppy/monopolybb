@@ -8,6 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.event.EventListenerList;
 
 import objectmodel.BonusCard;
+import objectmodel.CardsDeck;
 import objectmodel.CellBase;
 import objectmodel.City;
 import objectmodel.Dice.DiceThrowResult;
@@ -336,10 +337,10 @@ public class StateManager
 	 * @param type - card type
 	 */
 	public void setCurrentStateToPlayerDrewCard(Object source, String message, Player player, 
-			BonusCard card)
+			BonusCard card, CardsDeck fromDeck)
 	{
 		GameStateChangedToPlayerDrewCardEvent newEvent = new GameStateChangedToPlayerDrewCardEvent(this, currentState, 
-				GameStates.PlayerDrewCard, message, player, card);
+				GameStates.PlayerDrewCard, message, player, card, fromDeck);
 		
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
