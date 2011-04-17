@@ -3,6 +3,8 @@ package monopolyUI;
 import java.awt.GridBagLayout;
 import javax.swing.JPanel;
 import javax.swing.Box;
+import javax.swing.SwingUtilities;
+
 import java.awt.GridBagConstraints;
 import java.util.Hashtable;
 import java.util.List;
@@ -21,7 +23,7 @@ public class CenterBoard extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private DiceController dice;
-	private final Hashtable<Player,JLabel> playerToLabel = new Hashtable<Player,JLabel>();
+	private final Hashtable<Player,SinglePlayerDisplay> playerToDisplay = new Hashtable<Player,SinglePlayerDisplay>();
 
 	/**
 	 * This is the default constructor
@@ -35,19 +37,19 @@ public class CenterBoard extends JPanel {
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
 		
-		dice = new DiceController(game);
-		GridBagConstraints gbc_dice = new GridBagConstraints();
-		gbc_dice.insets = new Insets(0, 0, 5, 0);
-		gbc_dice.gridx = 1;
-		gbc_dice.gridy = 0;
-		add(dice, gbc_dice);
-		
 		Box playersBox = Box.createVerticalBox();
 		GridBagConstraints gbc_playersBox = new GridBagConstraints();
 		gbc_playersBox.insets = new Insets(0, 0, 5, 5);
 		gbc_playersBox.gridx = 0;
 		gbc_playersBox.gridy = 0;
 		add(playersBox, gbc_playersBox);
+		
+		dice = new DiceController(game);
+		GridBagConstraints gbc_dice = new GridBagConstraints();
+		gbc_dice.insets = new Insets(0, 0, 5, 0);
+		gbc_dice.gridx = 1;
+		gbc_dice.gridy = 0;
+		add(dice, gbc_dice);
 		
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setIcon(Utils.getImageIcon("cardsdeck.jpg"));
@@ -60,25 +62,25 @@ public class CenterBoard extends JPanel {
 		
 		for (Player player : game.getPlayers())
 		{
-			JLabel userLbl = new JLabel();
-			playerToLabel.put(player, userLbl);
-			UpdatePlayerLabelText(player);
-			String colorImageName = "Box" + player.getPlayerColor().toString() + "32.png";
-			userLbl.setIcon(Utils.getImageIcon(colorImageName));
-			playersBox.add(userLbl);
+			SinglePlayerDisplay userDisplay = new SinglePlayerDisplay(player);
+			playerToDisplay.put(player, userDisplay);
+			playersBox.add(userDisplay);
 		}
 		
 		initialize();
 	}
 	
-	public void UpdatePlayerLabelText(Player player)
+	public void SetPlayingUser(final Player player)
 	{
-		JLabel lbl = playerToLabel.get(player);
-		lbl.setText(player.getName() + ", " + player.getMoney() + "$");
-		if (!player.isInGame())
+		for (Player p : playerToDisplay.keySet())
 		{
-			lbl.setEnabled(false);
-		}
+			playerToDisplay.get(p).SetPlayingUser(p == player);
+		}				
+	}
+	
+	public void UpdatePlayerDisplay(Player player)
+	{
+		playerToDisplay.get(player).UpdatePlayerLabelText();
 	}
 	
 	public void SimulateDiceThrow(DiceThrowResult diceThrow)

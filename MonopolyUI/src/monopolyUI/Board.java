@@ -159,6 +159,14 @@ public class Board extends JPanel {
         this.add(component, c);
     }
 
+    public void SetPlayingUser(final Player p)
+    {
+    	innerBoard.SetPlayingUser(p);
+    	
+    	validate();
+		repaint();
+    }
+
     public void MovePlayer(final Player player, final CellBase origin, final CellBase destination)
     {
     	try {
@@ -245,14 +253,14 @@ public class Board extends JPanel {
 
     public void UpdateBalance(Player p)
     {
-    	innerBoard.UpdatePlayerLabelText(p);
+    	innerBoard.UpdatePlayerDisplay(p);
     }
     
     public void UpdateBalanceForAllPlayers()
     {
     	for (Player p : monopolyGame.getPlayers())
     	{
-    		innerBoard.UpdatePlayerLabelText(p);
+    		innerBoard.UpdatePlayerDisplay(p);
     	}
     }
     
@@ -262,7 +270,7 @@ public class Board extends JPanel {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() 
 			    { 
-					innerBoard.UpdatePlayerLabelText(p);
+					innerBoard.UpdatePlayerDisplay(p);
 					
 					CellBase currentPosition = monopolyGame.getGameBoard().getCellBase().get(p.getBoardPosition());
 					DisplayCell currentPositionDisplay = cellBaseToDisplayCell.get(currentPosition);
