@@ -73,6 +73,9 @@ public class EventHandler
 					(GameStateChangedToPlayerRollingEvent)evt;
 				board.SimulateDiceThrow(rollingEvent.getDiceThrowResult());
 				break;
+			case WaitingForPlayerToRoll:
+				board.EnableDiceThrow();
+				break;
 			case PlayerBuying:
 				GameStateChangedToPlayerBuyingEvent buyingEvent = 
 					(GameStateChangedToPlayerBuyingEvent)evt;

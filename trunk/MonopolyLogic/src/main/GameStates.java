@@ -12,6 +12,7 @@ public enum GameStates
 	Initialized,
 	Starting,
 	PlayerSelling,
+	WaitingForPlayerToRoll,
 	PlayerRolling,
 	PlayerMoving,
 	PlayerGettingOutOfJail,

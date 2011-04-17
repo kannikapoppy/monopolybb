@@ -206,6 +206,25 @@ public class StateManager
 	 * @param source - the object who triggered the game state change
 	 * @param message - a message regarding the new state
 	 * @param player - player who made the action
+	 */
+	public void setCurrentStateToWaitingForPlayerToRoll(Object source, String message, 
+			Player player)
+	{
+		GameStateChangedToPlayerActionEvent newEvent = new GameStateChangedToPlayerActionEvent(this, currentState, 
+				GameStates.WaitingForPlayerToRoll, message, player);
+		
+		// Change the state and raise the event
+		innerSetCurrentState(newEvent);
+	}
+	
+	
+	
+	/**
+	 * Sets the current game state
+	 * Triggers an event for the new state 
+	 * @param source - the object who triggered the game state change
+	 * @param message - a message regarding the new state
+	 * @param player - player who made the action
 	 * @param numberOfSteps - number of steps to move. 
 	 */
 	public void setCurrentStateToPlayerMoving(Object source, String message, Player player, 
@@ -439,6 +458,7 @@ public class StateManager
 				break;
 			case PlayerSelling:
 			case PlayerRolling:
+			case WaitingForPlayerToRoll:
 			case PlayerMoving:
 			case PlayerGettingOutOfJail:
 			case PlayerLanded:

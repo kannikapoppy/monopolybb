@@ -13,6 +13,7 @@ import java.util.Random;
 
 import javax.swing.SwingConstants;
 
+import main.MonopolyGame;
 import objectmodel.Dice.DiceThrowResult;
 import services.Utils;
 import javax.swing.JButton;
@@ -32,13 +33,15 @@ public class DiceController extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private final JLabel lblfirstDice = new JLabel("");
 	private final JLabel labelSecondDice = new JLabel("");
+	private final JButton btnRollDice = new JButton("Roll Dice");
 	private final int DELAY_TIME_MS = 300;
 
 	/**
 	 * This is the default constructor
 	 */
-	public DiceController() {
+	public DiceController(final MonopolyGame game) {
 		super();
+		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{106, 106, 0};
 		gridBagLayout.rowHeights = new int[]{107, 0, 0};
@@ -67,12 +70,13 @@ public class DiceController extends JPanel {
 		labelSecondDice.setHorizontalAlignment(SwingConstants.CENTER);
 		labelSecondDice.setIcon(Utils.getImageIcon("die6.gif"));
 		
-		JButton btnRollDice = new JButton("Roll Dice");
 		btnRollDice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				game.NotifyRollDice();
 			}
 		});
+		
+		btnRollDice.setEnabled(false);
 		GridBagConstraints gbc_btnRollDice = new GridBagConstraints();
 		gbc_btnRollDice.gridwidth = 2;
 		gbc_btnRollDice.gridx = 0;
@@ -86,6 +90,8 @@ public class DiceController extends JPanel {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() 
 		    {
+				btnRollDice.setEnabled(false);
+				
 				lblfirstDice.setIcon(Utils.getImageIcon("die" + diceThrow.getFirstDice() + ".gif"));
 				labelSecondDice.setIcon(Utils.getImageIcon("die" + diceThrow.getSecondDice() + ".gif"));
 				
@@ -95,6 +101,16 @@ public class DiceController extends JPanel {
 		});
 	}
 
+	public void EnableDiceThrow()
+    {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() 
+		    { 
+				btnRollDice.setEnabled(true);
+		    }
+		});
+    }
+	
 	/**
 	 * This method initializes this
 	 * 
