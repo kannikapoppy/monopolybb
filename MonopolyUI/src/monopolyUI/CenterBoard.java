@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
+import main.MonopolyGame;
 import objectmodel.Dice.DiceThrowResult;
 import objectmodel.Player;
 import services.Utils;
@@ -19,21 +20,22 @@ import javax.swing.border.BevelBorder;
 public class CenterBoard extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private final DiceController dice = new DiceController();
+	private DiceController dice;
 	private final Hashtable<Player,JLabel> playerToLabel = new Hashtable<Player,JLabel>();
 
 	/**
 	 * This is the default constructor
 	 */
-	public CenterBoard(List<Player> players) {
+	public CenterBoard(MonopolyGame game) {
 		super();
-		setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{217, 0};
 		gridBagLayout.rowHeights = new int[]{142, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
+		
+		dice = new DiceController(game);
 		GridBagConstraints gbc_dice = new GridBagConstraints();
 		gbc_dice.insets = new Insets(0, 0, 5, 0);
 		gbc_dice.gridx = 1;
@@ -48,7 +50,7 @@ public class CenterBoard extends JPanel {
 		add(playersBox, gbc_playersBox);
 		
 		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon(CenterBoard.class.getResource("/Images/cardsdeck.jpg")));
+		lblNewLabel.setIcon(Utils.getImageIcon("cardsdeck.jpg"));
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 		gbc_lblNewLabel.gridwidth = 2;
 		gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
@@ -56,7 +58,7 @@ public class CenterBoard extends JPanel {
 		gbc_lblNewLabel.gridy = 1;
 		add(lblNewLabel, gbc_lblNewLabel);
 		
-		for (Player player : players)
+		for (Player player : game.getPlayers())
 		{
 			JLabel userLbl = new JLabel();
 			playerToLabel.put(player, userLbl);
@@ -84,6 +86,11 @@ public class CenterBoard extends JPanel {
 		dice.SimulateThrow(diceThrow);
 	}
 
+	public void EnableDiceThrow()
+    {
+    	dice.EnableDiceThrow();
+    }
+	
 	/**
 	 * This method initializes this
 	 * 

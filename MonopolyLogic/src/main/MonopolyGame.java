@@ -1,6 +1,8 @@
 package main;
 import javax.xml.bind.*;
 
+import Utils.WaitNotifyManager;
+
 import GameStateChangedEvent.GameStateChangedEvent;
 import main.StateManager.GameStartEventListener;
 import java.io.*;
@@ -60,6 +62,10 @@ public class MonopolyGame
 	 * The thread used to run the logic
 	 */
 	private Thread logicThread;
+	/**
+	 * The waitManager to synchronize dice throw
+	 */
+	private final WaitNotifyManager diceThrowWaitManager = new WaitNotifyManager();
 	
 	/**
 	 * Creates a new monopoly game logic
@@ -251,6 +257,14 @@ public class MonopolyGame
 			// check if the player should roll the dice
 			if(currentCell.shouldRollTheDice(currentPlayer))
 			{
+				if (!(currentPlayer instanceof AutomaticPlayer))
+				{
+					getStateManager().setCurrentStateToWaitingForPlayerToRoll(this, 
+							"waiting for " + currentPlayer.getName() + " to roll the dice",
+							currentPlayer);
+					diceThrowWaitManager.doWait();
+				}
+				
 				// roll the dice & check if the player should move
 				DiceThrowResult diceResult = gameDice.roll();
 				getStateManager().setCurrentStateToPlayerRolling(this, 
@@ -279,6 +293,14 @@ public class MonopolyGame
 		isPlaying = false;
 		getStateManager().setCurrentStateToGameOver(this, 
 				winner.getName() + " has won the game", winner);
+	}
+	
+	/**
+	 * notifies that the user want to throw the dice
+	 */
+	public void NotifyRollDice()
+	{
+		diceThrowWaitManager.doNotify();
 	}
 
 	/**

@@ -129,31 +129,22 @@ public class Board extends JPanel {
         }
 
         // Main Inner Area Notice Starts at (1,1) and takes up 11x11
-        innerBoard = new CenterBoard(players);
+        innerBoard = new CenterBoard(monopolyGame);
         this.add(innerBoard,
             new GridBagConstraints(1,
                     1,
-                    6,
-                    6,
+                    8,
+                    8,
                     2, 2,
                     GridBagConstraints.CENTER,
-                    GridBagConstraints.BOTH,
+                    GridBagConstraints.CENTER,
                     new Insets(0, 0, 0, 0), 0, 0));
 	}
 
-    private DisplayCell createCellPanel(CellBase cell) {
+    private DisplayCell createCellPanel(CellBase cell) 
+    {
     	return new DisplayCell(cell);
     }
-    
-    /*private JPanel createInnerPanel(String text) {
-        JPanel panel = new JPanel(new BorderLayout()) ;
-        panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED));
-        JLabel label = new JLabel(text);
-        label.setHorizontalAlignment(JLabel.CENTER);
-        label.setVerticalAlignment(JLabel.CENTER);
-        panel.add(label, BorderLayout.CENTER);
-        return panel;
-    }*/
 
     private void addComponent(int gridX, int gridY, JComponent component) {
         GridBagConstraints c = new GridBagConstraints();
@@ -227,6 +218,11 @@ public class Board extends JPanel {
 	{
     	innerBoard.SimulateDiceThrow(diceThrow);
 	}
+    
+    public void EnableDiceThrow()
+    {
+    	innerBoard.EnableDiceThrow();
+    }
     
     public void SetCellOwner(CellBase cell, Player owner)
     {
