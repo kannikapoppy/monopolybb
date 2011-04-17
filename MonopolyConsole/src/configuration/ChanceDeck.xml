@@ -22,6 +22,6 @@
 		<Message>Feeling lucky? Move to the next 'Chance' cell and draw another card!</Message>
 	</BonusCard>
 	<BonusCard ID="8" Type="MoveTo" MoveTo="Go" GetGoCash="true">
-		<Message></Message>
+		<Message>Lucky You. Move To GO square</Message>
 	</BonusCard>
 </CardsDeck>

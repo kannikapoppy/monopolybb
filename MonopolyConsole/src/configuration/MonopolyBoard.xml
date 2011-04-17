@@ -147,7 +147,7 @@
 		<Country Name="South Africa"/>
 	</CellBase>
 	<CellBase ID="19" Name="Parking" Buyable="false" Type="Parking" Owned="false"/>
-	<CellBase ID="20" Name="Shanghai" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+	<CellBase ID="20" Name="Tel Aviv" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
 		<Price>300</Price>
 		<LandToll>200</LandToll>
 		<SingleHousePrice>150</SingleHousePrice>
@@ -156,9 +156,9 @@
 			<Two>400</Two>
 			<Three>500</Three>
 		</HouseToll>
-		<Country Name="China"/>
+		<Country Name="Israel"/>
 	</CellBase>
-	<CellBase ID="21" Name="Beijing" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+	<CellBase ID="21" Name="Jerusalem" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
 		<Price>280</Price>
 		<LandToll>85</LandToll>
 		<SingleHousePrice>150</SingleHousePrice>
@@ -167,9 +167,9 @@
 			<Two>260</Two>
 			<Three>370</Three>
 		</HouseToll>
-		<Country Name="China"/>
+		<Country Name="Israel"/>
 	</CellBase>
-	<CellBase ID="22" Name="Hong Kong" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
+	<CellBase ID="22" Name="Haifa" Buyable="true" Type="City" Owned="false" HousesNumber="0" xsi:type="City">
 		<Price>300</Price>
 		<LandToll>90</LandToll>
 		<SingleHousePrice>150</SingleHousePrice>
@@ -178,7 +178,7 @@
 			<Two>260</Two>
 			<Three>370</Three>
 		</HouseToll>
-		<Country Name="China"/>
+		<Country Name="Israel"/>
 	</CellBase>
 	<CellBase ID="23" Name="Community Chest" Buyable="false" Type="Community Chest" Owned="false"/>
 	<CellBase ID="24" Name="Deutsche Bahn" Buyable="true" Type="Service" Owned="false" xsi:type="Asset">
