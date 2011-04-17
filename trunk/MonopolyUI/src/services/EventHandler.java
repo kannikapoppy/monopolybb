@@ -60,7 +60,9 @@ public class EventHandler
 		switch (evt.getNewState())
 		{
 			case PlayerSwitching:
-				try { Thread.sleep(1500); } catch (InterruptedException e) { }
+				GameStateChangedToPlayerActionEvent switchingEvent = 
+					(GameStateChangedToPlayerActionEvent)evt;
+				board.SetPlayingUser(switchingEvent.getPlayer());
 				break;
 			case PlayerMoving:
 				GameStateChangedToPlayerMovingEvent movingEvent = 
@@ -69,9 +71,11 @@ public class EventHandler
 						movingEvent.getDestinationCell());
 				break;
 			case PlayerRolling:
+				try { Thread.sleep(200); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerRollingEvent rollingEvent = 
 					(GameStateChangedToPlayerRollingEvent)evt;
 				board.SimulateDiceThrow(rollingEvent.getDiceThrowResult());
+				try { Thread.sleep(200); } catch (InterruptedException e) { }
 				break;
 			case WaitingForPlayerToRoll:
 				board.EnableDiceThrow();
