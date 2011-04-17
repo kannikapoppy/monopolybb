@@ -7,5 +7,5 @@ public enum PlayerColor
 	Blue,
 	Yellow,
 	Orange,
-	White
+	Gray
 };

@@ -187,6 +187,9 @@ public class Board extends JPanel {
 			    	{
 			    		destinationDisplayCell.AddPlayerToPlayersList(player);
 			    	}
+			    	
+			    	validate();
+			    	repaint();
 			    }
 			});
 		} catch (InterruptedException e) {
@@ -246,7 +249,15 @@ public class Board extends JPanel {
 
     public void UpdateBalance(Player p)
     {
-    	innerBoard.UpdateBalance(p);
+    	innerBoard.UpdatePlayerLabelText(p);
+    }
+    
+    public void UpdateBalanceForAllPlayers()
+    {
+    	for (Player p : monopolyGame.getPlayers())
+    	{
+    		innerBoard.UpdatePlayerLabelText(p);
+    	}
     }
     
     public void UpdatePlayerLost(final Player p)
@@ -255,7 +266,19 @@ public class Board extends JPanel {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() 
 			    { 
-					innerBoard.MarkPlayerAsLost(p);
+					innerBoard.UpdatePlayerLabelText(p);
+					
+					CellBase currentPosition = monopolyGame.getGameBoard().getCellBase().get(p.getBoardPosition());
+					DisplayCell currentPositionDisplay = cellBaseToDisplayCell.get(currentPosition);
+					if (p.isInJail())
+					{
+						currentPositionDisplay.RemovePlayerFromSecondaryPlayersList(p);
+					}
+					else
+					{
+						currentPositionDisplay.RemovePlayerFromPlayersList(p);
+					}
+					
 			    	for (CellBase cell : cellBaseToDisplayCell.keySet())
 			    	{	
 			    		if (cell instanceof Asset)
@@ -263,6 +286,10 @@ public class Board extends JPanel {
 			    		if (cell instanceof City)
 			    			cellBaseToDisplayCell.get(cell).SetOwner(((City)cell).getOwner());
 			    	}
+			    	
+			    	JOptionPane.showMessageDialog(null, 
+							p.getName() + " lost !!!",
+							"Another one bites the dust !!!", JOptionPane.OK_OPTION);
 			    }
 			});
 		} catch (InterruptedException e) {

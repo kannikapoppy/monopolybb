@@ -198,6 +198,15 @@ public class MonopolyGame
 	}
 	
 	/**
+	 * 
+	 * @return Gets the list of players
+	 */
+	public List<Player> getPlayers()
+	{
+		return playerList;
+	}
+	
+	/**
 	 * switches the player to next one
 	 */
 	private void switchPlayer()
@@ -635,7 +644,7 @@ public class MonopolyGame
 		public void drawChanceCard() {
 			BonusCard card = chanceDeck.drawCard();
 			getStateManager().setCurrentStateToPlayerDrewCard(this, 
-					card.getMessage(), (Player) actor, card);
+					card.getMessage(), (Player) actor, card, chanceDeck);
 			
 			if (card.getType().equals("MoveTo"))
 			{
@@ -651,10 +660,25 @@ public class MonopolyGame
 				if (card.isBank())
 				{
 					getMoneyFromBank(card.getAmount());
+					
+					StateManager.getStateManager().setCurrentStateToPlayerGotPaid(this, 
+							((Player) actor).getName() + " got paid " + card.getAmount() + " by the bank",
+							((Player) actor), card.getAmount());
 				}
 				else
 				{
 					getMoneyFromAllPlayers(card.getAmount());
+					
+					StateManager.getStateManager().setCurrentStateToPlayerGotPaid(this, 
+							((Player) actor).getName() + " got paid " + card.getAmount() + " together by all players in the game",
+							((Player) actor), card.getAmount() * (playerList.size() - 1));
+					
+					for (Player p : playerList)
+					{
+						StateManager.getStateManager().setCurrentStateToPlayerPaying(this, 
+								p.getName() + " is paying " + card.getAmount() + " to " + ((Player) actor).getName(),
+								p, card.getAmount());
+					}
 				}
 				chanceDeck.returnCard(card);
 			}
@@ -664,7 +688,7 @@ public class MonopolyGame
 		public void drawCommunityChestCard() {
 			BonusCard card = communityChestDeck.drawCard();
 			getStateManager().setCurrentStateToPlayerDrewCard(this, 
-					card.getMessage(), (Player) actor, card);
+					card.getMessage(), (Player) actor, card, communityChestDeck);
 			
 			if (card.getType().equals("MoveTo"))
 			{
@@ -679,10 +703,24 @@ public class MonopolyGame
 				if (card.isBank())
 				{
 					payMoneyToBank(card.getAmount());
+					StateManager.getStateManager().setCurrentStateToPlayerPaying(this, 
+							((Player) actor).getName() + " paid " + card.getAmount() + " to the bank",
+							((Player) actor), card.getAmount());
 				}
 				else
 				{
 					payToAllPlayers(card.getAmount());
+					
+					StateManager.getStateManager().setCurrentStateToPlayerPaying(this, 
+							((Player) actor).getName() + " paid " + card.getAmount() + " all together to all players in the game",
+							((Player) actor), card.getAmount() * (playerList.size() - 1));
+					
+					for (Player p : playerList)
+					{
+						StateManager.getStateManager().setCurrentStateToPlayerGotPaid(this, 
+								p.getName() + " got paid " + card.getAmount() + " by " + ((Player) actor).getName(),
+								p, card.getAmount());
+					}
 				}
 			}
 			
