@@ -6,7 +6,6 @@ import Utils.WaitNotifyManager;
 import GameStateChangedEvent.GameStateChangedEvent;
 import main.StateManager.GameStartEventListener;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import objectmodel.*; 
 import objectmodel.Dice.DiceThrowResult;
@@ -203,6 +202,11 @@ public class MonopolyGame
 		return gameBoard;
 	}
 	
+	public boolean isPlaying()
+	{
+		return isPlaying;
+	}
+	
 	/**
 	 * 
 	 * @return Gets the list of players
@@ -273,15 +277,8 @@ public class MonopolyGame
 				if (currentCell.shouldMove(currentPlayer, diceResult))
 				{
 					// Move!
-					CellBase destination = movePlayer(currentPlayer, diceResult.sumOfDice());
+					movePlayer(currentPlayer, diceResult.sumOfDice());
 				}
-			}
-			else
-			{
-				// probably in parking and can't move
-//				getStateManager().setCurrentStateToPlayerRolling(this, 
-//						currentPlayer.getName() + " doesn't get to roll the dice",
-//						currentPlayer, new DiceThrowResult(-1, -1));
 			}
 			
 			// finished the turn, next player!
@@ -418,55 +415,6 @@ public class MonopolyGame
 				
 		landedCell.performPlayerLand(landedPlayer);
 	}
-	
-//	/**
-//	 * Perform an asset transaction between two players  
-//	 * @param sourcePlayer - the player with source assets
-//	 * @param destPlayer - the player with destination assets 
-//	 * @param sourceAssets - the assets that move from source player to destination player
-//	 * @param destAssets - the assets that move from destination player to source player
-//	 */
-//	private void performAssetTransaction(Player sourcePlayer, Player destPlayer, List<CellBase> sourceAssets, List<CellBase> destAssets)
-//	{
-//		// used for safety (so that the lists won't be modified as they are being iterated through)
-//		List<CellBase> assistingList = new ArrayList<CellBase>();
-//		
-//		if (sourceAssets != null)
-//		{
-//			for (CellBase cell : sourceAssets)
-//			{
-//				String message = cell.getName() + " is moving from " + sourcePlayer.getName() + " to " + destPlayer.getName();
-//				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
-//				assistingList.add(cell);
-//			}
-//			
-//			for (CellBase cell : assistingList)
-//			{
-//				sourcePlayer.getOwnedCells().getCell().remove(cell);
-//				destPlayer.getOwnedCells().getCell().add(cell);
-//				cell.setOwner(destPlayer);
-//			}
-//		}
-//		
-//		if (destAssets != null)
-//		{
-//			assistingList.clear();
-//			
-//			for (CellBase cell : destAssets)
-//			{
-//				String message = cell.getName() + " is moving from " + destPlayer.getName() + " to " + sourcePlayer.getName();
-//				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
-//				assistingList.add(cell);
-//			}
-//			
-//			for (CellBase cell : assistingList)
-//			{
-//				destPlayer.getOwnedCells().getCell().remove(cell);
-//				sourcePlayer.getOwnedCells().getCell().add(cell);
-//				cell.setOwner(sourcePlayer);
-//			}
-//		}
-//	}
 	
 	/**
 	 * Perform a money transaction between two players or between a player and the bank (to player should be null)
@@ -753,19 +701,5 @@ public class MonopolyGame
 		public void returnCardToDeck(BonusCard card) {
 			chanceDeck.returnCard(card);
 		}
-
-//		@Override
-//		public void performAuctionExchange(Player buyer,
-//				List<CellBase> sellingItems, AuctionBid auctionSuggestions)
-//		{
-//			if (auctionSuggestions.getCash() > 0)
-//			{
-//				String message = buyer.getName() + " is paying " + auctionSuggestions.getCash() + " to " + ((Player) actor).getName();
-//				getStateManager().setCurrentState(this, GameStates.PlayerPaying, message);
-//				buyer.getPlayerActions().payToPlayer((Player) actor, auctionSuggestions.getCash());
-//			}
-//			
-//			performAssetTransaction((Player) actor, buyer, sellingItems, auctionSuggestions.getCells());
-//		}
 	}
 }

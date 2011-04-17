@@ -13,8 +13,6 @@ import GameStateChangedEvent.GameStateChangedToPlayerDrewCardEvent;
 import GameStateChangedEvent.GameStateChangedToPlayerMovingEvent;
 import GameStateChangedEvent.GameStateChangedToPlayerPaymentsEvent;
 import GameStateChangedEvent.GameStateChangedToPlayerRollingEvent;
-import main.GameStates;
-import main.MonopolyGame;
 import main.StateManager.GameStateChangedEventListener;
 import monopolyUI.Board;
 
@@ -54,7 +52,7 @@ public class EventHandler
 	}
 	
 	/**
-	 * Registers to the events in the logic
+	 * unRegisters to the events in the logic
 	 * @param monopolyGame - the logic
 	 */
 	public void unRegisterEvents()
@@ -75,12 +73,14 @@ public class EventHandler
 			case PlayerSwitching:
 				GameStateChangedToPlayerActionEvent switchingEvent = 
 					(GameStateChangedToPlayerActionEvent)evt;
+				// indicate who is the current user
 				board.SetPlayingUser(switchingEvent.getPlayer());
 				break;
 			case PlayerMoving:
 				try { Thread.sleep(300); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerMovingEvent movingEvent = 
 					(GameStateChangedToPlayerMovingEvent)evt;
+				// move the player on the board
 				board.MovePlayer(movingEvent.getPlayer(), movingEvent.getOriginCell(),
 						movingEvent.getDestinationCell());
 				break;
@@ -88,6 +88,7 @@ public class EventHandler
 				try { Thread.sleep(200); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerRollingEvent rollingEvent = 
 					(GameStateChangedToPlayerRollingEvent)evt;
+				// simulate the dice throw
 				board.SimulateDiceThrow(rollingEvent.getDiceThrowResult());
 				try { Thread.sleep(200); } catch (InterruptedException e) { }
 				break;
@@ -98,6 +99,7 @@ public class EventHandler
 				try { Thread.sleep(100); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerBuyingEvent buyingEvent = 
 					(GameStateChangedToPlayerBuyingEvent)evt;
+				// update the cell owner and balance of buyer
 				board.SetCellOwner(buyingEvent.getBoughtCell(), buyingEvent.getPlayer());
 				board.UpdateBalance(buyingEvent.getPlayer());
 				break;
@@ -105,30 +107,34 @@ public class EventHandler
 				try { Thread.sleep(100); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerBuildingEvent buildingEvent = 
 					(GameStateChangedToPlayerBuildingEvent)evt;
+				// add house to the city in which the house was built
 				board.BuildHouse(buildingEvent.getCity());
 				break;
 			case PlayerPaying:
 				try { Thread.sleep(150); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerPaymentsEvent payEvent = 
 					(GameStateChangedToPlayerPaymentsEvent)evt;
+				// update the player paying balance
 				board.UpdateBalance(payEvent.getPlayer());
 				break;
 			case PlayerGotPaid:
 				try { Thread.sleep(150); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerPaymentsEvent gotPaidEvent = 
 					(GameStateChangedToPlayerPaymentsEvent)evt;
+				// update the got paid player balance
 				board.UpdateBalance(gotPaidEvent.getPlayer());
 				break;
 			case PlayerGettingOutOfJail:
 				try { Thread.sleep(300); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerActionEvent outOfJailEvent = 
 					(GameStateChangedToPlayerActionEvent)evt;
+				// get the player out of jail
 				board.GetPlayerOutOfJail(outOfJailEvent.getPlayer());
 				break;
 			case PlayerDrewCard:
 				final GameStateChangedToPlayerDrewCardEvent drewCardEvent = 
 					(GameStateChangedToPlayerDrewCardEvent)evt;
-				
+				// display the card
 				try {
 					SwingUtilities.invokeAndWait(new Runnable() {
 						public void run() 
@@ -149,9 +155,11 @@ public class EventHandler
 			case PlayerLost:
 				GameStateChangedToPlayerActionEvent playerLostEvent = 
 					(GameStateChangedToPlayerActionEvent)evt;
+				// clean up after looser
 				board.UpdatePlayerLost(playerLostEvent.getPlayer());
 				break;
 			case GameOver:
+				// display game over notification
 				final GameStateChangedToPlayerActionEvent finishEvent = 
 					(GameStateChangedToPlayerActionEvent)evt;
 				

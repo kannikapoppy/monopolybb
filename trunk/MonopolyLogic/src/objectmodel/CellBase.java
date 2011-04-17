@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import objectmodel.Dice.DiceThrowResult;
 
-import main.GameStates;
 import main.StateManager;
 
 
@@ -339,7 +338,7 @@ public class CellBase {
     	else if (type.equals("GotoJail"))
     	{
     		landedPlayer.isInJail = true;
-    		CellBase destination = landedPlayer.getPlayerActions().moveToCell("Jail (Free Pass)", false);    		
+    		landedPlayer.getPlayerActions().moveToCell("Jail (Free Pass)", false);    		
     	}
     }
     

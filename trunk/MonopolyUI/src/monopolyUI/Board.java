@@ -14,9 +14,19 @@ import services.*;
 import objectmodel.*;
 import objectmodel.Dice.DiceThrowResult;
 
+/**
+ * This class represent the entire visual board
+ * @author Benda & Eizenman
+ *
+ */
 public class Board extends JPanel {
 
 	private static final int LINE_SIZE = 9;
+	private static final String WINDOW_TITLE = "Monopoly By Benda And Eizenman";
+	private static final String ERROR_INITIALIZING_MSG = "Error Initializing";
+	private static final String UNABLE_TO_START_GAME_MSG = "Unable To Start Game";
+	private static final String PLAYER_LOST_MSG_SUFFIX = " lost!!!";
+	private static final String PLAYER_LOST_MSG_TITLE = "Another one bites the dust !!!";
 	private CenterBoard innerBoard = null;
 	private EventHandler eventHandler = null;
 	
@@ -24,19 +34,24 @@ public class Board extends JPanel {
 	 * The game board representation
 	 */
 	private MonopolyGame monopolyGame;
+	/**
+	 * mapping between logical cells to visual cells
+	 */
 	private Hashtable<CellBase, DisplayCell> cellBaseToDisplayCell = new Hashtable<CellBase, DisplayCell> ();
 
+	/**
+	 * entry point of the program
+	 * @param args
+	 */
 	public static void main(String[] args) {
       //all swing code runs in the EDT so we need to initialize the main container (JFrame) to run inside of the EDT as well
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JFrame frame = new JFrame("Monopoly By Benda And Eizenman");
+                JFrame frame = new JFrame(WINDOW_TITLE);
                 //what do we want to happen when the user click on the "X" button
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.getContentPane().setLayout(new BorderLayout());
-                
-                // TODO: add a panel which displays an image of monopoly, just for the beauty
 
                 //set size
                 Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -46,6 +61,7 @@ public class Board extends JPanel {
 
                 frame.setLocationRelativeTo(null);
                 
+                // setting the menu
                 frame.setJMenuBar(new MonopolyMenu());
 
                 frame.setVisible(true);
@@ -53,7 +69,12 @@ public class Board extends JPanel {
         });
     }
 
-    public Board(List<Player> players) throws Exception {
+    /**
+     * ctor
+     * @param players - players of the game
+     * @throws Exception - upon error might throw exception
+     */
+	public Board(List<Player> players) throws Exception {
 		super();
 		// Create the logic
 		monopolyGame = new MonopolyGame();
@@ -63,7 +84,7 @@ public class Board extends JPanel {
 		
 		if (!monopolyGame.initGame(players))
 		{
-			throw new Exception("Error Initializing");
+			throw new Exception(ERROR_INITIALIZING_MSG);
 		}
 		
 		initUI(players);
@@ -80,7 +101,7 @@ public class Board extends JPanel {
     	{
     		if (!monopolyGame.startGame(false))
     		{
-    			throw new Exception("Unable To Start Game");
+    			throw new Exception(UNABLE_TO_START_GAME_MSG);
     		}
     	}
     	catch (Exception ex)
@@ -89,6 +110,9 @@ public class Board extends JPanel {
     	}
     }
 
+    /**
+     * when finishing a game by starting a new game in the menu
+     */
     public void FinishGame()
     {
     	eventHandler.unRegisterEvents();
@@ -98,15 +122,19 @@ public class Board extends JPanel {
         // init layout
         this.setLayout(new GridBagLayout());
 
+        // create visual cells
         List<DisplayCell> components = new LinkedList<DisplayCell>();
         for (int i=0 ; i < LINE_SIZE * 4 ; i++) {
         	CellBase logicCell = monopolyGame.getGameBoard().getCellBase().get(i);
-        	DisplayCell cell = createCellPanel(logicCell);
+        	// create display cell for logical cell
+        	DisplayCell cell = new DisplayCell(logicCell);
+        	// add it to the mapping
         	cellBaseToDisplayCell.put(logicCell, cell);
         	components.add(cell);
         }
         
-    	for (Player player : players)
+    	// set the initial position of all players to the cell 0 (GO)
+        for (Player player : players)
     	{
     		components.get(0).AddPlayerToPlayersList(player);
     	}
@@ -139,7 +167,7 @@ public class Board extends JPanel {
             }
         }
 
-        // Main Inner Area Notice Starts at (1,1) and takes up 11x11
+        // Main Inner Area Notice Starts at (1,1) and takes up 8X8
         innerBoard = new CenterBoard(monopolyGame);
         this.add(innerBoard,
             new GridBagConstraints(1,
@@ -151,11 +179,6 @@ public class Board extends JPanel {
                     GridBagConstraints.CENTER,
                     new Insets(0, 0, 0, 0), 0, 0));
 	}
-
-    private DisplayCell createCellPanel(CellBase cell) 
-    {
-    	return new DisplayCell(cell);
-    }
 
     private void addComponent(int gridX, int gridY, JComponent component) {
         GridBagConstraints c = new GridBagConstraints();
@@ -170,6 +193,10 @@ public class Board extends JPanel {
         this.add(component, c);
     }
 
+    /**
+     * Visually marks player p as the current player by pointing an arrow to it 
+     * @param p - player who turn is now
+     */
     public void SetPlayingUser(final Player p)
     {
     	innerBoard.SetPlayingUser(p);
@@ -178,19 +205,29 @@ public class Board extends JPanel {
 		repaint();
     }
     
+    /**
+     * visually moves the player on the board
+     * @param player - player to move
+     * @param origin - from cell
+     * @param destination - to cell
+     */
     public void MovePlayer(final Player player, final CellBase origin, final CellBase destination)
     {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() 
 			    { 
+					// remove the player from origin cell
 					DisplayCell originDisplayCell = cellBaseToDisplayCell.get(origin);
 			    	originDisplayCell.RemovePlayerFromPlayersList(player);
 			    	
+			    	// add the user to his new cell
 			    	DisplayCell destinationDisplayCell = cellBaseToDisplayCell.get(destination);
 			    	if (destination.getType().compareTo("Jail") == 0 &&
 			    			player.isInJail())
 			    	{
+			    		// if the user is in jail we add him to a box in the middle of
+			    		// the cell so it would like he is in jail.
 			    		destinationDisplayCell.AddPlayerToSecondaryPlayersList(player);
 			    	}
 			    	else
@@ -211,6 +248,10 @@ public class Board extends JPanel {
 		}
     }
 
+    /**
+     * very good. player is getting out of jail
+     * @param player
+     */
     public void GetPlayerOutOfJail(final Player player)
     {
 		try {
@@ -219,6 +260,7 @@ public class Board extends JPanel {
 			    { 
 					CellBase prisonCell = monopolyGame.getGameBoard().getCellBase().get(player.getBoardPosition());
 					
+					// we remove the player from the center cell box and add him to bottom box
 					DisplayCell prisonDisplayCell = cellBaseToDisplayCell.get(prisonCell);
 					prisonDisplayCell.RemovePlayerFromSecondaryPlayersList(player);
 					prisonDisplayCell.AddPlayerToPlayersList(player);
@@ -283,6 +325,7 @@ public class Board extends JPanel {
 			    { 
 					innerBoard.UpdatePlayerDisplay(p);
 					
+					// remove the player from the board.
 					CellBase currentPosition = monopolyGame.getGameBoard().getCellBase().get(p.getBoardPosition());
 					DisplayCell currentPositionDisplay = cellBaseToDisplayCell.get(currentPosition);
 					if (p.isInJail())
@@ -294,7 +337,9 @@ public class Board extends JPanel {
 						currentPositionDisplay.RemovePlayerFromPlayersList(p);
 					}
 					
-			    	for (CellBase cell : cellBaseToDisplayCell.keySet())
+					// clear all cells which were owned by the loser, so visual will be coordinated
+					// with logics
+					for (CellBase cell : cellBaseToDisplayCell.keySet())
 			    	{	
 			    		if (cell instanceof Asset)
 			    			cellBaseToDisplayCell.get(cell).SetOwner(((Asset)cell).getOwner());
@@ -302,9 +347,10 @@ public class Board extends JPanel {
 			    			cellBaseToDisplayCell.get(cell).SetOwner(((City)cell).getOwner());
 			    	}
 			    	
-			    	JOptionPane.showMessageDialog(null, 
-							p.getName() + " lost !!!",
-							"Another one bites the dust !!!", JOptionPane.OK_OPTION);
+			    	// show a message that the user has lost
+					JOptionPane.showMessageDialog(null, 
+							p.getName() + PLAYER_LOST_MSG_SUFFIX,
+							PLAYER_LOST_MSG_TITLE, JOptionPane.OK_OPTION);
 			    }
 			});
 		} catch (InterruptedException e) {

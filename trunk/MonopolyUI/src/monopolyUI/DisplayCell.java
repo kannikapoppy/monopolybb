@@ -8,7 +8,6 @@ import javax.swing.JLabel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -21,13 +20,35 @@ import objectmodel.PlayerColor;
 
 import services.Utils;
 
+/**
+ * this class displays a single cell
+ * @author Benda & Eizenman
+ *
+ */
 public class DisplayCell extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+	/**
+	 * used to draw images as the cell
+	 */
 	private Image m_bgImage = null;
+	/**
+	 * a box which will hold players in the current location. will be located at the bottom
+	 * of the cell
+	 */
 	private Box playersBox = Box.createHorizontalBox();
+	/**
+	 * a box which will hold players in the current location. will be located at the center
+	 * of the cell. especially here for jail
+	 */
 	private Box secondaryPlayersBox;
+	/**
+	 * label of the owner
+	 */
 	private JLabel assetOwnerLbl;
+	/**
+	 * box that will hold houses icons to display when houses are built
+	 */
 	private Box housesBox = null;
 
 	/**
@@ -40,17 +61,22 @@ public class DisplayCell extends JPanel {
 		
 		if (cell instanceof City)
         {
+			//this is a city lets display it
+			
 			City city = (City)cell;
 			setLayout(new GridLayout(4, 1, 0, 0));
 			
+			// display name
 			JLabel assetNameLbl = new JLabel(city.getName());
 			assetNameLbl.setIcon(Utils.getImageIcon(city.getCountry().getName() + ".png"));
 			add(assetNameLbl);
 			
+			// display owner
 			assetOwnerLbl = new JLabel();
     		add(assetOwnerLbl);
 			SetOwner(city.getOwner());
 
+			// display houses
 			housesBox = Box.createHorizontalBox();
 			
 			int numberOfHouses = city.getHousesNumber();
@@ -61,6 +87,7 @@ public class DisplayCell extends JPanel {
 			
 			add(housesBox);  
 			
+			// set the tool tip of the city
 			setToolTipText(String.format("<html><body>Price: %d<br>House Price: %d<br>Land Toll: %d<br>One House Toll: %d<br>Two House Toll: %d<br>Three House Toll: %d</body></html>", 
 					city.getPrice(), city.getSingleHousePrice(), city.getLandToll(), 
 					city.getHouseToll().getOne(), city.getHouseToll().getTwo(), 
@@ -68,21 +95,27 @@ public class DisplayCell extends JPanel {
         }
     	else if (cell instanceof Asset)
         {
+    		//this is a service. lets display it.
+    		
     		Asset service = (Asset)cell;
     		
     		setLayout(new GridLayout(4, 1, 0, 0));
     		
+    		// display name
     		JLabel assetNameLbl = new JLabel(service.getName());
     		assetNameLbl.setIcon(Utils.getImageIcon(service.getGroup().getName() + ".png"));
     		add(assetNameLbl);
     		
+    		// display owner
     		assetOwnerLbl = new JLabel();
     		add(assetOwnerLbl);
 			SetOwner(service.getOwner());
     		
-    		JLabel assetTypeLbl = new JLabel("Type: " + service.getGroup().getName());
+    		// display type
+			JLabel assetTypeLbl = new JLabel("Type: " + service.getGroup().getName());
     		add(assetTypeLbl);
     		
+    		// set the tool tip
     		setToolTipText(String.format("<html><body>Price: %d<br>Land Toll: %d<br>Group Toll: %d</body></html>", 
     				service.getPrice(), service.getLandToll(), service.getGroupToll()));
         }
@@ -90,6 +123,7 @@ public class DisplayCell extends JPanel {
     	{
     		setLayout(new BorderLayout());
     		
+    		// set the background image later to be drawn
     		m_bgImage = Utils.getImage(cell.getType() + ".gif");
     		clearComponents();
     	}
@@ -98,6 +132,8 @@ public class DisplayCell extends JPanel {
 		
 		if (cell.getType().compareTo("Jail") == 0)
 		{			
+			// if this is the jail cell we need to prepare place for prisioners
+			
 			secondaryPlayersBox = Box.createHorizontalBox();
 			
 			add(secondaryPlayersBox, BorderLayout.CENTER);
@@ -108,11 +144,16 @@ public class DisplayCell extends JPanel {
 	
 	public void BuildHouse()
 	{
+		// add house label to the box of houses
 		JLabel houseLabel = new JLabel();
 		houseLabel.setIcon(Utils.getImageIcon("house.png"));
 		housesBox.add(houseLabel);
 	}
 	
+	/**
+	 * sets owner data in the label.
+	 * @param p
+	 */
 	public void SetOwner(Player p)
 	{
 		String ownerStr;
