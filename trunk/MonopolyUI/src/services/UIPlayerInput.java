@@ -84,8 +84,9 @@ public class UIPlayerInput extends PlayerInput
 	 * Checks if the player wants to build a house on the given cell
 	 */
 	@Override
-	public boolean buildHouse(final City landCell) {
-final boolean[] result = new boolean[1];
+	public boolean buildHouse(final City landCell) 
+	{
+		final boolean[] result = new boolean[1];
 		
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {

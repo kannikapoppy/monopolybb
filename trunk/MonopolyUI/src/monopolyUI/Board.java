@@ -180,7 +180,7 @@ public class Board extends JPanel {
     
     public void MovePlayer(final Player player, final CellBase origin, final CellBase destination)
     {
-    	try {
+		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() 
 			    { 
@@ -208,12 +208,12 @@ public class Board extends JPanel {
 		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}
     }
 
     public void GetPlayerOutOfJail(final Player player)
     {
-    	try {
+		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				public void run() 
 			    { 
@@ -230,7 +230,7 @@ public class Board extends JPanel {
 		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}
     }
     
     public void SimulateDiceThrow(DiceThrowResult diceThrow)

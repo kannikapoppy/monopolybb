@@ -78,6 +78,7 @@ public class EventHandler
 				board.SetPlayingUser(switchingEvent.getPlayer());
 				break;
 			case PlayerMoving:
+				try { Thread.sleep(300); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerMovingEvent movingEvent = 
 					(GameStateChangedToPlayerMovingEvent)evt;
 				board.MovePlayer(movingEvent.getPlayer(), movingEvent.getOriginCell(),
@@ -94,27 +95,32 @@ public class EventHandler
 				board.EnableDiceThrow();
 				break;
 			case PlayerBuying:
+				try { Thread.sleep(100); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerBuyingEvent buyingEvent = 
 					(GameStateChangedToPlayerBuyingEvent)evt;
 				board.SetCellOwner(buyingEvent.getBoughtCell(), buyingEvent.getPlayer());
 				board.UpdateBalance(buyingEvent.getPlayer());
 				break;
 			case PlayerBuilding:
+				try { Thread.sleep(100); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerBuildingEvent buildingEvent = 
 					(GameStateChangedToPlayerBuildingEvent)evt;
 				board.BuildHouse(buildingEvent.getCity());
 				break;
 			case PlayerPaying:
+				try { Thread.sleep(150); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerPaymentsEvent payEvent = 
 					(GameStateChangedToPlayerPaymentsEvent)evt;
 				board.UpdateBalance(payEvent.getPlayer());
 				break;
 			case PlayerGotPaid:
+				try { Thread.sleep(150); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerPaymentsEvent gotPaidEvent = 
 					(GameStateChangedToPlayerPaymentsEvent)evt;
 				board.UpdateBalance(gotPaidEvent.getPlayer());
 				break;
 			case PlayerGettingOutOfJail:
+				try { Thread.sleep(300); } catch (InterruptedException e) { }
 				GameStateChangedToPlayerActionEvent outOfJailEvent = 
 					(GameStateChangedToPlayerActionEvent)evt;
 				board.GetPlayerOutOfJail(outOfJailEvent.getPlayer());
