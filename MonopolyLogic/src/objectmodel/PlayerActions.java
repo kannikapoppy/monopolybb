@@ -1,7 +1,5 @@
 package objectmodel;
 
-import java.util.List;
-
 /**
  * The actions a player can raise in the logic
  * @author Benda & Eizenman
@@ -72,11 +70,4 @@ public abstract class PlayerActions
 	 * @param card - the card to be return
 	 */
 	public abstract void returnCardToDeck(BonusCard card);
-	/**
-	 * Creates an auction exchange with another player
-	 * @param buyer - the player with whom the transfer is made
-	 * @param sellingItems - the items to be moved to the other player
-	 * @param auctionSuggestions - the items & money this player gets
-	 */
-	//public abstract void performAuctionExchange(Player buyer, List<CellBase> sellingItems, AuctionBid auctionSuggestions);
 }

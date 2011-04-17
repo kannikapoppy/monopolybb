@@ -1,15 +1,11 @@
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
-import objectmodel.AuctionBid;
 import objectmodel.AutomaticPlayer;
 import objectmodel.CellBase;
 import objectmodel.City;
 import objectmodel.Player;
 import objectmodel.PlayerInput;
-import objectmodel.RealEstate;
 
 /**
  * An assisting class used to create all the players in the game
@@ -129,44 +125,6 @@ public class PlayerManager
 		}
 
 		/**
-		 * Gets an single auction bid for a list of cells being proposed for sale
-		 */
-		@Override
-		public AuctionBid getAuctionSuggestion(List<CellBase> auctionCell) {
-			AuctionBid bid = new AuctionBid();
-			Player me = (Player) sender;
-			System.out.println(me.getName() + " place your offer for buying: ");
-			
-			for (CellBase cell : auctionCell)
-			{
-				System.out.println("****" + cell.getName() + "****");
-			}
-			
-			System.out.println("\tCash offer: ");
-			int cashOffer = 0;
-			while ((cashOffer = ReadIntFromConsole()) < 0)
-			{
-				System.out.println("\tBad input, try again:");
-			}
-			bid.setCash(cashOffer);
-			
-			System.out.println("\tAsset offer: ");
-			bid.setCells(getAuctionItem());
-			
-			return bid;
-		}
-
-		/**
-		 * Asks the player if he wants to sell an asset
-		 */
-		@Override
-		public boolean doPerformAuction()
-		{
-			System.out.println("Would you like to sell an asset? (Y/N):");
-			return GetYesNoAnswer();
-		}
-
-		/**
 		 * Checks if the player wants to buy a cell
 		 */
 		@Override
@@ -187,123 +145,6 @@ public class PlayerManager
 			String buyMessage = "Would you like to build a house in " + landCell.getName() + " for " + landCell.getSingleHousePrice() + "? (Y/N):";
 			System.out.println(buyMessage);
 			return GetYesNoAnswer();
-		}
-		
-		/**
-		 * Gets an auction decision from the player who performed an auction
-		 * The decision is made based on the given auction suggestions from all the players
-		 */
-		@Override
-		public Player getAuctionDecision(
-				Dictionary<Player, AuctionBid> auctionResult)
-		{
-			System.out.println("Auction finished, time to select your decision:");
-			List<Player> players = new ArrayList<Player>();
-			int counter = 1;
-			
-			System.out.println("0. Cancel Auction");
-			Enumeration<Player> keys = auctionResult.keys();
-			while (keys.hasMoreElements())
-			{
-				Player suggestingPlayer = keys.nextElement();
-				AuctionBid bid = auctionResult.get(suggestingPlayer);
-				System.out.println(counter + ". " + suggestingPlayer.getName() + " suggsting:");
-				System.out.println("\tCash: " + bid.getCash());
-				if (bid.getCells() != null)
-				{
-					for (CellBase cell : bid.getCells())
-					{
-						System.out.println("\tAsset: " + cell.getName());
-					}
-				}
-				
-				players.add(suggestingPlayer);
-				counter ++;
-			}
-			
-			int selection = 0;
-			while ((selection = ReadIntFromConsole()) < 0 || selection > players.size())
-			{
-				System.out.println("Invalid input, try again:");
-			}
-			if (selection == 0)
-			{
-				return null;
-			}
-			
-			return players.get(selection - 1);
-		}
-
-		/**
-		 * Gets the item(s) to be proposed in the auction
-		 */
-		@Override
-		public List<CellBase> getAuctionItem()
-		{
-			Player me = (Player) sender;
-			List<CellBase> sellingList = null;
-			
-			if (!me.getOwnedCells().getCell().isEmpty())
-			{
-				int counter = 1;
-				System.out.println(me.getName() + " select item to sell:");
-				System.out.println("\t0. None");
-				for (CellBase itemToSell : me.getOwnedCells().getCell())
-				{
-					System.out.println("\t" + counter + ". " + itemToSell.getName());
-					counter ++;
-				}
-				
-				int selection = 0;
-				while ((selection = ReadIntFromConsole()) < 0 || selection > me.getOwnedCells().getCell().size())
-				{
-					System.out.println("Invalid input, try again:");
-				}
-				
-				if (selection != 0)
-				{
-					CellBase itemToSell = me.getOwnedCells().getCell().get(selection - 1);
-					if (RealEstate.getRealEstate().doesOwnWholeGroup(itemToSell))
-					{
-						System.out.println("You own the whole group. Sell group? (Y/N)");
-						if (GetYesNoAnswer())
-						{
-							sellingList = RealEstate.getRealEstate().getWholeGroup(itemToSell);
-						}
-					}
-					else
-					{
-						sellingList = new ArrayList<CellBase>();
-						sellingList.add(itemToSell);
-					}
-				}
-			}
-			return sellingList;
-		}
-		
-		/**
-		 * Reads an integer from the console
-		 * @return the integer read from the console
-		 */
-		private int ReadIntFromConsole()
-		{
-			boolean validInt = false;
-			int newInt = 0;
-			
-			while (!validInt)
-			{
-				try
-				{
-					newInt = Integer.parseInt(scanner.nextLine());
-					validInt = true;
-				}
-				catch (Exception exp)
-				{
-					System.out.println("Please enter a valid number");
-				}
-			}
-			
-			return newInt;
 		}
 		
 		/**

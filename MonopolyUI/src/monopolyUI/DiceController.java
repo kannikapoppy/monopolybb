@@ -6,10 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import java.awt.GridBagConstraints;
-import javax.swing.ImageIcon;
 import java.awt.Insets;
-import java.awt.GridLayout;
-import java.util.Random;
 
 import javax.swing.SwingConstants;
 
@@ -17,24 +14,30 @@ import main.MonopolyGame;
 import objectmodel.Dice.DiceThrowResult;
 import services.Utils;
 import javax.swing.JButton;
-import java.awt.FlowLayout;
-import java.awt.BorderLayout;
-import javax.swing.Box;
 import java.awt.Component;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import java.awt.CardLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+/**
+ * this class displays the Dice
+ * @author Benda & Eizenman
+ *
+ */
 public class DiceController extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+	/**
+	 * the first dice image
+	 */
 	private final JLabel lblfirstDice = new JLabel("");
+	/**
+	 * the second dice image
+	 */
 	private final JLabel labelSecondDice = new JLabel("");
+	/**
+	 * button to roll the dice
+	 */
 	private final JButton btnRollDice = new JButton("Roll Dice");
-	private final int DELAY_TIME_MS = 300;
 
 	/**
 	 * This is the default constructor
@@ -72,10 +75,13 @@ public class DiceController extends JPanel {
 		
 		btnRollDice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// we just notify the game that it can proceeds now after the user decided
+				// he wants to roll the dice. this is of course only relevant to human players
 				game.NotifyRollDice();
 			}
 		});
 		
+		// at first the dice button is disabled, until we get an event from the game
 		btnRollDice.setEnabled(false);
 		GridBagConstraints gbc_btnRollDice = new GridBagConstraints();
 		gbc_btnRollDice.gridwidth = 2;
@@ -85,6 +91,10 @@ public class DiceController extends JPanel {
 		initialize();
 	}
 	
+	/**
+	 * simulate dice throw
+	 * @param diceThrow
+	 */
 	public void SimulateThrow(final DiceThrowResult diceThrow)
 	{
 		SwingUtilities.invokeLater(new Runnable() {
@@ -92,6 +102,7 @@ public class DiceController extends JPanel {
 		    {
 				btnRollDice.setEnabled(false);
 				
+				// set the images describing the throw
 				lblfirstDice.setIcon(Utils.getImageIcon("die" + diceThrow.getFirstDice() + ".gif"));
 				labelSecondDice.setIcon(Utils.getImageIcon("die" + diceThrow.getSecondDice() + ".gif"));
 				
@@ -101,6 +112,9 @@ public class DiceController extends JPanel {
 		});
 	}
 
+	/**
+	 * enable the dice throw button so the user can indicate he wants to throw the dice
+	 */
 	public void EnableDiceThrow()
     {
 		SwingUtilities.invokeLater(new Runnable() {

@@ -1,6 +1,5 @@
 package GameStateChangedEvent;
 
-import objectmodel.CellBase;
 import objectmodel.City;
 import objectmodel.Player;
 import main.GameStates;

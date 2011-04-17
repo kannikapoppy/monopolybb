@@ -1,7 +1,6 @@
 package main;
 
 import java.util.EventListener;
-import java.util.EventObject;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 

@@ -13,7 +13,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import main.GameStates;
 import main.StateManager;
 
 
@@ -233,6 +232,10 @@ public class City
     			StateManager.getStateManager().setCurrentStateToPlayerPaying(this, 
     					landedPlayer.getName() + " has to pay " + payToll + " to " + owner.getName(),
     					landedPlayer, payToll);
+    			
+    			StateManager.getStateManager().setCurrentStateToPlayerGotPaid(this, 
+    					owner.getName() + " got paid " + payToll + " by " + landedPlayer.getName(),
+    					owner, payToll);
     		}
     	}
     	// no one owns the city
