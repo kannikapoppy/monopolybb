@@ -18,6 +18,7 @@ public class Board extends JPanel {
 
 	private static final int LINE_SIZE = 9;
 	private CenterBoard innerBoard = null;
+	private EventHandler eventHandler = null;
 	
 	/**
 	 * The game board representation
@@ -57,8 +58,8 @@ public class Board extends JPanel {
 		// Create the logic
 		monopolyGame = new MonopolyGame();
 		// Create the event Handler & register to the events 
-		EventHandler eventHandler = new EventHandler(this);
-		eventHandler.registerEvents(monopolyGame);
+		eventHandler = new EventHandler(this);
+		eventHandler.registerEvents();
 		
 		if (!monopolyGame.initGame(players))
 		{
@@ -68,6 +69,11 @@ public class Board extends JPanel {
 		initUI(players);
 	}
     
+    public MonopolyGame getMonopolyGame()
+    {
+    	return monopolyGame;
+    }
+
     public void StartGame() throws Exception
     {
     	try
@@ -83,6 +89,11 @@ public class Board extends JPanel {
     	}
     }
 
+    public void FinishGame()
+    {
+    	eventHandler.unRegisterEvents();
+    }
+    
     private void initUI(List<Player> players) {
         // init layout
         this.setLayout(new GridBagLayout());
@@ -166,7 +177,7 @@ public class Board extends JPanel {
     	validate();
 		repaint();
     }
-
+    
     public void MovePlayer(final Player player, final CellBase origin, final CellBase destination)
     {
     	try {

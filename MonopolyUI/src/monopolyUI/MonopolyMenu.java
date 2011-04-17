@@ -49,6 +49,18 @@ public class MonopolyMenu extends JMenuBar
 						});
 						return;
 					}
+					
+					for(Component comp : rootFrame.getContentPane().getComponents())
+					{
+						if (comp instanceof Board)
+						{
+							Board previousGame = (Board)comp;
+							previousGame.FinishGame();
+							rootFrame.getContentPane().remove(comp);
+							break;
+						}
+					}
+					
 					rootFrame.getContentPane().add(board, BorderLayout.CENTER);
 					rootFrame.setVisible(true);
 					try

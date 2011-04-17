@@ -28,6 +28,7 @@ import monopolyUI.Board;
 public class EventHandler
 {
 	private Board board = null;
+	GameStateChangedEventListener listener = null;
 	
 	public EventHandler(Board board)
 	{
@@ -38,15 +39,27 @@ public class EventHandler
 	 * Registers to the events in the logic
 	 * @param monopolyGame - the logic
 	 */
-	public void registerEvents(MonopolyGame monopolyGame)
+	public void registerEvents()
 	{
-		monopolyGame.getStateManager().registerToGameChangedEvent(GameStateChangedEventListener.class, new GameStateChangedEventListener() {
+		listener = new GameStateChangedEventListener() {
 			
 			@Override
 			public void gameStateChanged(GameStateChangedEvent evt) {
 				HandleState(evt);
 			}
-		});
+		};
+		
+		board.getMonopolyGame().getStateManager().registerToGameChangedEvent(GameStateChangedEventListener.class, 
+				listener);
+	}
+	
+	/**
+	 * Registers to the events in the logic
+	 * @param monopolyGame - the logic
+	 */
+	public void unRegisterEvents()
+	{
+		board.getMonopolyGame().getStateManager().unregisterFromGameChangedEvent(listener);
 	}
 	
 	/**
