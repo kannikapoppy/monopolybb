@@ -143,9 +143,9 @@ public class Asset
     			}
     					
     			landedPlayer.getPlayerActions().payToPlayer(owner, payToll);
-    			StateManager.getStateManager().setCurrentStateToPlayerPaying(this, 
+    			StateManager.getStateManager().setCurrentStateToPlayerPayingToAnotherPlayer(this,
     					landedPlayer.getName() + " has to pay " + payToll + " to " + owner.getName(),
-    					landedPlayer, payToll);
+    					landedPlayer, payToll, owner);
     		}
     	}
     	// no one owns the asset
@@ -164,6 +164,9 @@ public class Asset
     				owned = true;
     				StateManager.getStateManager().setCurrentStateToPlayerBuying(this, 
     						landedPlayer.getName() + " has just bought " + name, landedPlayer, this);
+                                StateManager.getStateManager().setCurrentStateToPlayerPayingToBank(this,
+    						landedPlayer.getName() + " has just bought " + name + " for " + price,
+                                                landedPlayer, price);
     			}
     		}
     		// not enough $$$

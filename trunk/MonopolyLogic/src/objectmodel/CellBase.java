@@ -14,8 +14,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import main.GettingOutOfJailReason;
 
-import objectmodel.Dice.DiceThrowResult;
+import objectmodel.DiceThrowResult;
 
 import main.StateManager;
 
@@ -295,9 +296,14 @@ public class CellBase {
     		}
     		
     		thePlayer.setInJail(false);
+
+                GettingOutOfJailReason reason = GettingOutOfJailReason.Double;
+                if (hasPass)
+                    reason = GettingOutOfJailReason.Card;
+
     		StateManager.getStateManager().setCurrentStateToPlayerGettingOutOfJail(this, 
 					thePlayer.getName() + " is walking out of jail with a jail pass",
-					thePlayer);
+					thePlayer, reason);
     	}
     	
     	return true;
@@ -305,19 +311,25 @@ public class CellBase {
     
     public void performPlayerLand(Player landedPlayer)
     {
-    	if (landToll != null)
+        if (getType().compareTo("Go") == 0)
+        {
+            StateManager.getStateManager().setCurrentStateToPlayerLandedOnStartSquare(this, "Passing Go",      
+                   landedPlayer);
+        }
+
+        if (landToll != null)
     	{
     		if (landToll > 0)
     		{
     			landedPlayer.getPlayerActions().payMoneyToBank(landToll);
-    			StateManager.getStateManager().setCurrentStateToPlayerPaying(this, 
+    			StateManager.getStateManager().setCurrentStateToPlayerPayingToBank(this,
     					landedPlayer.getName() + " is paying " + landToll + " to the bank",
     					landedPlayer, landToll);
     		}
     		else
     		{
     			landedPlayer.getPlayerActions().getMoneyFromBank(-landToll);
-    			StateManager.getStateManager().setCurrentStateToPlayerGotPaid(this, 
+    			StateManager.getStateManager().setCurrentStateToPlayerGettingPaidByTheBank(this,
     					landedPlayer.getName() + " got " + -landToll + " from the bank",
     					landedPlayer, -landToll);
     		}
