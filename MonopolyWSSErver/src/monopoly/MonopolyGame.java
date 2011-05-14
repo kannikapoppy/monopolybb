@@ -5,12 +5,15 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import main.UserPrompt;
 import monopoly.gamesmanager.MonopolyGameManager;
 import monopoly.results.EventArrayResult;
 import monopoly.results.GameDetailsResult;
 import monopoly.results.IDResult;
 import monopoly.results.MonopolyResult;
 import monopoly.results.PlayerDetailsResult;
+import objectmodel.DiceThrowResult;
+import objectmodel.Player;
 
 /**
  *
@@ -117,10 +120,20 @@ public class MonopolyGame {
     }
 
     public MonopolyResult setDiceRollResults(int playerID, int eventID, int dice1, int dice2) {
-        //validate evendID against last eventID
-        //validate playerID against games players and players state
-        //validate game mode
-        return new MonopolyResult("Dice1= " + dice1 + ", Dice2= " + dice2);
+        if (gameManager.getGame() != null)
+        {
+            Player player = gameManager.getGame().GetPlayer(playerID);
+
+            if (player != null)
+            {
+                if (UserPrompt.Validate(player,eventID))
+                {
+                    UserPrompt.Notify(eventID, new DiceThrowResult(dice1, dice2));
+                    return new MonopolyResult("Dice1= " + dice1 + ", Dice2= " + dice2);
+                }
+            }
+        }
+        return new MonopolyResult(true, "Error!");
     }
 
     public MonopolyResult resign(int playerID) {
@@ -129,9 +142,19 @@ public class MonopolyGame {
     }
 
     public MonopolyResult buy(int playerID, int eventID, boolean buy) {
-        //validate evendID against last eventID
-        //validate playerID against games players and players state
-        //validate asset from eventID
+        if (gameManager.getGame() != null)
+        {
+            Player player = gameManager.getGame().GetPlayer(playerID);
+            
+            if (player != null)
+            {
+                if (UserPrompt.Validate(player,eventID))
+                {
+                    UserPrompt.Notify(eventID, buy);
+                    return new MonopolyResult(false, "All Good");
+                }
+            }
+        }
         return new MonopolyResult(true, "No Buy!");
     }
 }
