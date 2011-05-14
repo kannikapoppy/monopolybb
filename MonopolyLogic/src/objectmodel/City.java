@@ -8,12 +8,17 @@
 
 package objectmodel;
 
+import Utils.WaitNotifyManager;
+import java.beans.EventHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import main.StateManager;
+import main.UserPrompt;
 
 
 /**
@@ -191,13 +196,30 @@ public class City
     			if (RealEstate.getRealEstate().doesOwnCountry(landedPlayer, country.getName()) && housesNumber < 3)
     			{
     				// we can build houses, do we want to & have the $$$?
-    				if (singleHousePrice < landedPlayer.getMoney() && landedPlayer.getInputObject().buildHouse(this))
+    				if (singleHousePrice < landedPlayer.getMoney())
     				{
-    					landedPlayer.getPlayerActions().payMoneyToBank(singleHousePrice);
-    					StateManager.getStateManager().setCurrentStateToPlayerBuilding(this, 
-    							landedPlayer.getName() + " is building a house in " + name,
-    							landedPlayer, this);
-    					housesNumber ++;
+    					WaitNotifyManager waiter = new WaitNotifyManager();
+
+                                        StateManager.getStateManager().setCurrentStateToPlayerOfferBuilding(this,
+    						landedPlayer.getName() + " has just bought " + name,
+    						landedPlayer, this, waiter);
+         
+                                        waiter.doWait();
+
+                                        boolean wantsToBuild = (Boolean)UserPrompt.GetObject();
+                                    
+                                        if (wantsToBuild)
+                                        {
+
+                                            landedPlayer.getPlayerActions().payMoneyToBank(singleHousePrice);
+                                            StateManager.getStateManager().setCurrentStateToPlayerBuilding(this,
+                                                            landedPlayer.getName() + " is building a house in " + name,
+                                                            landedPlayer, this);
+                                            StateManager.getStateManager().setCurrentStateToPlayerPayingToBank(this,
+                                                            landedPlayer.getName() + " is paying to the bank for a house",
+                                                            landedPlayer, singleHousePrice);
+                                            housesNumber ++;
+                                        }
     				}
     			}
     			// we don't own the country or the city already has 3 houses
@@ -229,13 +251,9 @@ public class City
     			}
     			
     			landedPlayer.getPlayerActions().payToPlayer(owner, payToll);
-    			StateManager.getStateManager().setCurrentStateToPlayerPaying(this, 
+    			StateManager.getStateManager().setCurrentStateToPlayerPayingToAnotherPlayer(this,
     					landedPlayer.getName() + " has to pay " + payToll + " to " + owner.getName(),
-    					landedPlayer, payToll);
-    			
-    			StateManager.getStateManager().setCurrentStateToPlayerGotPaid(this, 
-    					owner.getName() + " got paid " + payToll + " by " + landedPlayer.getName(),
-    					owner, payToll);
+    					landedPlayer, payToll, owner);
     		}
     	}
     	// no one owns the city
@@ -244,8 +262,18 @@ public class City
     		// does the player have enough money to buy the city?
     		if (landedPlayer.getMoney() > price)
     		{
-    			// does the player want to buy the city?
-    			if (landedPlayer.getInputObject().buyCell(this))
+    			WaitNotifyManager waiter = new WaitNotifyManager();
+
+                        StateManager.getStateManager().setCurrentStateToPlayerOfferBuying(this,
+    						landedPlayer.getName() + " has just bought " + name,
+    						landedPlayer, this, waiter);
+
+                        waiter.doWait();
+
+                        boolean wantsToBuy = (Boolean)UserPrompt.GetObject();
+
+                        // does the player want to buy the city?
+    			if (wantsToBuy)
     			{
     				// yep! buy the city...
     				landedPlayer.getPlayerActions().payMoneyToBank(price);
@@ -255,6 +283,9 @@ public class City
     				StateManager.getStateManager().setCurrentStateToPlayerBuying(this, 
     						landedPlayer.getName() + " has just bought " + name,
     						landedPlayer, this);
+                                StateManager.getStateManager().setCurrentStateToPlayerPayingToBank(this,
+    						landedPlayer.getName() + " has just bought " + name + " for " + price,
+    						landedPlayer, price);
     			}
     		}
     		// not enough $$$
