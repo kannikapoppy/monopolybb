@@ -10,7 +10,7 @@ import objectmodel.BonusCard;
 import objectmodel.CardsDeck;
 import objectmodel.CellBase;
 import objectmodel.City;
-import objectmodel.Dice.DiceThrowResult;
+import objectmodel.DiceThrowResult;
 import objectmodel.Player;
 
 import GameStateChangedEvent.GameStateChangedEvent;
@@ -18,10 +18,15 @@ import GameStateChangedEvent.GameStateChangedToPlayerActionEvent;
 import GameStateChangedEvent.GameStateChangedToPlayerBuildingEvent;
 import GameStateChangedEvent.GameStateChangedToPlayerBuyingEvent;
 import GameStateChangedEvent.GameStateChangedToPlayerDrewCardEvent;
+import GameStateChangedEvent.GameStateChangedToPlayerGettingOutOfJailEvent;
 import GameStateChangedEvent.GameStateChangedToPlayerLandedEvent;
 import GameStateChangedEvent.GameStateChangedToPlayerMovingEvent;
 import GameStateChangedEvent.GameStateChangedToPlayerPaymentsEvent;
 import GameStateChangedEvent.GameStateChangedToPlayerRollingEvent;
+import GameStateChangedEvent.GameStateChangedToPromptPlayerActionEvent;
+import GameStateChangedEvent.GameStateChangedToPromptPlayerBuildingEvent;
+import GameStateChangedEvent.GameStateChangedToPromptPlayerBuyingEvent;
+import Utils.WaitNotifyManager;
 
 /**
  * Manages the transitions of states in the game
@@ -205,25 +210,6 @@ public class StateManager
 	 * @param source - the object who triggered the game state change
 	 * @param message - a message regarding the new state
 	 * @param player - player who made the action
-	 */
-	public void setCurrentStateToWaitingForPlayerToRoll(Object source, String message, 
-			Player player)
-	{
-		GameStateChangedToPlayerActionEvent newEvent = new GameStateChangedToPlayerActionEvent(this, currentState, 
-				GameStates.WaitingForPlayerToRoll, message, player);
-		
-		// Change the state and raise the event
-		innerSetCurrentState(newEvent);
-	}
-	
-	
-	
-	/**
-	 * Sets the current game state
-	 * Triggers an event for the new state 
-	 * @param source - the object who triggered the game state change
-	 * @param message - a message regarding the new state
-	 * @param player - player who made the action
 	 * @param numberOfSteps - number of steps to move. 
 	 */
 	public void setCurrentStateToPlayerMoving(Object source, String message, Player player, 
@@ -245,10 +231,11 @@ public class StateManager
 	 * @param numberOfSteps - number of steps to move. 
 	 */
 	public void setCurrentStateToPlayerGettingOutOfJail(Object source, String message, 
-			Player player)
+			Player player, GettingOutOfJailReason reason)
 	{
-		GameStateChangedToPlayerActionEvent newEvent = new GameStateChangedToPlayerActionEvent(this, currentState, 
-				GameStates.PlayerGettingOutOfJail, message, player);
+		GameStateChangedToPlayerGettingOutOfJailEvent newEvent =
+                        new GameStateChangedToPlayerGettingOutOfJailEvent(this, currentState,
+				GameStates.PlayerGettingOutOfJail, message, player, reason);
 		
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
@@ -290,21 +277,21 @@ public class StateManager
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
 	}
-	
-	/**
+
+        /**
 	 * Sets the current game state
-	 * Triggers an event for the new state 
+	 * Triggers an event for the new state
 	 * @param source - the object who triggered the game state change
 	 * @param message - a message regarding the new state
 	 * @param player - player who made the action
-	 * @param amount - amount to pay
+	 * @param boughtCell - cell which was bought
 	 */
-	public void setCurrentStateToPlayerPaying(Object source, String message, Player player, 
-			int amount)
+	public void setCurrentStateToPlayerOfferBuying(Object source, String message, Player player,
+			CellBase offeredCell, WaitNotifyManager eventHandler)
 	{
-		GameStateChangedToPlayerPaymentsEvent newEvent = new GameStateChangedToPlayerPaymentsEvent(this, currentState, 
-				GameStates.PlayerPaying, message, player, amount);
-		
+		GameStateChangedToPromptPlayerBuyingEvent newEvent = new GameStateChangedToPromptPlayerBuyingEvent(this,
+                        currentState, GameStates.PromptPlayerForBuying, message, player, offeredCell, eventHandler);
+
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
 	}
@@ -315,14 +302,57 @@ public class StateManager
 	 * @param source - the object who triggered the game state change
 	 * @param message - a message regarding the new state
 	 * @param player - player who made the action
-	 * @param amount - amount received
+	 * @param amount - amount to pay
+         * @param otherPlayer - player getting the money
 	 */
-	public void setCurrentStateToPlayerGotPaid(Object source, String message, Player player, 
+	public void setCurrentStateToPlayerPayingToAnotherPlayer(Object source, String message, Player player,
+			int amount, Player otherPlayer)
+	{
+		GameStateChangedToPlayerPaymentsEvent newEvent =
+                        new GameStateChangedToPlayerPaymentsEvent(this, currentState,
+				GameStates.PlayerPayment, message, player, amount, otherPlayer,
+                                MoneyTransactionDirection.Paying);
+		
+		// Change the state and raise the event
+		innerSetCurrentState(newEvent);
+	}
+
+        /**
+	 * Sets the current game state
+	 * Triggers an event for the new state
+	 * @param source - the object who triggered the game state change
+	 * @param message - a message regarding the new state
+	 * @param player - player who made the action
+	 * @param amount - amount to pay
+	 */
+	public void setCurrentStateToPlayerPayingToBank(Object source, String message, Player player,
 			int amount)
 	{
-		GameStateChangedToPlayerPaymentsEvent newEvent = new GameStateChangedToPlayerPaymentsEvent(this, currentState, 
-				GameStates.PlayerGotPaid, message, player, amount);
-		
+		GameStateChangedToPlayerPaymentsEvent newEvent =
+                        new GameStateChangedToPlayerPaymentsEvent(this, currentState,
+				GameStates.PlayerPayment, message, player, amount, null,
+                                MoneyTransactionDirection.Paying);
+
+		// Change the state and raise the event
+		innerSetCurrentState(newEvent);
+	}
+
+        /**
+	 * Sets the current game state
+	 * Triggers an event for the new state
+	 * @param source - the object who triggered the game state change
+	 * @param message - a message regarding the new state
+	 * @param player - player who made the action
+	 * @param amount - amount to pay
+	 */
+	public void setCurrentStateToPlayerGettingPaidByTheBank(Object source, String message, Player player,
+			int amount)
+	{
+		GameStateChangedToPlayerPaymentsEvent newEvent =
+                        new GameStateChangedToPlayerPaymentsEvent(this, currentState,
+				GameStates.PlayerPayment, message, player, amount, null,
+                                MoneyTransactionDirection.GettingPaid);
+
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
 	}
@@ -341,6 +371,42 @@ public class StateManager
 		GameStateChangedToPlayerBuildingEvent newEvent = new GameStateChangedToPlayerBuildingEvent(this, currentState, 
 				GameStates.PlayerBuilding, message, player, where);
 		
+		// Change the state and raise the event
+		innerSetCurrentState(newEvent);
+	}
+
+        /**
+	 * Sets the current game state
+	 * Triggers an event for the new state
+	 * @param source - the object who triggered the game state change
+	 * @param message - a message regarding the new state
+	 * @param player - player who made the action
+	 * @param where - city at which building
+	 */
+	public void setCurrentStateToPlayerOfferBuilding(Object source, String message, Player player,
+			City where, WaitNotifyManager eventHandler)
+	{
+		GameStateChangedToPromptPlayerBuildingEvent newEvent = new GameStateChangedToPromptPlayerBuildingEvent(this,
+                        currentState, GameStates.PlayerBuilding, message, player, where, eventHandler);
+
+		// Change the state and raise the event
+		innerSetCurrentState(newEvent);
+	}
+
+        /**
+	 * Sets the current game state
+	 * Triggers an event for the new state
+	 * @param source - the object who triggered the game state change
+	 * @param message - a message regarding the new state
+	 * @param player - player who made the action
+	 * @param where - city at which building
+	 */
+	public void setCurrentStateToPromptPlayerRollDice(Object source, String message, Player player,
+			WaitNotifyManager eventHandler)
+	{
+		GameStateChangedToPromptPlayerActionEvent newEvent = new GameStateChangedToPromptPlayerActionEvent(this,
+                        currentState, GameStates.PromptPlayerForRollingDice, message, player, eventHandler);
+
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
 	}
@@ -411,6 +477,38 @@ public class StateManager
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
 	}
+
+        /**
+	 * Sets the current game state
+	 * Triggers an event for the new state
+	 * @param source - the object who triggered the game state change
+	 * @param message - a message regarding the new state
+	 * @param player - player who made the action
+	 */
+	public void setCurrentStateToPlayerPassedStartSquare(Object source, String message, Player player)
+	{
+		GameStateChangedToPlayerActionEvent newEvent = new GameStateChangedToPlayerActionEvent(this, currentState,
+				GameStates.PlayerPassedStartSquare, message, player);
+
+		// Change the state and raise the event
+		innerSetCurrentState(newEvent);
+	}
+
+        /**
+	 * Sets the current game state
+	 * Triggers an event for the new state
+	 * @param source - the object who triggered the game state change
+	 * @param message - a message regarding the new state
+	 * @param player - player who made the action
+	 */
+	public void setCurrentStateToPlayerLandedOnStartSquare(Object source, String message, Player player)
+	{
+		GameStateChangedToPlayerActionEvent newEvent = new GameStateChangedToPlayerActionEvent(this, currentState,
+				GameStates.PlayerLandedOnStartSquare, message, player);
+
+		// Change the state and raise the event
+		innerSetCurrentState(newEvent);
+	}
 	
 	/**
 	 * Register for a general event with a specific type of event listener
@@ -457,19 +555,22 @@ public class StateManager
 				break;
 			case PlayerSelling:
 			case PlayerRolling:
-			case WaitingForPlayerToRoll:
+                        case PromptPlayerForRollingDice:
 			case PlayerMoving:
 			case PlayerGettingOutOfJail:
 			case PlayerLanded:
 			case PlayerBuying:
+                        case PromptPlayerForBuying:
 			case PlayerBidding:
-			case PlayerPaying:
-			case PlayerGotPaid:
+			case PlayerPayment:
 			case PlayerBuilding:
+                        case PromptPlayerForBuilding:
 			case PlayerDrewCard:
 			case Auction:
 			case PlayerBroke:
 			case PlayerLost:
+                        case PlayerPassedStartSquare:
+                        case PlayerLandedOnStartSquare:
 				releventListeners = listenerList.getListeners(PlayerActionEventListener.class);
 				break;
 			case PlayerSwitching:
