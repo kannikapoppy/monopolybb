@@ -4,10 +4,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import objectmodel.Player;
 import services.Utils;
 
 import java.awt.BorderLayout;
+import src.client.PlayerDetails;
 
 /**
  * displays one player in the center board player mapping
@@ -18,7 +18,7 @@ public class SinglePlayerDisplay extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	/**
-	 * display color, name and amount of money of player 
+	 * display color, name and amount of money of player
 	 */
 	private final JLabel userLbl = new JLabel("", JLabel.LEFT);
 	/**
@@ -28,43 +28,43 @@ public class SinglePlayerDisplay extends JPanel {
 	/**
 	 * the player object this class is displaying
 	 */
-	private Player player;
+	private PlayerDetails player;
 
 	/**
 	 * This is the default constructor
 	 */
-	public SinglePlayerDisplay(Player player) {
+	public SinglePlayerDisplay(PlayerDetails player) {
 		super();
-		
+
 		this.player = player;
-		
+
 		setLayout(new BorderLayout(0, 0));
-		
+
 		// set the player text display
 		UpdatePlayerLabelText();
 		String colorImageName = "Box" + player.getPlayerColor().toString() + "32.png";
 		userLbl.setIcon(Utils.getImageIcon(colorImageName));
-		
+
 		add(userLbl, BorderLayout.WEST);
-		
+
 		// add the current player indication
 		currentPlayerLbl.setIcon(Utils.getImageIcon("arrow-left.gif"));
 		currentPlayerLbl.setVisible(false);
-		
+
 		add(currentPlayerLbl, BorderLayout.EAST);
-		
+
 		initialize();
 	}
-	
+
 	/**
 	 * updates the player text composed of color, name and money
 	 */
 	public void UpdatePlayerLabelText()
 	{
 		SwingUtilities.invokeLater(new Runnable() {
-			public void run() 
-		    { 
-				userLbl.setText(player.getName() + ", " + player.getMoney() + "$");
+			public void run()
+		    {
+				userLbl.setText(player.getName() + ", " + player.getAmount() + "$");
 				if (!player.isInGame())
 				{
 					// if the player is not in game == lost then disable the mapping
@@ -73,7 +73,7 @@ public class SinglePlayerDisplay extends JPanel {
 		    }
 		});
 	}
-	
+
 	/**
 	 * turn on or off the current player indication, depending on who's turn is it right now.
 	 * @param isHisTurn
@@ -81,10 +81,10 @@ public class SinglePlayerDisplay extends JPanel {
 	public void SetPlayingUser(final boolean isHisTurn)
 	{
 		SwingUtilities.invokeLater(new Runnable() {
-			public void run() 
-		    { 
+			public void run()
+		    {
 				currentPlayerLbl.setVisible(isHisTurn);
-				
+
 				validate();
 				repaint();
 		    }
@@ -93,7 +93,7 @@ public class SinglePlayerDisplay extends JPanel {
 
 	/**
 	 * This method initializes this
-	 * 
+	 *
 	 * @return void
 	 */
 	private void initialize() {
