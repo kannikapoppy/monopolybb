@@ -4,12 +4,13 @@ import javax.swing.*;
 
 import java.util.List;
 
-import objectmodel.Player;
 import services.Utils;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
+import src.client.Server;
 
 /**
  * this class is the menu of the glorious game
@@ -20,88 +21,152 @@ public class MonopolyMenu extends JMenuBar
 	{
 	
 	private static final String FILE_STR = "File";
-	private static final String NEW_GAME_STR = "New Game";
+	private static final String NEW_GAME_STR = "Start/Join Game";
 	private static final String EXIT_STR = "Exit";
-	private static final String UNABLE_TO_INIT_GAME_PREFIX_ERROR_MSG = "Unable To Init Game! Error message: ";
+	private static final String GAME_IN_PROGRESS_ERROR_MSG = "A game is in progress and the server supports only one conccurent game.";
 	private static final String GAME_ENDED_UNEXPECTEDLY_PREFIX_ERROR_MSG = "The game has ended unexpectedly! Error message: ";
 	private static final String CANT_START_NEW_GAME_UNTIL_NOT_FINISH_CURRENT_ERROR_MSG = "The crrent game didn't finish. First finish the current game and only than you may start a new one.";
 
     public MonopolyMenu() throws HeadlessException {
-    	JMenu fileMenu = new JMenu(FILE_STR);
+    	final JComponent parentComponenet = this;
+
+        JMenu fileMenu = new JMenu(FILE_STR);
         this.add (fileMenu);
 
-        JMenuItem newGameMenu = new JMenuItem(NEW_GAME_STR);
+        final JMenuItem newGameMenu = new JMenuItem(NEW_GAME_STR);
         fileMenu.add(newGameMenu);
         newGameMenu.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// new game was clicked
-				// first see if the current game ended
-				JFrame rootFrame = (JFrame)getTopLevelAncestor(); 
+            public void actionPerformed(ActionEvent e) {
+                final List<String> waitingGames = Server.getInstance().getWaitingGames();
+                if (waitingGames.isEmpty())
+                {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run()
+                    {
+                        if (!Server.getInstance().getActiveGames().isEmpty())
+                        {
+                            Utils.ShowError(parentComponenet, GAME_IN_PROGRESS_ERROR_MSG);
+                            return;
+                        }
+
+                        String gameName = JOptionPane.showInputDialog(null,
+                            "Currenly No Game Exists. Please Provide A Name For The New Game",
+                            "Create New Game",
+                            JOptionPane.QUESTION_MESSAGE);
+
+                        while (true)
+                        {
+                            if (gameName == null)
+                                return;
+
+                            if (gameName.trim().isEmpty())
+                                gameName = JOptionPane.showInputDialog(null,
+                                    "Empty Name Is Not Valid. Please Provide A Name For The New Game",
+                                    "Create New Game",
+                                    JOptionPane.QUESTION_MESSAGE);
+                            else
+                                break;
+                        }
+                        
+                        String humanPlayersStr = JOptionPane.showInputDialog(null,
+                            "Please Insert The Number Of Human Players",
+                            "Human Players",
+                            JOptionPane.QUESTION_MESSAGE);
+
+                        if (humanPlayersStr == null)
+                            return;
+
+                        int humanPlayers = 0;
+
+                        while (true)
+                        {
+                            try
+                            {
+                                humanPlayers = Integer.parseInt(humanPlayersStr);
+                                if (humanPlayers > 0 && humanPlayers <= 6)
+                                {
+                                    break;
+                                }
+                            }
+                            catch (NumberFormatException ex) {}
+
+                            humanPlayersStr = JOptionPane.showInputDialog(null,
+                            "Invalid Input. Try Again. Please Insert The Number Of Human Players",
+                            "Human Players",
+                            JOptionPane.QUESTION_MESSAGE);
+
+                            if (humanPlayersStr == null)
+                            return;
+                        }
+
+                        int machinePlayers = 0;
+
+                        if (humanPlayers == 6)
+                            machinePlayers = 0;
+                        else
+                        {
+                            String machinePlayersStr = JOptionPane.showInputDialog(null,
+                                "Please Insert The Number Of Machine Players",
+                                "Machine Players",
+                                JOptionPane.QUESTION_MESSAGE);
+
+                            if (machinePlayersStr == null)
+                                return;
+
+                            while (true)
+                            {
+                                try
+                                {
+                                    machinePlayers = Integer.parseInt(machinePlayersStr);
+                                    if ((machinePlayers + humanPlayers) >= 2 && (machinePlayers + humanPlayers) <= 6)
+                                    {
+                                        break;
+                                    }
+                                }
+                                catch (NumberFormatException ex){}
+
+                                machinePlayersStr = JOptionPane.showInputDialog(null,
+                                "Invalid Input. Try Again. Please Insert The Number Of Machine Players",
+                                "Machine Players",
+                                JOptionPane.QUESTION_MESSAGE);
+
+                                if (machinePlayersStr == null)
+                                    return;
+                            }
+                        }
+                        boolean automateRollDice = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                            "Would You Like To Automate Dice Roll ?",
+                            "Automate Dice Roll", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
+                        boolean success = Server.getInstance().startNewGame(gameName, humanPlayers,
+                                machinePlayers, automateRollDice);
+                        if (!success)
+                        {
+                            // show error message and suggest to try again
+                            Utils.ShowError(parentComponenet, "Something went wrong. It's possible that a game has already been created. Try Again.");
+                        }
+                        else
+                        {
+                            PromptForUserName(gameName, newGameMenu);
+                            // show message that updates and states how many people are missing
+                        }
+
+                        }
+                    });
+                }
+                else
+                {
+                    // show join game window
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run()
+                        {
+                            PromptForUserName(waitingGames.get(0), newGameMenu);
+                        }
+                    });
+                }
+            }
+        });
 				
-				for(Component comp : rootFrame.getContentPane().getComponents())
-				{
-					if (comp instanceof Board)
-					{
-						Board previousGame = (Board)comp;
-						if (previousGame.getMonopolyGame().isPlaying())
-						{
-							// we don't allow new game to start until previous one ends
-							ShowError(CANT_START_NEW_GAME_UNTIL_NOT_FINISH_CURRENT_ERROR_MSG);
-							return;
-						}
-						
-						// clear the board and remove all relations to old game
-						previousGame.FinishGame();
-						rootFrame.getContentPane().remove(comp);
-						break;
-					}
-				}
-				
-				CreatePlayersDialog playersDialog = new CreatePlayersDialog(rootFrame);
-				playersDialog.setVisible(true);
-				List<Player> players = playersDialog.GetPlayers();
-				if (playersDialog.GetPlayers() != null)
-				{
-					// user wants to start the game
-					
-					// create the new board 
-					Board board = null;
-					try
-					{
-						board = new Board(players);
-					}
-					catch (final Exception ex)
-					{
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() 
-						    { 
-								ShowError(UNABLE_TO_INIT_GAME_PREFIX_ERROR_MSG + ex.getMessage());
-						    }
-						});
-						return;
-					}
-					
-					// display the board
-					rootFrame.getContentPane().add(board, BorderLayout.CENTER);
-					rootFrame.setVisible(true);
-					try
-					{
-						board.StartGame();
-					}
-					catch (final Exception ex)
-					{
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() 
-						    { 
-								ShowError(GAME_ENDED_UNEXPECTEDLY_PREFIX_ERROR_MSG + ex.getMessage());
-						    }
-						});	
-					}
-				}
-				
-			}
-		});
-        
         // add the exit menu item
         JMenuItem exitMenuItem = new JMenuItem(EXIT_STR);
         fileMenu.add(exitMenuItem);
@@ -111,19 +176,43 @@ public class MonopolyMenu extends JMenuBar
 			}
 		});
     }
-    
-    /**
-     * shows error to the screen
-     * @param msg
-     */
-    private void ShowError(final String msg)
+
+    private void PromptForUserName(String gameName, JMenuItem newGameMenu)
     {
-    	final JComponent parentComponenet = this;
-    	SwingUtilities.invokeLater(new Runnable() {
-			public void run() 
-		    { 
-				Utils.ShowError(parentComponenet, msg);
-		    }
-		});	
+        String playerName = JOptionPane.showInputDialog(null, "Please Provide User Name To Join The Game '" + gameName + "'", "Join Game",
+                JOptionPane.QUESTION_MESSAGE);
+        
+        while (true)
+        {
+            if (playerName == null)
+                return;
+            
+            if (playerName.trim().isEmpty())
+                playerName = JOptionPane.showInputDialog(null, "Empty Name Is Not Valid. Please Provide User Name To Join The Game '" + gameName + "'", "Join Game", 
+                        JOptionPane.QUESTION_MESSAGE);
+            else
+                break;
+        }
+        int playerId = Server.getInstance().joinPlayer(gameName, playerName);
+        if (playerId == -1)
+        {
+            // error occured, show message to try again with a different name
+            Utils.ShowError(this, "Something went wrong. Try Again.");
+        } 
+        else
+        {
+            // timer to show how many players are missing
+            Server.getInstance().setPlayerId(playerId);
+            // create the new board
+            Board board = null;
+            board = new Board(gameName, playerName);
+
+            // display the board
+            JFrame rootFrame = (JFrame)getTopLevelAncestor(); 
+            rootFrame.getContentPane().add(board, BorderLayout.CENTER);
+            rootFrame.setVisible(true);
+
+            newGameMenu.setEnabled(false);
+        }
     }
 }

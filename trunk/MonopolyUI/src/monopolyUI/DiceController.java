@@ -10,13 +10,13 @@ import java.awt.Insets;
 
 import javax.swing.SwingConstants;
 
-import main.MonopolyGame;
-import objectmodel.Dice.DiceThrowResult;
 import services.Utils;
 import javax.swing.JButton;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Random;
+import src.client.Server;
 
 /**
  * this class displays the Dice
@@ -42,16 +42,16 @@ public class DiceController extends JPanel {
 	/**
 	 * This is the default constructor
 	 */
-	public DiceController(final MonopolyGame game) {
+	public DiceController() {
 		super();
-		
+
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{106, 106, 0};
 		gridBagLayout.rowHeights = new int[]{107, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
-		
+
 		lblfirstDice.setAlignmentX(Component.CENTER_ALIGNMENT);
 		GridBagConstraints gbc_lblfirstDice = new GridBagConstraints();
 		gbc_lblfirstDice.anchor = GridBagConstraints.NORTHWEST;
@@ -59,7 +59,7 @@ public class DiceController extends JPanel {
 		gbc_lblfirstDice.gridx = 0;
 		gbc_lblfirstDice.gridy = 0;
 		add(lblfirstDice, gbc_lblfirstDice);
-		
+
 		lblfirstDice.setHorizontalAlignment(SwingConstants.CENTER);
 		lblfirstDice.setIcon(Utils.getImageIcon("die4.gif"));
 		labelSecondDice.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -69,18 +69,22 @@ public class DiceController extends JPanel {
 		gbc_labelSecondDice.gridx = 1;
 		gbc_labelSecondDice.gridy = 0;
 		add(labelSecondDice, gbc_labelSecondDice);
-		
+
 		labelSecondDice.setHorizontalAlignment(SwingConstants.CENTER);
 		labelSecondDice.setIcon(Utils.getImageIcon("die6.gif"));
-		
+
 		btnRollDice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// we just notify the game that it can proceeds now after the user decided
 				// he wants to roll the dice. this is of course only relevant to human players
-				game.NotifyRollDice();
+                                Random random = new Random();
+                                int dice1 = random.nextInt(6) + 1;
+                                int dice2 = random.nextInt(6) + 1;
+                                // TODO: fix this
+                                //Server.getInstance().setDiceRollResults(, dice1, dice)
 			}
 		});
-		
+
 		// at first the dice button is disabled, until we get an event from the game
 		btnRollDice.setEnabled(false);
 		GridBagConstraints gbc_btnRollDice = new GridBagConstraints();
@@ -90,22 +94,22 @@ public class DiceController extends JPanel {
 		add(btnRollDice, gbc_btnRollDice);
 		initialize();
 	}
-	
+
 	/**
 	 * simulate dice throw
 	 * @param diceThrow
 	 */
-	public void SimulateThrow(final DiceThrowResult diceThrow)
+	public void SimulateThrow(final int firstDice, final int secondDice)
 	{
 		SwingUtilities.invokeLater(new Runnable() {
-			public void run() 
+			public void run()
 		    {
 				btnRollDice.setEnabled(false);
-				
+
 				// set the images describing the throw
-				lblfirstDice.setIcon(Utils.getImageIcon("die" + diceThrow.getFirstDice() + ".gif"));
-				labelSecondDice.setIcon(Utils.getImageIcon("die" + diceThrow.getSecondDice() + ".gif"));
-				
+				lblfirstDice.setIcon(Utils.getImageIcon("die" + firstDice + ".gif"));
+				labelSecondDice.setIcon(Utils.getImageIcon("die" + secondDice + ".gif"));
+
 				validate();
 				repaint();
 		    }
@@ -118,16 +122,16 @@ public class DiceController extends JPanel {
 	public void EnableDiceThrow()
     {
 		SwingUtilities.invokeLater(new Runnable() {
-			public void run() 
-		    { 
+			public void run()
+		    {
 				btnRollDice.setEnabled(true);
 		    }
 		});
     }
-	
+
 	/**
 	 * This method initializes this
-	 * 
+	 *
 	 * @return void
 	 */
 	private void initialize() {
