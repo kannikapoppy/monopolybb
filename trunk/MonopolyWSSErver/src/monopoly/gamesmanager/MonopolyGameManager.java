@@ -240,13 +240,14 @@ public class MonopolyGameManager {
             
             if (this.players.size() == this.humanPlayers)
             {
-                InnerStartGame();
+                if (!InnerStartGame())
+                    return -1;
             }
 
             return retValue;
         }
 
-        private void InnerStartGame() {
+        private boolean InnerStartGame() {
             //crate all machine players
             int currentIndex = 0;
             for (int i = 0; i < computerizedPlayers; i++) {
@@ -270,25 +271,18 @@ public class MonopolyGameManager {
                 }
             };
             gameLogic.getStateManager().registerToGameChangedEvent(GameStateChangedEventListener.class, listener);
-            System.out.println("Initing Game");
             if (!gameLogic.initGame(players)) {
-                // TODO: throw exception
-                // throw new Exception(ERROR_INITIALIZING_MSG);
-                System.out.println("Failed to init Game");
-                return;
+                return false;
             }
             try {
-                System.out.println("Starting Game");
                 if (!gameLogic.startGame(false)) {
-                    // TODO: throw exception
-                    // throw ex;
-                    System.out.println("Failed to start Game with no exception");
+                    return false;
                 }
             } catch (Exception ex) {
-                // TODO: throw exception
-                // throw ex;
-                System.out.println("Failed to start Game with exception");
+                return false;
             }
+
+            return true;
         }
 
         /**
