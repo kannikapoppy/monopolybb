@@ -8,12 +8,14 @@
 
 package objectmodel;
 
+import Utils.WaitNotifyManager;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import main.StateManager;
+import main.UserPrompt;
 
 
 /**
@@ -143,9 +145,6 @@ public class Asset
     			}
     					
     			landedPlayer.getPlayerActions().payToPlayer(owner, payToll);
-    			StateManager.getStateManager().setCurrentStateToPlayerPayingToAnotherPlayer(this,
-    					landedPlayer.getName() + " has to pay " + payToll + " to " + owner.getName(),
-    					landedPlayer, payToll, owner);
     		}
     	}
     	// no one owns the asset
@@ -155,7 +154,7 @@ public class Asset
     		if (landedPlayer.getMoney() > price)
     		{
     			// does the player want to buy the asset?
-    			if (landedPlayer.getInputObject().buyCell(this))
+    			if (landedPlayer.getInputObject().buyCell(this, landedPlayer))
     			{
     				// yep! buy the asset...
     				landedPlayer.getPlayerActions().payMoneyToBank(price);
@@ -164,9 +163,6 @@ public class Asset
     				owned = true;
     				StateManager.getStateManager().setCurrentStateToPlayerBuying(this, 
     						landedPlayer.getName() + " has just bought " + name, landedPlayer, this);
-                                StateManager.getStateManager().setCurrentStateToPlayerPayingToBank(this,
-    						landedPlayer.getName() + " has just bought " + name + " for " + price,
-                                                landedPlayer, price);
     			}
     		}
     		// not enough $$$

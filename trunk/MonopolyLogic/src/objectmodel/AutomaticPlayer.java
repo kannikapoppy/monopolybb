@@ -24,7 +24,7 @@ public class AutomaticPlayer extends Player
 		}
 
 		@Override
-		public boolean buyCell(CellBase landCell) {
+		public boolean buyCell(CellBase landCell, Player landedPlayer) {
 			if (((Player) sender).getMoney() > MIN_CASH_FOR_BUYING_CELL)
 			{
 				return true;
@@ -33,7 +33,7 @@ public class AutomaticPlayer extends Player
 		}
 		
 		@Override
-		public boolean buildHouse(City landCell) {
+		public boolean buildHouse(City landCell, Player landedPlayer) {
 			if (((Player) sender).getMoney() > MIN_CASH_FOR_BUILDING_HOUSE)
 			{
 				return true;

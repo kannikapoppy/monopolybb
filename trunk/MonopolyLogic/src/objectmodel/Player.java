@@ -8,6 +8,7 @@
 
 package objectmodel;
 
+import Utils.WaitNotifyManager;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -15,6 +16,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import main.StateManager;
+import main.UserPrompt;
+import monopoly.results.PlayerDetailsResult;
 
 /**
  * <p>Java class for Player complex type.
@@ -105,8 +109,8 @@ public class Player
     protected boolean isParking;
     @XmlAttribute(name = "auctionsPerformed", required = false)
     protected int auctionsPerformed;
-    @XmlAttribute(name = "playerColor", required = false)
-    protected PlayerColor playerColor;
+    @XmlAttribute(name = "resignRequested", required = false)
+    private boolean resignRequested = false;
     
     public boolean canPerformAuction()
     {
@@ -175,14 +179,6 @@ public class Player
 
 	public void setPlayerActions(PlayerActions playerActions) {
 		this.playerActions = playerActions;
-	}
-	
-	public PlayerColor getPlayerColor() {
-		return playerColor;
-	}
-	
-	public void setPlayerColor(PlayerColor newPlayerColor) {
-		playerColor = newPlayerColor;
 	}
 
 	/**
@@ -305,6 +301,22 @@ public class Player
         this.isInGame = value;
     }
 
+    /**
+     * enables a player to resign from the game
+     */
+    public void RequestToResign()
+    {
+        this.resignRequested = true;
+    }
+
+    /**
+     * returns true if the player requested to resign
+     */
+    public boolean WasResignRequested()
+    {
+        return this.resignRequested;
+    }
+
 
     /**
      * <p>Java class for anonymous complex type.
@@ -422,6 +434,5 @@ public class Player
             }
             return this.cell;
         }
-
     }
 }
