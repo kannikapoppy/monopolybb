@@ -10,14 +10,23 @@ import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.lang.model.SourceVersion;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import objectmodel.Asset;
 import objectmodel.CellBase;
 import objectmodel.City;
 import objectmodel.GameBoard;
+import org.xml.sax.SAXException;
 import src.client.PlayerDetails;
 import src.client.Server;
 import src.monopolyUI.GetEventsTask;
@@ -108,20 +117,36 @@ public class Board extends JPanel {
     {
         this.players = players;
 
+        usersLeftTimer.cancel();
         remove(waitingForPlayersLabel);
 
         // init layout
         this.setLayout(new GridBagLayout());
 
         String boardXML = Server.getInstance().getGameBoardXML();
+        String boardSchema = Server.getInstance().getGameBoardSchema();
         JAXBContext jContext;
         GameBoard gameBoard = null;
         try
         {
             jContext = JAXBContext.newInstance("objectmodel", objectmodel.ObjectFactory.class.getClassLoader());
             Unmarshaller unmarshaller = jContext.createUnmarshaller() ;
-            InputStream is = new ByteArrayInputStream(boardXML.getBytes("UTF-8"));
-            gameBoard = (GameBoard)unmarshaller.unmarshal(is);
+            SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+            InputStream xsdIs = new ByteArrayInputStream(boardSchema.getBytes("UTF-8"));
+            StreamSource sourceStrm = new StreamSource(xsdIs);
+            Schema schema = null;
+            try {
+                schema = schemaFactory.newSchema(sourceStrm);
+            } catch (SAXException ex) {
+                Logger.getLogger(Board.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (schema != null)
+            {
+                unmarshaller.setSchema(schema);
+                unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
+            }
+            InputStream xmlIs = new ByteArrayInputStream(boardXML.getBytes("UTF-8"));
+            gameBoard = (GameBoard)unmarshaller.unmarshal(xmlIs);
         }
         catch (JAXBException ex)
         {
@@ -277,9 +302,6 @@ public class Board extends JPanel {
 
     public void SimulateDiceThrow(int dice1, int dice2)
     {
-    	if (innerBoard == null)
-            System.out.println("innerBoard is null");
-
         innerBoard.SimulateDiceThrow(dice1, dice2);
     }
 
