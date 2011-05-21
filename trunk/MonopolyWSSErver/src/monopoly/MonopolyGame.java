@@ -129,12 +129,18 @@ public class MonopolyGame {
         {
             Player player = gameManager.getGame().GetPlayer(playerID);
 
+            if (player instanceof AutomaticPlayer)
+                return new MonopolyResult(true, "Cannot set dice role results for machine player!");
+
+            if (dice1 < 1 || dice1 > 6 || dice2 < 1 || dice2 > 6)
+                return new MonopolyResult(true, "dice result can only be between 1 and 6");
+
             if (player != null)
             {
                 if (UserPrompt.Validate(player,eventID))
                 {
                     UserPrompt.Notify(eventID, new DiceThrowResult(dice1, dice2));
-                    return new MonopolyResult("Dice1= " + dice1 + ", Dice2= " + dice2);
+                    return new MonopolyResult(false, "Dice1= " + dice1 + ", Dice2= " + dice2);
                 }
             }
         }

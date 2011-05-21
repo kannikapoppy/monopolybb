@@ -173,7 +173,7 @@ public class MonopolyGameManager {
     }
 
     public class GameDetails {
-        private static final int DEFAULT_TIMEOUT = 30*1000;
+        private static final int DEFAULT_TIMEOUT = 90*1000;
 
         private String gameName;
         private int humanPlayers;
@@ -203,7 +203,7 @@ public class MonopolyGameManager {
 
         public Player GetPlayer(int playerID)
         {
-            return players.get(playerID-1);
+            return players.get(playerID);
         }
 
         public boolean isGameStarted() {
@@ -214,25 +214,49 @@ public class MonopolyGameManager {
             return isGameStarted() && (this.humanPlayers + this.computerizedPlayers == this.players.size());
         }
 
+        private boolean isNameAlreadyExists(String playerName) {
+            if (!isGameExists())
+                return true;
+
+            for (Player player : game.players)
+            {
+                if (player.getName().compareTo(playerName) == 0)
+                    return true;
+            }
+
+            return false;        
+        }
+
         public int joinPlayer(String playerName) {
+            if (isNameAlreadyExists(playerName))
+                return -1;
+
             Player newPlayer = new Player();
             newPlayer.setName(playerName);
             newPlayer.setInputObject(new RealPlayerInput(newPlayer));
             this.players.add(newPlayer);
+
+            int retValue = this.players.size() - 1;
             
             if (this.players.size() == this.humanPlayers)
             {
                 InnerStartGame();
             }
 
-            return this.players.size();
+            return retValue;
         }
 
         private void InnerStartGame() {
             //crate all machine players
+            int currentIndex = 0;
             for (int i = 0; i < computerizedPlayers; i++) {
                 AutomaticPlayer newMachinePlayer = new AutomaticPlayer();
-                newMachinePlayer.setName("Machine Player " + i);
+                while (isNameAlreadyExists("Machine Player " + currentIndex))
+                {
+                    currentIndex++;
+                }
+                newMachinePlayer.setName("Machine Player " + currentIndex);
+                currentIndex++;
                 players.add(newMachinePlayer);
             }
             // all players have joined. we need to start the game
@@ -274,7 +298,6 @@ public class MonopolyGameManager {
 	 */
 	private void HandleState(GameStateChangedEvent evt)
 	{
-            System.out.println("handling event of type " + evt.getNewState().toString());
             switch (evt.getNewState())
 		{
                     case Starting:
