@@ -37,6 +37,10 @@ public class BackendService {
         return monopolyGamePortType.getGameBoardXML().getReturn().getValue();
     }
 
+    public String getGameBoardSchema() {
+        return monopolyGamePortType.getGameBoardSchema().getReturn().getValue();
+    }
+
     public boolean startGame(String name, int humanPlayers, int computerPlayers, boolean useAutomaticDiceRollCheckBox) {
         MonopolyResult result = monopolyGamePortType.startGame(name, humanPlayers, computerPlayers, useAutomaticDiceRollCheckBox);
         return !hasError(result);
