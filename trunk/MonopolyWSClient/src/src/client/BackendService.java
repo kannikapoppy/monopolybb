@@ -119,4 +119,10 @@ public class BackendService {
                     result.getStatus().getValue());
         }
     }
+
+    public boolean Resign(int playerID)
+    {
+        MonopolyResult result = monopolyGamePortType.resign(playerID);
+        return !hasError(result);
+    }
 }

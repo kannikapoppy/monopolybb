@@ -118,6 +118,9 @@ public class City
      */
     public void setOwner(PlayerDetails player) {
         owner = player;
+        if (owner == null)
+            numberOfHouses = 0;
+
     }
 
     /**
