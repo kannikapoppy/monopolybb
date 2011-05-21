@@ -20,15 +20,15 @@ public class MonopolyGameLogic
 	/**
 	 * The path for the game board config file
 	 */
-	private static final String BOARD_PATH = "bin\\configuration\\MonopolyBoard.xml";
+	private static final String BOARD_PATH = "configuration/MonopolyBoard.xml";
 	/**
 	 * The path for the community chest card deck config file
 	 */
-	private static final String COMMUNITY_CHEST_DECK_PATH = "bin\\configuration\\CommunityChestDeck.xml";
+	private static final String COMMUNITY_CHEST_DECK_PATH = "configuration/CommunityChestDeck.xml";
 	/**
 	 * The path for the chance card deck config file
 	 */
-	private static final String CHANCE_DECK_PATH = "bin\\configuration\\ChanceDeck.xml";
+	private static final String CHANCE_DECK_PATH = "configuration/ChanceDeck.xml";
 	/**
 	 * The game board representation
 	 */
@@ -106,12 +106,13 @@ public class MonopolyGameLogic
 		// Load the game board & card decks
 		try
 		{			
-			JAXBContext jContext = JAXBContext.newInstance("objectmodel");
+			JAXBContext jContext = JAXBContext.newInstance("objectmodel", objectmodel.ObjectFactory.class.getClassLoader());
 			Unmarshaller unmarshaller = jContext.createUnmarshaller() ;
-			gameBoard = (GameBoard)unmarshaller.unmarshal(new FileInputStream(BOARD_PATH)); 
-			chanceDeck = (CardsDeck)unmarshaller.unmarshal(new FileInputStream(CHANCE_DECK_PATH));
+			
+                        gameBoard = (GameBoard)unmarshaller.unmarshal(getClass().getClassLoader().getResourceAsStream(BOARD_PATH));
+                        chanceDeck = (CardsDeck)unmarshaller.unmarshal(getClass().getClassLoader().getResourceAsStream(CHANCE_DECK_PATH));
 			chanceDeck.shuffleDeck();
-			communityChestDeck = (CardsDeck)unmarshaller.unmarshal(new FileInputStream(COMMUNITY_CHEST_DECK_PATH));
+			communityChestDeck = (CardsDeck)unmarshaller.unmarshal(getClass().getClassLoader().getResourceAsStream(COMMUNITY_CHEST_DECK_PATH));
 			communityChestDeck.shuffleDeck();
 			RealEstate.getRealEstate().init(gameBoard);
 		} 
@@ -119,11 +120,12 @@ public class MonopolyGameLogic
 		{
 			initializedSuccessfully = false;
 			failMessage = "Couldn't load the game board & cards since the XML file does not suit the schema: " + e.getMessage();
+                        e.printStackTrace();
 		}
-		catch (FileNotFoundException e)
+		catch (Exception e)
 		{
 			initializedSuccessfully = false;
-			failMessage = "Couldn't load the game board & cards since a XML file could not be found: " + e.getMessage();
+			failMessage = "Couldn't load the game board & cards: " + e.getMessage();
 		}
 		
 		// check if all went right so far...
@@ -231,20 +233,42 @@ public class MonopolyGameLogic
 	 */
 	private void switchPlayer(int playerIndex)
 	{
-		Player nextPlayer = playerList.get(playerIndex);
-		// if the player isn't in game move to the next one
-		if (!nextPlayer.isInGame())
-		{
-			switchPlayer((playerIndex + 1) % playerList.size());
-		}
-		else
-		{
-			currentPlayerIndex = playerIndex;
-			String cellName = gameBoard.getCellBase().get(nextPlayer.getBoardPosition()).getName();
-			String switchMessage = "It's now " + nextPlayer.getName() + "'s turn. Current Position: " + cellName + ". Balance: " + nextPlayer.getMoney();
-			getStateManager().setCurrentStateToPlayerSwitching(this, switchMessage, nextPlayer);
-		}
+            Player nextPlayer = playerList.get(playerIndex);
+            // if the player isn't in game move to the next one
+            if (!nextPlayer.isInGame())
+            {
+                switchPlayer((playerIndex + 1) % playerList.size());
+            }
+            else if (checkForPlayerResignationAndAct(nextPlayer))
+            {
+                switchPlayer((playerIndex + 1) % playerList.size());
+            }
+            else
+            {
+                currentPlayerIndex = playerIndex;
+                String cellName = gameBoard.getCellBase().get(nextPlayer.getBoardPosition()).getName();
+                String switchMessage = "It's now " + nextPlayer.getName() + "'s turn. Current Position: " + cellName + ". Balance: " + nextPlayer.getMoney();
+                getStateManager().setCurrentStateToPlayerSwitching(this, switchMessage, nextPlayer);
+            }
 	}
+        
+        /**
+	 * checks if there is need to resign the player, and if so - do it.
+	 * @param player the player to check for resignation
+	 */
+        private boolean checkForPlayerResignationAndAct(Player player)
+        {
+            if (player.WasResignRequested() && getWinner() == null)
+            {
+                dropPlayer(player);
+
+                getStateManager().setCurrentStateToPlayerResigned(this,
+				player.getName() + " has lost!", player);
+
+                return true;
+            }
+            return false;
+        }
 
 	/**
 	 * The main game loop!
@@ -262,7 +286,7 @@ public class MonopolyGameLogic
 			// check if the player should roll the dice
 			if(currentCell.shouldRollTheDice(currentPlayer))
 			{
-				DiceThrowResult diceResult;
+				DiceThrowResult diceResult = null;
 
                                 if (!(currentPlayer instanceof AutomaticPlayer) && !useAutomaticDiceRoll)
 				{
@@ -274,24 +298,31 @@ public class MonopolyGameLogic
 
                                     waiter.doWait();
 
-                                    diceResult = (DiceThrowResult)UserPrompt.GetObject();
+                                    if (UserPrompt.GetObject() != null)
+                                        diceResult = (DiceThrowResult)UserPrompt.GetObject();
 				}
                                 else
                                 {
                                     // roll the dice & check if the player should move
                                     diceResult = gameDice.roll();
                                 }
-				getStateManager().setCurrentStateToPlayerRolling(this, 
-						currentPlayer.getName() + " rolled a " + gameDice,
-						currentPlayer, diceResult);
-				if (currentCell.shouldMove(currentPlayer, diceResult))
-				{
-					// Move!
-					movePlayer(currentPlayer, diceResult.sumOfDice());
-				}
+				
+                                if (diceResult != null)
+                                {
+                                    getStateManager().setCurrentStateToPlayerRolling(this,
+                                                    currentPlayer.getName() + " rolled a " + gameDice,
+                                                    currentPlayer, diceResult);
+                                    if (currentCell.shouldMove(currentPlayer, diceResult))
+                                    {
+                                            // Move!
+                                            movePlayer(currentPlayer, diceResult.sumOfDice());
+                                    }
+                                }
 			}
 			
-			// finished the turn, next player!
+			// check for resignation before switching turn
+                        checkForPlayerResignationAndAct(currentPlayer);
+                        // finished the turn, next player!
 			switchPlayer();
 		} while ((winner = getWinner()) == null);
 		
@@ -397,16 +428,10 @@ public class MonopolyGameLogic
 			if (passToll < 0)
 			{
 				performMoneyTransaction(passedPlayer, -passToll, true);
-				String message = String.format("%s just received %d dollars for passing through %s", passedPlayer.getName(), -passToll, passedCell.getName());
-                                getStateManager().setCurrentStateToPlayerGettingPaidByTheBank(this, message,
-						passedPlayer, -passToll);
 			}
 			else
 			{
 				performMoneyTransaction(passedPlayer, passToll, false);
-				String message = String.format("%s just lost %d dollars for passing through %s", passedPlayer.getName(), passToll, passedCell.getName());
-				getStateManager().setCurrentStateToPlayerPayingToBank(this, message,
-						passedPlayer, passToll);
 			}
 		}
 	}
@@ -422,7 +447,14 @@ public class MonopolyGameLogic
 				landedPlayer.getName() + " has just landed on " + landedCell.getName(),
 				landedPlayer, landedCell);
 				
-		landedCell.performPlayerLand(landedPlayer);
+                try
+                {
+                    landedCell.performPlayerLand(landedPlayer);
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
+                }
 	}
 	
 	/**
@@ -443,10 +475,16 @@ public class MonopolyGameLogic
 		if (debtMoney == 0)
 		{
 			toPlayer.addMoney(amount);
+                        StateManager.getStateManager().setCurrentStateToPlayerPayingToAnotherPlayer(this,
+								toPlayer.getName() + " got paid " + amount + " by " + fromPlayer.getName(),
+								fromPlayer, amount, toPlayer);
 		}
 		else
 		{
 			toPlayer.addMoney(amount - debtMoney);
+                        StateManager.getStateManager().setCurrentStateToPlayerPayingToAnotherPlayer(this,
+								toPlayer.getName() + " got paid " + (amount - debtMoney) + " by " + fromPlayer.getName(),
+								fromPlayer, amount - debtMoney, toPlayer);
 			handleMoneyDebt(fromPlayer, toPlayer, debtMoney);
 		}
 	}
@@ -462,10 +500,16 @@ public class MonopolyGameLogic
 		if (toPlayer)
 		{
 			relevantPlayer.addMoney(amount);
+                        StateManager.getStateManager().setCurrentStateToPlayerGettingPaidByTheBank(this,
+								relevantPlayer.getName() + " got paid " + amount + " by the bank",
+								relevantPlayer, amount);
 		}
 		else
 		{
 			int debtMoney = relevantPlayer.subtractMoney(amount);
+                        StateManager.getStateManager().setCurrentStateToPlayerPayingToBank(this,
+								relevantPlayer.getName() + " is paying  " + (amount - debtMoney) + " to the bank",
+								relevantPlayer, amount - debtMoney);
 			if (debtMoney > 0)
 			{
 				handleMoneyDebt(relevantPlayer, null, debtMoney);
@@ -494,9 +538,10 @@ public class MonopolyGameLogic
 		// Triggers the player broke event
 		String message = inDebtPlayer.getName() + " owes " + debtMoney + " to " + toDebtPlayerName;
 		getStateManager().setCurrentStateToPlayerBroke(this, message, inDebtPlayer);
-		
-		dropPlayer(inDebtPlayer);
-		getStateManager().setCurrentStateToPlayerLost(this, 
+		               
+                dropPlayer(inDebtPlayer);
+
+                getStateManager().setCurrentStateToPlayerLost(this,
 				inDebtPlayer.getName() + " has lost!", inDebtPlayer);
 	}
 	
@@ -639,21 +684,10 @@ public class MonopolyGameLogic
 				if (card.isBank())
 				{
 					getMoneyFromBank(card.getAmount());
-					
-					StateManager.getStateManager().setCurrentStateToPlayerGettingPaidByTheBank(this,
-							((Player) actor).getName() + " got paid " + card.getAmount() + " by the bank",
-							((Player) actor), card.getAmount());
 				}
 				else
 				{
 					getMoneyFromAllPlayers(card.getAmount());
-					
-					for (Player p : playerList)
-					{
-                                                StateManager.getStateManager().setCurrentStateToPlayerPayingToAnotherPlayer(this,
-							p.getName() + " is paying " + card.getAmount() + " to " + ((Player) actor).getName(),
-							p, card.getAmount(), ((Player) actor));
-					}
 				}
 				chanceDeck.returnCard(card);
 			}
@@ -678,20 +712,10 @@ public class MonopolyGameLogic
 				if (card.isBank())
 				{
 					payMoneyToBank(card.getAmount());
-					StateManager.getStateManager().setCurrentStateToPlayerPayingToBank(this,
-							((Player) actor).getName() + " paid " + card.getAmount() + " to the bank",
-							((Player) actor), card.getAmount());
 				}
 				else
 				{
 					payToAllPlayers(card.getAmount());
-					
-					for (Player p : playerList)
-					{
-						StateManager.getStateManager().setCurrentStateToPlayerPayingToAnotherPlayer(this,
-								p.getName() + " got paid " + card.getAmount() + " by " + ((Player) actor).getName(),
-								((Player) actor), card.getAmount(), p);
-					}
 				}
 			}
 			

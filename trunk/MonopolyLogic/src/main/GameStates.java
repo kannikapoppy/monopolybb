@@ -29,6 +29,7 @@ public enum GameStates
         PlayerLandedOnStartSquare,
 	PlayerBroke,
 	PlayerLost,
+        PlayerResigned,
 	Auction,
 	GameOver,
 	Error
