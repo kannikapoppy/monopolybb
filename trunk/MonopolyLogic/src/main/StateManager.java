@@ -166,7 +166,6 @@ public class StateManager
 	 */
 	public void setCurrentStateToError(Object source, String message)
 	{
-		System.out.println(message);
                 GameStateChangedEvent newEvent = new GameStateChangedEvent(this, currentState, GameStates.Initializing, message);
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
