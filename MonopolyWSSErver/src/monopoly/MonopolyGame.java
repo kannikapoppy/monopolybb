@@ -29,7 +29,18 @@ public class MonopolyGame {
     }
 
     public String getGameBoardSchema() {
-        return "BoardSchema";
+        InputStream is = null;
+        try {
+                is = getClass().getClassLoader().getResourceAsStream("configuration/MonopolyBoard.xsd");
+                return new Scanner(is).useDelimiter("\\Z").next();
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
     }
 
     public String getGameBoardXML() {
