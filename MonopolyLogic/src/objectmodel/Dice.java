@@ -29,6 +29,11 @@ public class Dice
 		
 		return currentRoll;
 	}
+
+        public void setRollResults(DiceThrowResult diceThrow)
+	{
+		currentRoll = diceThrow;
+	}
 	
 	@Override
 	public String toString()
