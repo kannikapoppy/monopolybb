@@ -54,7 +54,6 @@ public class UserPrompt {
             s_notified = true;
             s_eventID = -1;
             s_player.RequestToResign();
-            System.out.println("resigning player");
             s_player = null;
             s_lastObjectPrompted = null;
             s_eventHandler.doNotify();
