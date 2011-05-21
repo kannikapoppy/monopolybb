@@ -4,6 +4,8 @@ import comm.Event;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -44,7 +46,17 @@ public class Server {
     }
 
     public String getGameBoardXML() {
-        return backendService.getGameBoardXML();
+        String xml = backendService.getGameBoardXML();
+        Matcher cleanerMatcher = (Pattern.compile("^([\\W]+)<")).matcher( xml.trim() );
+        xml = cleanerMatcher.replaceFirst("<");
+        return xml;
+    }
+
+    public String getGameBoardSchema() {
+        String schema = backendService.getGameBoardSchema();
+        Matcher cleanerMatcher = (Pattern.compile("^([\\W]+)<")).matcher( schema.trim() );
+        schema = cleanerMatcher.replaceFirst("<");
+        return schema;
     }
 
     public List<String> getActiveGames() {
