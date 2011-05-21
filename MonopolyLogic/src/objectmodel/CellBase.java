@@ -322,16 +322,10 @@ public class CellBase {
     		if (landToll > 0)
     		{
     			landedPlayer.getPlayerActions().payMoneyToBank(landToll);
-    			StateManager.getStateManager().setCurrentStateToPlayerPayingToBank(this,
-    					landedPlayer.getName() + " is paying " + landToll + " to the bank",
-    					landedPlayer, landToll);
     		}
     		else
     		{
     			landedPlayer.getPlayerActions().getMoneyFromBank(-landToll);
-    			StateManager.getStateManager().setCurrentStateToPlayerGettingPaidByTheBank(this,
-    					landedPlayer.getName() + " got " + -landToll + " from the bank",
-    					landedPlayer, -landToll);
     		}
     	}
     	
