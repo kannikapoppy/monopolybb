@@ -6,25 +6,14 @@
 package src.monopolyUI;
 
 import comm.Event;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import monopolyUI.Board;
 import objectmodel.CellBase;
-import objectmodel.GameBoard;
 import objectmodel.ServerEvents;
-import src.client.GameDetails;
-import src.client.PlayerDetails;
 import src.client.Server;
 
 /**
@@ -94,14 +83,79 @@ public class GetEventsTask extends TimerTask
                         // player lost
                         String playerName = event.getPlayerName().getValue();
                         int cellID = event.getBoardSquareID();
-                        board.UpdatePlayerLost(playerName, cellID);
+                        board.UpdatePlayerLost(playerName, cellID,
+                                event.getEventType() == ServerEvents.PlayerResigned);
                         break;
                     case ServerEvents.PromptPlayerToRollDice:
                         // Prompt Player to Roll Dice
+                        board.SetPlayingUser(event.getPlayerName().getValue());
+
                         if (event.getPlayerName().getValue().compareTo(this.playerName) != 0)
                             return;
 
-                        board.SetPlayingUser(event.getPlayerName().getValue());
+                        final int[] diceThrows = new int[2];
+                        try {
+                            SwingUtilities.invokeAndWait(new Runnable() {
+				public void run()
+                                {
+                                    String dice1 = JOptionPane.showInputDialog(null,
+                                        "Insert Value For Dice 1",
+                                        "Dice Throw Manually",
+                                        JOptionPane.QUESTION_MESSAGE);
+
+                                    while (true)
+                                    {
+                                        try
+                                        {
+                                            diceThrows[0] = Integer.parseInt(dice1);
+                                            if (diceThrows[0] >= 1 && diceThrows[0] <= 6)
+                                            {
+                                                break;
+                                            }
+                                        }
+                                        catch (Exception ex) {}
+
+                                        dice1 = JOptionPane.showInputDialog(null,
+                                                "Invalid Input. Insert Value For Dice 1",
+                                                "Dice Throw Manually",
+                                                JOptionPane.QUESTION_MESSAGE);
+                                    }
+
+                                    String dice2 = JOptionPane.showInputDialog(null,
+                                        "Insert Value For Dice 2",
+                                        "Dice Throw Manually",
+                                        JOptionPane.QUESTION_MESSAGE);
+
+                                    while (true)
+                                    {
+                                        try
+                                        {
+                                            diceThrows[1] = Integer.parseInt(dice2);
+                                            if (diceThrows[1] >= 1 && diceThrows[1] <= 6)
+                                            {
+                                                break;
+                                            }
+                                        }
+                                        catch (Exception ex) {}
+
+                                        dice2 = JOptionPane.showInputDialog(null,
+                                                "Invalid Input. Insert Value For Dice 2",
+                                                "Dice Throw Manually",
+                                                JOptionPane.QUESTION_MESSAGE);
+                                    }
+                                }
+                            });
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (InvocationTargetException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        
+                        Server.getInstance().setDiceRollResults(event.getEventID(), diceThrows[0],
+                                diceThrows[1]);
+
                         break;
                     case ServerEvents.DiceRoll:
                         // dice roll

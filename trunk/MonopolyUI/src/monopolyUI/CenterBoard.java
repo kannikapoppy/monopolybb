@@ -11,9 +11,13 @@ import javax.swing.JLabel;
 
 import services.Utils;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Hashtable;
 import java.util.List;
+import javax.swing.JButton;
 import src.client.PlayerDetails;
+import src.client.Server;
 
 /**
  * this class represent the visual center board (without the cells that is)
@@ -32,11 +36,21 @@ public class CenterBoard extends JPanel {
 	 */
 	private final Hashtable<PlayerDetails,SinglePlayerDisplay> playerToDisplay = new Hashtable<PlayerDetails,SinglePlayerDisplay>();
 
+        /**
+         * the name of the local player
+         */
+        private String localPlayerName;
+        /**
+         * resign button
+         */
+        private JButton resignButton = new JButton("Resign");
 	/**
 	 * This is the default constructor
 	 */
-	public CenterBoard(List<PlayerDetails> players) {
+	public CenterBoard(List<PlayerDetails> players, String localPlayerName) {
 		super();
+
+                this.localPlayerName = localPlayerName;
 		// set layout
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{217, 0};
@@ -60,6 +74,16 @@ public class CenterBoard extends JPanel {
 			playerToDisplay.put(player, userDisplay);
 			playersBox.add(userDisplay);
 		}
+
+                resignButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				boolean res = Server.getInstance().Resign();
+                                if (res)
+                                    resignButton.setEnabled(false);
+			}
+		});
+
+                playersBox.add(resignButton);
 
 		// create the dice controller and it
 		dice = new DiceController();
@@ -98,17 +122,14 @@ public class CenterBoard extends JPanel {
 	public void UpdatePlayerDisplay(PlayerDetails player)
 	{
 		playerToDisplay.get(player).UpdatePlayerLabelText();
+                if (player.getName().compareTo(localPlayerName) == 0 && !player.isInGame())
+                    resignButton.setEnabled(false);
 	}
 
 	public void SimulateDiceThrow(int dice1, int dice2)
 	{
 		dice.SimulateThrow(dice1, dice2);
 	}
-
-	public void EnableDiceThrow()
-    {
-    	dice.EnableDiceThrow();
-    }
 
 	/**
 	 * This method initializes this

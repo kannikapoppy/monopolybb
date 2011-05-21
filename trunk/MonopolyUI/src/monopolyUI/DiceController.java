@@ -34,10 +34,6 @@ public class DiceController extends JPanel {
 	 * the second dice image
 	 */
 	private final JLabel labelSecondDice = new JLabel("");
-	/**
-	 * button to roll the dice
-	 */
-	private final JButton btnRollDice = new JButton("Roll Dice");
 
 	/**
 	 * This is the default constructor
@@ -73,25 +69,6 @@ public class DiceController extends JPanel {
 		labelSecondDice.setHorizontalAlignment(SwingConstants.CENTER);
 		labelSecondDice.setIcon(Utils.getImageIcon("die6.gif"));
 
-		btnRollDice.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// we just notify the game that it can proceeds now after the user decided
-				// he wants to roll the dice. this is of course only relevant to human players
-                                Random random = new Random();
-                                int dice1 = random.nextInt(6) + 1;
-                                int dice2 = random.nextInt(6) + 1;
-                                // TODO: fix this
-                                //Server.getInstance().setDiceRollResults(, dice1, dice)
-			}
-		});
-
-		// at first the dice button is disabled, until we get an event from the game
-		btnRollDice.setEnabled(false);
-		GridBagConstraints gbc_btnRollDice = new GridBagConstraints();
-		gbc_btnRollDice.gridwidth = 2;
-		gbc_btnRollDice.gridx = 0;
-		gbc_btnRollDice.gridy = 1;
-		add(btnRollDice, gbc_btnRollDice);
 		initialize();
 	}
 
@@ -104,8 +81,6 @@ public class DiceController extends JPanel {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run()
 		    {
-				btnRollDice.setEnabled(false);
-
 				// set the images describing the throw
 				lblfirstDice.setIcon(Utils.getImageIcon("die" + firstDice + ".gif"));
 				labelSecondDice.setIcon(Utils.getImageIcon("die" + secondDice + ".gif"));
@@ -115,19 +90,6 @@ public class DiceController extends JPanel {
 		    }
 		});
 	}
-
-	/**
-	 * enable the dice throw button so the user can indicate he wants to throw the dice
-	 */
-	public void EnableDiceThrow()
-    {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run()
-		    {
-				btnRollDice.setEnabled(true);
-		    }
-		});
-    }
 
 	/**
 	 * This method initializes this

@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 import services.Utils;
 
 import java.awt.BorderLayout;
+import javax.swing.JButton;
 import src.client.PlayerDetails;
 
 /**
