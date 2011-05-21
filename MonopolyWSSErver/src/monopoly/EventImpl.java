@@ -37,22 +37,25 @@ public class EventImpl implements Event{
         m_eventType = eventType;
     }
 
-    public EventImpl(String gameName, int eventId, int eventType, String playerName)
+    public EventImpl(String gameName, int eventId, int eventType, String playerName,
+            int boardPosition)
     {
         this(gameName, eventId, eventType);
         m_playerName = playerName;
+        m_boardSquareId = boardPosition;
     }
 
-    public EventImpl(String gameName, int eventId, int eventType, String playerName, int timeoutCount)
+    public EventImpl(String gameName, int eventId, int eventType, String playerName,
+            int boardPosition, int timeoutCount)
     {
-        this(gameName, eventId, eventType, playerName);
+        this(gameName, eventId, eventType, playerName, boardPosition);
         m_timeoutCount = timeoutCount;
     }
 
     public EventImpl(String gameName, int eventId, int eventType, String playerName,
-            DiceThrowResult diceThrow)
+            DiceThrowResult diceThrow, int boardPosition)
     {
-        this(gameName, eventId, eventType, playerName);
+        this(gameName, eventId, eventType, playerName, boardPosition);
         m_firstDiceResult = diceThrow.getFirstDice();
         m_secondDiceResult = diceThrow.getSecondDice();
     }
@@ -60,38 +63,23 @@ public class EventImpl implements Event{
     public EventImpl(String gameName, int eventId, int eventType, String playerName,
             CellBase originCell, CellBase destinationCell)
     {
-        this(gameName, eventId, eventType, playerName);
-        m_boardSquareId = originCell.getID();
+        this(gameName, eventId, eventType, playerName, originCell.getID());
         m_nextBoardSquareId = destinationCell.getID();
         m_isPlayerMoved = true;
     }
 
     public EventImpl(String gameName, int eventId, int eventType, String playerName,
-            CellBase currentCell)
+            String message, int boardPosition)
     {
-        this(gameName, eventId, eventType, playerName);
-        m_boardSquareId = currentCell.getID();
-    }
-
-    public EventImpl(String gameName, int eventId, int eventType, String playerName,
-            CellBase currentCell, int timeout)
-    {
-        this(gameName, eventId, eventType, playerName, currentCell);
-        m_timeoutCount = timeout;
-    }
-
-    public EventImpl(String gameName, int eventId, int eventType, String playerName,
-            String message)
-    {
-        this(gameName, eventId, eventType, playerName);
+        this(gameName, eventId, eventType, playerName, boardPosition);
         m_eventMessage = message;
     }
     
     public EventImpl(String gameName, int eventId, int eventType, String playerName,
             boolean isPaymentToOrFromTreasury, boolean isPaymemtFromUser,
-            String paymentToPlayerName, int paymentAmount)
+            String paymentToPlayerName, int paymentAmount, int boardPosition)
     {
-        this(gameName, eventId, eventType, playerName);
+        this(gameName, eventId, eventType, playerName, boardPosition);
         m_isPaymentToOrFromTreasury = isPaymentToOrFromTreasury;
         m_isPaymemtFromUser = isPaymemtFromUser;;
         m_PaymentToPlayerName = paymentToPlayerName;

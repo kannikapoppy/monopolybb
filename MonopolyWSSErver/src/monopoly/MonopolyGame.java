@@ -12,6 +12,7 @@ import monopoly.results.GameDetailsResult;
 import monopoly.results.IDResult;
 import monopoly.results.MonopolyResult;
 import monopoly.results.PlayerDetailsResult;
+import objectmodel.AutomaticPlayer;
 import objectmodel.DiceThrowResult;
 import objectmodel.Player;
 
@@ -34,7 +35,7 @@ public class MonopolyGame {
     public String getGameBoardXML() {
         InputStream is = null;
         try {
-                is = getClass().getClassLoader().getResourceAsStream("resources/monopoly_config.xml");
+                is = getClass().getClassLoader().getResourceAsStream("configuration/MonopolyBoard.xml");
                 return new Scanner(is).useDelimiter("\\Z").next();
         } finally {
             if (is != null) {
@@ -49,6 +50,10 @@ public class MonopolyGame {
     public MonopolyResult startGame(String gameName, int humanPlayers, int computerizedPlayers, boolean useAutomaticDiceRoll) {
         if (gameManager.isGameStarted(gameName)) {
             return MonopolyResult.error("A game '" + gameName + "' has already been started");
+        } else if (humanPlayers  == 0) {
+            return MonopolyResult.error("A game must have at least one human player");
+        } else if (humanPlayers + computerizedPlayers < 2 || humanPlayers + computerizedPlayers > 6) {
+            return MonopolyResult.error("A game must have between 2 and 6 players");
         } else {
             gameManager.addGame(gameName, humanPlayers, computerizedPlayers, useAutomaticDiceRoll);
             return new MonopolyResult();
@@ -138,7 +143,23 @@ public class MonopolyGame {
 
     public MonopolyResult resign(int playerID) {
         //validate playerID against games players and players state
-        return new MonopolyResult();
+        if (gameManager.getGame() == null)
+        {
+            return new MonopolyResult(true, "game does not exists");
+        }
+
+        Player player = gameManager.getGame().GetPlayer(playerID);
+        if (player == null)
+        {
+            return new MonopolyResult(true, "user does not exists");
+        }
+        if (player instanceof AutomaticPlayer)
+        {
+            return new MonopolyResult(true, "machine player cannot resign");
+        }
+
+        player.RequestToResign();
+        return new MonopolyResult(false, "All Good");
     }
 
     public MonopolyResult buy(int playerID, int eventID, boolean buy) {

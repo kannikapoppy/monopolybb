@@ -24,8 +24,6 @@ import main.MonopolyGameLogic;
 import monopoly.Event;
 import monopoly.results.EventArrayResult;
 import objectmodel.Player;
-import objectmodel.PlayerColor;
-import java.util.Arrays;
 import java.util.Timer;
 import main.MoneyTransactionDirection;
 import main.StateManager.GameStateChangedEventListener;
@@ -33,6 +31,8 @@ import main.UserPrompt;
 import main.UserPromptTimerTask;
 import monopoly.EventImpl;
 import objectmodel.AutomaticPlayer;
+import objectmodel.RealPlayerInput;
+import objectmodel.ServerEvents;
 
 /**
  *
@@ -53,8 +53,11 @@ public class MonopolyGameManager {
         if (eventID < 0 || eventID >= events.size())
             return null;
 
-        Event eventsToReturn[] = new Event[events.size()];
-        eventsToReturn = events.subList(eventID + 1 , events.size() - 1).toArray(eventsToReturn);
+        if (eventID == events.size())
+            return new EventArrayResult(new Event[0]);
+
+        Event eventsToReturn[] = new Event[events.size() - eventID];
+        eventsToReturn = events.subList(eventID , events.size()).toArray(eventsToReturn);
 
         EventArrayResult result = new EventArrayResult(eventsToReturn);
         return result;
@@ -69,10 +72,16 @@ public class MonopolyGameManager {
         if (isGameExists()) {
             return false;
         } else {
+            events.clear();
             game = new GameDetails(gameName, humanPlayers, computerizedPlayers,
-                    useAutomaticDiceRoll, events);
+                    useAutomaticDiceRoll, events, this);
             return true;
         }
+    }
+
+    private void SignalGameEnded()
+    {
+        game = null;
     }
 
     private boolean isGameExists() {
@@ -87,7 +96,7 @@ public class MonopolyGameManager {
         return isGameExists() && game.GetName().compareTo(gameName) == 0 && game.isGameActive();
     }
 
-    public int joinPlayer(String playerName, String gameName) {
+    public int joinPlayer(String gameName, String playerName) {
         if (isGameExists() && game.GetName().compareTo(gameName) == 0) {
             return game.joinPlayer(playerName);
         } else {
@@ -97,7 +106,8 @@ public class MonopolyGameManager {
 
     public List<String> getGamesNames() {
         ArrayList<String> res = new ArrayList<String>();
-        res.add(game.GetName());
+        if (isGameExists())
+            res.add(game.GetName());
         return res;
     }
     
@@ -163,7 +173,7 @@ public class MonopolyGameManager {
     }
 
     public class GameDetails {
-        private static final int DEFAULT_TIMEOUT = 30;
+        private static final int DEFAULT_TIMEOUT = 30*1000;
 
         private String gameName;
         private int humanPlayers;
@@ -173,18 +183,17 @@ public class MonopolyGameManager {
         private MonopolyGameLogic gameLogic;
         GameStateChangedEventListener listener = null;
         List<Event> events = null;
+        MonopolyGameManager gameManager;
 
         public GameDetails(String gameName, int humanPlayers, int computerizedPlayers, boolean useAutomaticDiceRoll,
-                List<Event> events) {
+                List<Event> events, MonopolyGameManager gameManager) {
             this.gameName = gameName;
             this.humanPlayers = humanPlayers;
             this.computerizedPlayers = computerizedPlayers;
             this.useAutomaticDiceRoll = useAutomaticDiceRoll;
             this.events = events;
             this.players = new LinkedList<Player>();
-
-            if (humanPlayers == 0)
-                InnerStartGame();
+            this.gameManager = gameManager;
         }
 
         public String GetName()
@@ -205,20 +214,10 @@ public class MonopolyGameManager {
             return isGameStarted() && (this.humanPlayers + this.computerizedPlayers == this.players.size());
         }
 
-        private PlayerColor ChooseFreeColor(List<Player> existingPlayers)
-        {
-            ArrayList<PlayerColor> availableColors = new ArrayList<PlayerColor>(Arrays.asList(PlayerColor.values()));
-            for (Player player : existingPlayers)
-            {
-                    availableColors.remove(player.getPlayerColor());
-            }
-            return availableColors.get(0);
-        }
-
         public int joinPlayer(String playerName) {
             Player newPlayer = new Player();
             newPlayer.setName(playerName);
-            newPlayer.setPlayerColor(ChooseFreeColor(players));
+            newPlayer.setInputObject(new RealPlayerInput(newPlayer));
             this.players.add(newPlayer);
             
             if (this.players.size() == this.humanPlayers)
@@ -234,7 +233,6 @@ public class MonopolyGameManager {
             for (int i = 0; i < computerizedPlayers; i++) {
                 AutomaticPlayer newMachinePlayer = new AutomaticPlayer();
                 newMachinePlayer.setName("Machine Player " + i);
-                newMachinePlayer.setPlayerColor(ChooseFreeColor(players));
                 players.add(newMachinePlayer);
             }
             // all players have joined. we need to start the game
@@ -248,18 +246,24 @@ public class MonopolyGameManager {
                 }
             };
             gameLogic.getStateManager().registerToGameChangedEvent(GameStateChangedEventListener.class, listener);
+            System.out.println("Initing Game");
             if (!gameLogic.initGame(players)) {
                 // TODO: throw exception
                 // throw new Exception(ERROR_INITIALIZING_MSG);
+                System.out.println("Failed to init Game");
+                return;
             }
             try {
+                System.out.println("Starting Game");
                 if (!gameLogic.startGame(false)) {
                     // TODO: throw exception
                     // throw ex;
+                    System.out.println("Failed to start Game with no exception");
                 }
             } catch (Exception ex) {
                 // TODO: throw exception
                 // throw ex;
+                System.out.println("Failed to start Game with exception");
             }
         }
 
@@ -270,32 +274,48 @@ public class MonopolyGameManager {
 	 */
 	private void HandleState(GameStateChangedEvent evt)
 	{
+            System.out.println("handling event of type " + evt.getNewState().toString());
             switch (evt.getNewState())
 		{
                     case Starting:
-                        EventImpl startGameEvent = new EventImpl(gameName, events.size(), 1);
+                        EventImpl startGameEvent = new EventImpl(gameName, events.size() + 1, 
+                                ServerEvents.GameStart);
                         events.add(startGameEvent);
+                        break;
                     case GameOver:
                         GameStateChangedToPlayerActionEvent finishEvent = 
 					(GameStateChangedToPlayerActionEvent)evt;
-                        EventImpl gameWinnerEvent = new EventImpl(gameName, events.size(), 
-                                3, finishEvent.getPlayer().getName());
-                        EventImpl gameOverEvent = new EventImpl(gameName, events.size(), 2);
+                        EventImpl gameWinnerEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.GameWinner, finishEvent.getPlayer().getName(), finishEvent.getPlayer().getBoardPosition());
+                        EventImpl gameOverEvent = new EventImpl(gameName, events.size() + 2, ServerEvents.GameOver);
                         events.add(gameWinnerEvent);
                         events.add(gameOverEvent);
+                        gameLogic.getStateManager().unregisterFromGameChangedEvent(listener);
+                        gameManager.SignalGameEnded();
+                        break;
                     case PlayerLost:
                         GameStateChangedToPlayerActionEvent playerLostInnerEvent =
                                 (GameStateChangedToPlayerActionEvent)evt;
-                        EventImpl playerLostEvent = new EventImpl(gameName, events.size(),
-                                4, playerLostInnerEvent.getPlayer().getName());
+                        EventImpl playerLostEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.PlayerLost, playerLostInnerEvent.getPlayer().getName(),
+                                playerLostInnerEvent.getPlayer().getBoardPosition());
                         events.add(playerLostEvent);
+                        break;
+                    case PlayerResigned:
+                        GameStateChangedToPlayerActionEvent playerResignedInnerEvent =
+                                (GameStateChangedToPlayerActionEvent)evt;
+                        EventImpl playerResignedEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.PlayerResigned, playerResignedInnerEvent.getPlayer().getName(),
+                                playerResignedInnerEvent.getPlayer().getBoardPosition());
+                        events.add(playerResignedEvent);
                         break;
                     case PromptPlayerForRollingDice:
                         GameStateChangedToPromptPlayerActionEvent waitingForRollEvent =
                                 (GameStateChangedToPromptPlayerActionEvent)evt;
-                        int rolleventid = events.size();
+                        int rolleventid = events.size() + 1;
                         EventImpl promptDiceEvent = new EventImpl(gameName, rolleventid,
-                                6, waitingForRollEvent.getPlayer().getName(), DEFAULT_TIMEOUT);
+                                ServerEvents.PromptPlayerToRollDice, waitingForRollEvent.getPlayer().getName(),
+                                waitingForRollEvent.getPlayer().getBoardPosition(), DEFAULT_TIMEOUT);
                         events.add(promptDiceEvent);
                         UserPrompt.Init(waitingForRollEvent.GetEventHandler(), rolleventid,
                                 waitingForRollEvent.getPlayer());
@@ -305,58 +325,61 @@ public class MonopolyGameManager {
                     case PlayerRolling:
                         GameStateChangedToPlayerRollingEvent rollingEvent =
                                 (GameStateChangedToPlayerRollingEvent)evt;
-                        EventImpl diceEvent = new EventImpl(gameName, events.size(),
-                                7, rollingEvent.getPlayer().getName(),
-                                rollingEvent.getDiceThrowResult());
+                        EventImpl diceEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.DiceRoll, rollingEvent.getPlayer().getName(),
+                                rollingEvent.getDiceThrowResult(), rollingEvent.getPlayer().getBoardPosition());
                         events.add(diceEvent);
                         break;
                     case PlayerMoving:
                         GameStateChangedToPlayerMovingEvent movingInnerEvent =
                                 (GameStateChangedToPlayerMovingEvent)evt;
                         // move the player on the board
-                        EventImpl movingEvent = new EventImpl(gameName, events.size(),
-                                8, movingInnerEvent.getPlayer().getName(),
-                                movingInnerEvent.getOriginCell(),
-                                movingInnerEvent.getDestinationCell());
-                        
-                        if (movingInnerEvent.getDestinationCell().getType().compareTo("Jail") == 0 
+                        if (movingInnerEvent.getDestinationCell().getType().compareTo("Jail") == 0
                                 && movingInnerEvent.getPlayer().isInJail())
                         {
-                            EventImpl goToJailEvent = new EventImpl(gameName, events.size(),
-                                11, movingInnerEvent.getPlayer().getName());
+                            EventImpl goToJailEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.GoToJail, movingInnerEvent.getPlayer().getName(),
+                                movingInnerEvent.getPlayer().getBoardPosition());
                             events.add(goToJailEvent);
                         }
+
+                        EventImpl movingEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.Move, movingInnerEvent.getPlayer().getName(),
+                                movingInnerEvent.getOriginCell(),
+                                movingInnerEvent.getDestinationCell());
 
                         events.add(movingEvent);
                         break;
                     case PlayerPassedStartSquare:
                         GameStateChangedToPlayerActionEvent playerPassedStartInnerEvent =
-                                (GameStateChangedToPlayerRollingEvent)evt;
-                        EventImpl playerPassedStartEvent = new EventImpl(gameName, events.size(),
-                                9, playerPassedStartInnerEvent.getPlayer().getName(), DEFAULT_TIMEOUT);
+                                (GameStateChangedToPlayerActionEvent)evt;
+                        EventImpl playerPassedStartEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.PassedStartSquare, playerPassedStartInnerEvent.getPlayer().getName(),
+                                playerPassedStartInnerEvent.getPlayer().getBoardPosition(), DEFAULT_TIMEOUT);
                         events.add(playerPassedStartEvent);
                         break;
                     case PlayerLandedOnStartSquare:
                         GameStateChangedToPlayerActionEvent playerLandedOnStartInnerEvent =
-                                (GameStateChangedToPlayerRollingEvent)evt;
-                        EventImpl playerLandedOnStartEvent = new EventImpl(gameName, events.size(),
-                                10, playerLandedOnStartInnerEvent.getPlayer().getName(), DEFAULT_TIMEOUT);
+                                (GameStateChangedToPlayerActionEvent)evt;
+                        EventImpl playerLandedOnStartEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.LandedOnStartSquare, playerLandedOnStartInnerEvent.getPlayer().getName(),
+                                playerLandedOnStartInnerEvent.getPlayer().getBoardPosition(), DEFAULT_TIMEOUT);
                         events.add(playerLandedOnStartEvent);
                         break;
                     case PlayerBuying:
                         GameStateChangedToPlayerBuyingEvent buyingEvent =
                                 (GameStateChangedToPlayerBuyingEvent)evt;
-                        EventImpl assetBoughtEvent = new EventImpl(gameName, events.size(),
-                                14, buyingEvent.getPlayer().getName(), buyingEvent.getCell());
+                        EventImpl assetBoughtEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.AssetBought, buyingEvent.getPlayer().getName(), buyingEvent.getCell().getID());
                         events.add(assetBoughtEvent);
                         break;
                     case PromptPlayerForBuying:
                         GameStateChangedToPromptPlayerBuyingEvent promptBuyingInnerEvent =
                                 (GameStateChangedToPromptPlayerBuyingEvent)evt;
-                        int eventid = events.size();
+                        int eventid = events.size() + 1;
                         EventImpl promptBuyingEvent = new EventImpl(gameName, eventid,
-                                12, promptBuyingInnerEvent.getPlayer().getName(), 
-                                promptBuyingInnerEvent.getCell(), DEFAULT_TIMEOUT);
+                                ServerEvents.PromptPlayerToBuyAsset, promptBuyingInnerEvent.getPlayer().getName(),
+                                promptBuyingInnerEvent.getCell().getID(), DEFAULT_TIMEOUT);
                         events.add(promptBuyingEvent);
                         UserPrompt.Init(promptBuyingInnerEvent.GetEventHandler(), eventid,
                                 promptBuyingInnerEvent.getPlayer());
@@ -366,42 +389,45 @@ public class MonopolyGameManager {
                     case PlayerBuilding:
                         GameStateChangedToPlayerBuildingEvent buildingEvent =
                                 (GameStateChangedToPlayerBuildingEvent)evt;
-                        EventImpl houseBoughtEvent = new EventImpl(gameName, events.size(),
-                                15, buildingEvent.getPlayer().getName(), buildingEvent.getCity());
+                        EventImpl houseBoughtEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.HouseBought, buildingEvent.getPlayer().getName(), buildingEvent.getCity().getID());
                         events.add(houseBoughtEvent);
+                        break;
                     case PromptPlayerForBuilding:
                         GameStateChangedToPromptPlayerBuildingEvent promptBuildingInnerEvent =
                                 (GameStateChangedToPromptPlayerBuildingEvent)evt;
-                        int buildeventid = events.size();
+                        int buildeventid = events.size() + 1;
                         EventImpl promptBuildingEvent = new EventImpl(gameName, buildeventid,
-                                15, promptBuildingInnerEvent.getPlayer().getName(), 
-                                promptBuildingInnerEvent.getCity(), DEFAULT_TIMEOUT);
+                                ServerEvents.PromptPlayerToBuyHouse, promptBuildingInnerEvent.getPlayer().getName(),
+                                promptBuildingInnerEvent.getCity().getID(), DEFAULT_TIMEOUT);
                         events.add(promptBuildingEvent);
                         UserPrompt.Init(promptBuildingInnerEvent.GetEventHandler(), buildeventid,
                                 promptBuildingInnerEvent.getPlayer());
                         Timer buildTimeoutTimer = new Timer();
                         buildTimeoutTimer.schedule(new UserPromptTimerTask(buildeventid), DEFAULT_TIMEOUT);
+                        break;
                     case PlayerDrewCard:
                         GameStateChangedToPlayerDrewCardEvent drewCardEvent =
                                 (GameStateChangedToPlayerDrewCardEvent)evt;
                         int eventType;
                         if (drewCardEvent.getDeck().getType().compareTo("Community Chest") == 0)
-                            eventType = 17;
+                            eventType = ServerEvents.WarrantCard;
                         else if (drewCardEvent.getCard().getType().compareTo("Jail Pass") == 0)
-                            eventType = 18;
+                            eventType = ServerEvents.GetOutOfJailCard;
                         else
-                            eventType = 16;
+                            eventType = ServerEvents.SurpriseCard;
 
-                        EventImpl cardEvent = new EventImpl(gameName, events.size(),
+                        EventImpl cardEvent = new EventImpl(gameName, events.size() + 1,
                                 eventType, drewCardEvent.getPlayer().getName(),
-                                drewCardEvent.getCard().getMessage());
+                                drewCardEvent.getCard().getMessage(),
+                                drewCardEvent.getPlayer().getBoardPosition());
                         events.add(cardEvent);
                         break;
                     case PlayerGettingOutOfJail:
                         GameStateChangedToPlayerGettingOutOfJailEvent outOfJailEvent =
                                 (GameStateChangedToPlayerGettingOutOfJailEvent)evt;
-                        EventImpl outOfJailCardEvent = new EventImpl(gameName, events.size(),
-                                20, outOfJailEvent.getPlayer().getName());
+                        EventImpl outOfJailCardEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.PlayerUsedGetOutOfJailCard, outOfJailEvent.getPlayer().getName(), outOfJailEvent.getPlayer().getBoardPosition());
                         events.add(outOfJailCardEvent);
                         break;
                     case PlayerPayment:
@@ -427,10 +453,10 @@ public class MonopolyGameManager {
 
                             int paymentAmount = payEvent.getAmount();
 
-                            EventImpl paymentEvent = new EventImpl(gameName, events.size(),
-                                19, paymentFromPlayerName,
+                            EventImpl paymentEvent = new EventImpl(gameName, events.size() + 1,
+                                ServerEvents.Payment, paymentFromPlayerName,
                                 isPaymentToOrFromTreasury, !isPaymemtFromBank,
-                                paymentToPlayerName, paymentAmount);
+                                paymentToPlayerName, paymentAmount, payEvent.getPlayer().getBoardPosition());
                             events.add(paymentEvent);
                             break;
 		}
