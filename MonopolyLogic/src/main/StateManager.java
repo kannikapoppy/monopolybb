@@ -166,7 +166,8 @@ public class StateManager
 	 */
 	public void setCurrentStateToError(Object source, String message)
 	{
-		GameStateChangedEvent newEvent = new GameStateChangedEvent(this, currentState, GameStates.Initializing, message);
+		System.out.println(message);
+                GameStateChangedEvent newEvent = new GameStateChangedEvent(this, currentState, GameStates.Initializing, message);
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
 	}
@@ -461,6 +462,22 @@ public class StateManager
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
 	}
+
+        /**
+	 * Sets the current game state
+	 * Triggers an event for the new state
+	 * @param source - the object who triggered the game state change
+	 * @param message - a message regarding the new state
+	 * @param player - player who made the action
+	 */
+	public void setCurrentStateToPlayerResigned(Object source, String message, Player player)
+	{
+		GameStateChangedToPlayerActionEvent newEvent = new GameStateChangedToPlayerActionEvent(this, currentState,
+				GameStates.PlayerResigned, message, player);
+
+		// Change the state and raise the event
+		innerSetCurrentState(newEvent);
+	}
 	
 	/**
 	 * Sets the current game state
@@ -569,6 +586,7 @@ public class StateManager
 			case Auction:
 			case PlayerBroke:
 			case PlayerLost:
+                        case PlayerResigned:
                         case PlayerPassedStartSquare:
                         case PlayerLandedOnStartSquare:
 				releventListeners = listenerList.getListeners(PlayerActionEventListener.class);
