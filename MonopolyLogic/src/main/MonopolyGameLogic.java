@@ -258,12 +258,12 @@ public class MonopolyGameLogic
 	 */
         private boolean checkForPlayerResignationAndAct(Player player)
         {
-            if (player.WasResignRequested() && getWinner() == null)
+            if (player.isInGame() && player.WasResignRequested() && getWinner() == null)
             {
                 dropPlayer(player);
 
                 getStateManager().setCurrentStateToPlayerResigned(this,
-				player.getName() + " has lost!", player);
+				player.getName() + " has resigned!", player);
 
                 return true;
             }
@@ -299,7 +299,10 @@ public class MonopolyGameLogic
                                     waiter.doWait();
 
                                     if (UserPrompt.GetObject() != null)
+                                    {
                                         diceResult = (DiceThrowResult)UserPrompt.GetObject();
+                                        gameDice.setRollResults(diceResult);
+                                    }
 				}
                                 else
                                 {
@@ -323,7 +326,8 @@ public class MonopolyGameLogic
 			// check for resignation before switching turn
                         checkForPlayerResignationAndAct(currentPlayer);
                         // finished the turn, next player!
-			switchPlayer();
+			if (getWinner() == null)
+                            switchPlayer();
 		} while ((winner = getWinner()) == null);
 		
 		// Game over!

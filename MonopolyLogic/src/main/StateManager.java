@@ -388,7 +388,7 @@ public class StateManager
 			City where, WaitNotifyManager eventHandler)
 	{
 		GameStateChangedToPromptPlayerBuildingEvent newEvent = new GameStateChangedToPromptPlayerBuildingEvent(this,
-                        currentState, GameStates.PlayerBuilding, message, player, where, eventHandler);
+                        currentState, GameStates.PromptPlayerForBuilding, message, player, where, eventHandler);
 
 		// Change the state and raise the event
 		innerSetCurrentState(newEvent);
