@@ -78,4 +78,9 @@ public class Server {
     public GameDetails getGameDetails(String gameName) {
         return backendService.getGameDetails(gameName);
     }
+
+    public boolean Resign()
+    {
+        return backendService.Resign(this.playerID);
+    }
 }
