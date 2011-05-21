@@ -21,6 +21,7 @@ import objectmodel.GameBoard;
 import src.client.PlayerDetails;
 import src.client.Server;
 import src.monopolyUI.GetEventsTask;
+import src.monopolyUI.WaitingForPlayersTask;
 
 /**
  * This class represent the entire visual board
@@ -34,13 +35,20 @@ public class Board extends JPanel {
 	private static final String ERROR_INITIALIZING_MSG = "Error Initializing";
 	private static final String UNABLE_TO_START_GAME_MSG = "Unable To Start Game";
 	private static final String PLAYER_LOST_MSG_SUFFIX = " lost!!!";
+        private static final String PLAYER_RESIGNED_MSG_SUFFIX = " resigned!!!";
 	private static final String PLAYER_LOST_MSG_TITLE = "Another one bites the dust !!!";
 	
-        private int playerId;
         private java.util.Timer getAllEventsTimer;
+        private java.util.Timer usersLeftTimer;
         java.util.List<PlayerDetails> players;
 
         private CenterBoard innerBoard = null;
+
+        private String localPlayerName;
+
+        private static JFrame mainWindowFrame;
+
+        private JLabel waitingForPlayersLabel = new JLabel();
 	
 	/**
 	 * mapping between logical cells to visual cells
@@ -57,23 +65,23 @@ public class Board extends JPanel {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JFrame frame = new JFrame(WINDOW_TITLE);
+                mainWindowFrame = new JFrame(WINDOW_TITLE);
                 //what do we want to happen when the user click on the "X" button
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.getContentPane().setLayout(new BorderLayout());
+                mainWindowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                mainWindowFrame.getContentPane().setLayout(new BorderLayout());
 
                 //set size
                 Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                 Dimension frameSize = new Dimension();
                 frameSize.setSize(screenSize.width * 0.5, screenSize.height * 0.5);
-                frame.setSize(frameSize);
+                mainWindowFrame.setSize(frameSize);
 
-                frame.setLocationRelativeTo(null);
+                mainWindowFrame.setLocationRelativeTo(null);
                 
                 // setting the menu
-                frame.setJMenuBar(new MonopolyMenu());
+                mainWindowFrame.setJMenuBar(new MonopolyMenu());
 
-                frame.setVisible(true);
+                mainWindowFrame.setVisible(true);
             }
         });
     }
@@ -85,14 +93,22 @@ public class Board extends JPanel {
      */
 	public Board(String gameName, String playerName) {
 		super();
-                this.playerId = playerId;
-		getAllEventsTimer = Server.getInstance().startPolling("Game Players Timer",
+                mainWindowFrame.setTitle(WINDOW_TITLE + ", " + playerName);
+                this.localPlayerName = playerName;
+		getAllEventsTimer = Server.getInstance().startPolling("Events Timer",
                         new GetEventsTask(gameName, this, playerName), 0, 1);
+                add(waitingForPlayersLabel);
+                usersLeftTimer = Server.getInstance().startPolling("Waiting For Payers Timer",
+                        new WaitingForPlayersTask(gameName,waitingForPlayersLabel), 0, 1);
+
+
 	}
     
     public void initUI(final java.util.List<PlayerDetails> players)
     {
         this.players = players;
+
+        remove(waitingForPlayersLabel);
 
         // init layout
         this.setLayout(new GridBagLayout());
@@ -163,7 +179,7 @@ public class Board extends JPanel {
                         }
                     }
                     // Main Inner Area Notice Starts at (1,1) and takes up 8X8
-                    innerBoard = new CenterBoard(players);
+                    innerBoard = new CenterBoard(players, localPlayerName);
                     board.add(innerBoard, new GridBagConstraints(1, 1, 8, 8, 2, 2, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(0, 0, 0, 0), 0, 0));
                     board.validate();
                     board.repaint();
@@ -267,12 +283,7 @@ public class Board extends JPanel {
         innerBoard.SimulateDiceThrow(dice1, dice2);
     }
 
-    public void EnableDiceThrow()
-    {
-    	innerBoard.EnableDiceThrow();
-    }
-
-    public void UpdatePlayerLost(String playerName, int currentPositionID)
+    public void UpdatePlayerLost(String playerName, int currentPositionID, final boolean resigned)
     {
     	final PlayerDetails p = GetPlayerDetails(playerName);
         p.setLost();
@@ -319,9 +330,19 @@ public class Board extends JPanel {
                         }
 
 			 // show a message that the user has lost
-                        JOptionPane.showMessageDialog(null,
-                                        p.getName() + PLAYER_LOST_MSG_SUFFIX,
-                                        PLAYER_LOST_MSG_TITLE, JOptionPane.OK_OPTION);
+                        String msg;
+                        if (resigned)
+                        {
+                            msg = p.getName() + PLAYER_RESIGNED_MSG_SUFFIX;
+                        }
+                        else
+                        {
+                            msg = p.getName() + PLAYER_LOST_MSG_SUFFIX;
+                        }
+
+                        JOptionPane.showMessageDialog(null, msg, PLAYER_LOST_MSG_TITLE,
+                                JOptionPane.OK_OPTION);
+                                        
                 }
             });
         } catch (InterruptedException e) {

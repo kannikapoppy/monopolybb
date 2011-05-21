@@ -153,6 +153,8 @@ public class DisplayCell extends JPanel {
 		{
 			ownerStr = "No Owner";
 			assetOwnerLbl.setForeground(Color.BLACK);
+                        if (housesBox != null)
+                            housesBox.removeAll();
 		}
 		else
 		{
