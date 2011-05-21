@@ -1,5 +1,6 @@
 package src.client;
 
+import comm.Event;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,6 +14,7 @@ public class Server {
     private static Server instance;
 
     private BackendService backendService;
+    private int playerID = -1;
 
     static {
         instance = new Server();
@@ -26,6 +28,11 @@ public class Server {
         return instance;
     }
 
+    public void setPlayerId(int playerId)
+    {
+        this.playerID = playerId;
+    }
+
     public Timer startPolling (String timerName, TimerTask task, int delay, int period) {
         Timer timer = new Timer (timerName, true);
         timer.scheduleAtFixedRate(task, delay*1000, period*1000);
@@ -34,6 +41,18 @@ public class Server {
 
     public List<String> getWaitingGames() {
         return backendService.getWaitingGames();
+    }
+
+    public String getGameBoardXML() {
+        return backendService.getGameBoardXML();
+    }
+
+    public List<String> getActiveGames() {
+        return backendService.getActiveGames();
+    }
+
+    public List<Event> getAllEvents(int lastEventID) {
+        return backendService.getAllEvents(lastEventID);
     }
 
     public boolean startNewGame(String name, int humanPlayers, int computerPlayers, boolean useAutomaticDiceRollCheckBox) {
@@ -46,6 +65,14 @@ public class Server {
 
     public int joinPlayer(String gameName, String playerName) {
         return backendService.joinGame(gameName, playerName);
+    }
+
+    public boolean setDiceRollResults(int eventId, int firstDice, int secondDice) {
+        return backendService.setDiceRollResults(this.playerID, eventId, firstDice, secondDice);
+    }
+
+    public boolean buy(int eventId, boolean buy) {
+        return backendService.buy(this.playerID, eventId, buy);
     }
 
     public GameDetails getGameDetails(String gameName) {

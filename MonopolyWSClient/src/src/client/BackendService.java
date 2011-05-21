@@ -5,7 +5,10 @@
 
 package src.client;
 
+import comm.Event;
+import comm.EventArrayResult;
 import comm.GameDetailsResult;
+import comm.GetActiveGamesResponse;
 import comm.GetWaitingGamesResponse;
 import comm.IDResult;
 import comm.MonopolyGame;
@@ -16,6 +19,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import objectmodel.PlayerColor;
 
 /**
  *
@@ -43,6 +47,16 @@ public class BackendService {
         return result != null ? result.getReturn() : Collections.EMPTY_LIST;
     }
 
+    public List<String> getActiveGames() {
+        GetActiveGamesResponse result = monopolyGamePortType.getActiveGames();
+        return result != null ? result.getReturn() : Collections.EMPTY_LIST;
+    }
+
+    public List<Event> getAllEvents(int lastEventID) {
+        EventArrayResult result = monopolyGamePortType.getAllEvents(lastEventID);
+        return result != null ? result.getResults() : Collections.EMPTY_LIST;
+    }
+
     public int joinGame (String gameName, String playerName) {
         IDResult result = monopolyGamePortType.joinGame(gameName, playerName);
         if (hasError(result)) {
@@ -50,6 +64,17 @@ public class BackendService {
         } else {
             return result.getResult();
         }
+    }
+
+    public boolean setDiceRollResults (int playerId, int eventId, int firstDice, int secondDice) {
+        MonopolyResult result = monopolyGamePortType.setDiceRollResults(playerId, eventId,
+                firstDice, secondDice);
+        return !hasError(result);
+    }
+
+    public boolean buy (int playerId, int eventId, boolean buy) {
+        MonopolyResult result = monopolyGamePortType.buy(playerId, eventId, buy);
+        return !hasError(result);
     }
 
     private boolean hasError(MonopolyResult monopolyResult) {
@@ -67,12 +92,14 @@ public class BackendService {
         if (hasError(result)) {
             return Collections.EMPTY_LIST;
         } else {
+            PlayerColor[] colors = PlayerColor.values();
             for (int index=0 ; index < result.getNames().size() ; index++) {
                 players.add(new PlayerDetails(
                         result.getNames().get(index),
                         result.getIsHumans().get(index),
                         result.getIsActive().get(index),
-                        result.getMoney().get(index)));
+                        result.getMoney().get(index),
+                        (PlayerColor)colors[index]));
             }
             return players;
         }
