@@ -1,4 +1,4 @@
-package services;
+package src.services;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
