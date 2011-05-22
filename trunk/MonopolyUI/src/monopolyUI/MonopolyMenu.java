@@ -1,16 +1,14 @@
-package monopolyUI;
+package src.monopolyUI;
 
 import javax.swing.*;
-
 import java.util.List;
-
-import services.Utils;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
+
+import src.monopolyUI.Board;
 import src.client.Server;
+import src.services.Utils;
 
 /**
  * this class is the menu of the glorious game
@@ -24,8 +22,6 @@ public class MonopolyMenu extends JMenuBar
 	private static final String NEW_GAME_STR = "Start/Join Game";
 	private static final String EXIT_STR = "Exit";
 	private static final String GAME_IN_PROGRESS_ERROR_MSG = "A game is in progress and the server supports only one conccurent game.";
-	private static final String GAME_ENDED_UNEXPECTEDLY_PREFIX_ERROR_MSG = "The game has ended unexpectedly! Error message: ";
-	private static final String CANT_START_NEW_GAME_UNTIL_NOT_FINISH_CURRENT_ERROR_MSG = "The crrent game didn't finish. First finish the current game and only than you may start a new one.";
 
     public MonopolyMenu() throws HeadlessException {
     	final JComponent parentComponenet = this;

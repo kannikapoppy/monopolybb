@@ -5,16 +5,8 @@
 
 package src.monopolyUI;
 
-import comm.Event;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.TimerTask;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import monopolyUI.Board;
-import objectmodel.CellBase;
-import objectmodel.ServerEvents;
 import src.client.Server;
 
 /**

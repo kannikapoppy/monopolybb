@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.TimerTask;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import monopolyUI.Board;
+import src.monopolyUI.Board;
 import objectmodel.CellBase;
 import objectmodel.ServerEvents;
 import src.client.Server;
@@ -57,6 +57,7 @@ public class GetEventsTask extends TimerTask
                         break;
                     case ServerEvents.GameOver:
                         // game ended
+                        board.GameFinished();
                         break;
                     case ServerEvents.GameWinner:
                         // game winner
