@@ -1,5 +1,7 @@
 package src.client;
 
+import objectmodel.PlayerDetails;
+import objectmodel.GameDetails;
 import comm.Event;
 import java.util.List;
 import java.util.Timer;
