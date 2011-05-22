@@ -5,6 +5,8 @@
 
 package src.client;
 
+import objectmodel.PlayerDetails;
+import objectmodel.GameDetails;
 import comm.Event;
 import comm.EventArrayResult;
 import comm.GameDetailsResult;
