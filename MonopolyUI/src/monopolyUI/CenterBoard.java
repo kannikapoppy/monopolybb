@@ -1,4 +1,4 @@
-package monopolyUI;
+package src.monopolyUI;
 
 import java.awt.GridBagLayout;
 import javax.swing.JPanel;
@@ -9,14 +9,14 @@ import java.awt.GridBagConstraints;
 import javax.swing.JLabel;
 
 
-import services.Utils;
+import src.services.Utils;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Hashtable;
 import java.util.List;
 import javax.swing.JButton;
-import src.client.PlayerDetails;
+import objectmodel.PlayerDetails;
 import src.client.Server;
 
 /**

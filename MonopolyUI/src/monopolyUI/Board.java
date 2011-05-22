@@ -1,4 +1,4 @@
-package monopolyUI;
+package src.monopolyUI;
 
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.*;
@@ -10,27 +10,21 @@ import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.lang.model.SourceVersion;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import monopolyUI.DisplayCell;
 import objectmodel.Asset;
 import objectmodel.CellBase;
 import objectmodel.City;
 import objectmodel.GameBoard;
 import org.xml.sax.SAXException;
-import src.client.PlayerDetails;
+import objectmodel.PlayerDetails;
 import src.client.Server;
-import src.monopolyUI.GetEventsTask;
-import src.monopolyUI.WaitingForPlayersTask;
 
 /**
  * This class represent the entire visual board
@@ -41,8 +35,6 @@ public class Board extends JPanel {
 
 	private static final int LINE_SIZE = 9;
 	private static final String WINDOW_TITLE = "Monopoly By Benda And Eizenman";
-	private static final String ERROR_INITIALIZING_MSG = "Error Initializing";
-	private static final String UNABLE_TO_START_GAME_MSG = "Unable To Start Game";
 	private static final String PLAYER_LOST_MSG_SUFFIX = " lost!!!";
         private static final String PLAYER_RESIGNED_MSG_SUFFIX = " resigned!!!";
 	private static final String PLAYER_LOST_MSG_TITLE = "Another one bites the dust !!!";
@@ -50,11 +42,9 @@ public class Board extends JPanel {
         private java.util.Timer getAllEventsTimer;
         private java.util.Timer usersLeftTimer;
         java.util.List<PlayerDetails> players;
-
-        private CenterBoard innerBoard = null;
-
         private String localPlayerName;
 
+        private CenterBoard innerBoard = null;
         private static JFrame mainWindowFrame;
 
         private JLabel waitingForPlayersLabel = new JLabel();
@@ -102,12 +92,12 @@ public class Board extends JPanel {
      */
 	public Board(String gameName, String playerName) {
 		super();
-                mainWindowFrame.setTitle(WINDOW_TITLE + ", " + playerName);
+                mainWindowFrame.setTitle(WINDOW_TITLE + "(" + playerName + ")");
                 this.localPlayerName = playerName;
 		getAllEventsTimer = Server.getInstance().startPolling("Events Timer",
                         new GetEventsTask(gameName, this, playerName), 0, 1);
                 add(waitingForPlayersLabel);
-                usersLeftTimer = Server.getInstance().startPolling("Waiting For Payers Timer",
+                usersLeftTimer = Server.getInstance().startPolling("Waiting For Players Timer",
                         new WaitingForPlayersTask(gameName,waitingForPlayersLabel), 0, 1);
 
 
@@ -292,11 +282,11 @@ public class Board extends JPanel {
                     }
                 });
         } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         } catch (InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
@@ -449,6 +439,10 @@ public class Board extends JPanel {
         PlayerDetails fromPlayer = GetPlayerDetails(to);
         fromPlayer.AddAmount(amountPaid);
         innerBoard.UpdatePlayerDisplay(fromPlayer);
+    }
+
+    public void GameFinished() {
+        getAllEventsTimer.cancel();
     }
 
 

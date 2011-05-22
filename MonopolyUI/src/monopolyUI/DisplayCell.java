@@ -16,8 +16,8 @@ import objectmodel.CellBase;
 import objectmodel.City;
 import objectmodel.PlayerColor;
 
-import services.Utils;
-import src.client.PlayerDetails;
+import src.services.Utils;
+import objectmodel.PlayerDetails;
 
 /**
  * this class displays a single cell

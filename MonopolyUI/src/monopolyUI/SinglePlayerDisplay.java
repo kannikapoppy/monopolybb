@@ -1,14 +1,12 @@
-package monopolyUI;
+package src.monopolyUI;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-
-import services.Utils;
-
 import java.awt.BorderLayout;
-import javax.swing.JButton;
-import src.client.PlayerDetails;
+
+import objectmodel.PlayerDetails;
+import src.services.Utils;
 
 /**
  * displays one player in the center board player mapping
