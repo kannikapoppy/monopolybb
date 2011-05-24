@@ -57,7 +57,11 @@ public class MonopolyGameManager {
             return new EventArrayResult(new Event[0]);
 
         Event eventsToReturn[] = new Event[events.size() - eventID];
-        eventsToReturn = events.subList(eventID , events.size()).toArray(eventsToReturn);
+
+        for (int i=eventID;i<events.size();i++)
+        {
+            eventsToReturn[i-eventID] = events.get(i);
+        }
 
         EventArrayResult result = new EventArrayResult(eventsToReturn);
         return result;
