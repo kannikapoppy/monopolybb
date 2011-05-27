@@ -43,57 +43,57 @@ public class Server {
         return timer;
     }
 
-    public List<String> getWaitingGames() {
+    public List<String> getWaitingGames() throws Exception {
         return backendService.getWaitingGames();
     }
 
-    public String getGameBoardXML() {
+    public String getGameBoardXML() throws Exception {
         String xml = backendService.getGameBoardXML();
         Matcher cleanerMatcher = (Pattern.compile("^([\\W]+)<")).matcher( xml.trim() );
         xml = cleanerMatcher.replaceFirst("<");
         return xml;
     }
 
-    public String getGameBoardSchema() {
+    public String getGameBoardSchema() throws Exception {
         String schema = backendService.getGameBoardSchema();
         Matcher cleanerMatcher = (Pattern.compile("^([\\W]+)<")).matcher( schema.trim() );
         schema = cleanerMatcher.replaceFirst("<");
         return schema;
     }
 
-    public List<String> getActiveGames() {
+    public List<String> getActiveGames() throws Exception {
         return backendService.getActiveGames();
     }
 
-    public List<Event> getAllEvents(int lastEventID) {
+    public List<Event> getAllEvents(int lastEventID) throws Exception {
         return backendService.getAllEvents(lastEventID);
     }
 
-    public boolean startNewGame(String name, int humanPlayers, int computerPlayers, boolean useAutomaticDiceRollCheckBox) {
+    public boolean startNewGame(String name, int humanPlayers, int computerPlayers, boolean useAutomaticDiceRollCheckBox) throws Exception {
         return backendService.startGame(name, humanPlayers, computerPlayers, useAutomaticDiceRollCheckBox);
     }
 
-    public List<PlayerDetails> getPlayersDetails(String gameName) {
+    public List<PlayerDetails> getPlayersDetails(String gameName) throws Exception {
         return backendService.getPlayersDetails(gameName);
     }
 
-    public int joinPlayer(String gameName, String playerName) {
+    public int joinPlayer(String gameName, String playerName) throws Exception {
         return backendService.joinGame(gameName, playerName);
     }
 
-    public boolean setDiceRollResults(int eventId, int firstDice, int secondDice) {
+    public boolean setDiceRollResults(int eventId, int firstDice, int secondDice) throws Exception {
         return backendService.setDiceRollResults(this.playerID, eventId, firstDice, secondDice);
     }
 
-    public boolean buy(int eventId, boolean buy) {
+    public boolean buy(int eventId, boolean buy) throws Exception {
         return backendService.buy(this.playerID, eventId, buy);
     }
 
-    public GameDetails getGameDetails(String gameName) {
+    public GameDetails getGameDetails(String gameName) throws Exception {
         return backendService.getGameDetails(gameName);
     }
 
-    public boolean Resign()
+    public boolean Resign() throws Exception
     {
         return backendService.Resign(this.playerID);
     }

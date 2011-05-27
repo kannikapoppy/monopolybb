@@ -77,9 +77,15 @@ public class CenterBoard extends JPanel {
 
                 resignButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				boolean res = Server.getInstance().Resign();
-                                if (res)
-                                    resignButton.setEnabled(false);
+                            boolean res;
+                            try {
+                                res = Server.getInstance().Resign();
+                            } catch (Exception ex) {
+                                Utils.ShowError(getParent(), "An error occured while connecting to the server. The Game Is Over. Sorry.");
+                                return;
+                            }
+                            if (res)
+                                resignButton.setEnabled(false);
 			}
 		});
 

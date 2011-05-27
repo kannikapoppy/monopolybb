@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.TimerTask;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import src.monopolyUI.Board;
 import objectmodel.CellBase;
 import objectmodel.ServerEvents;
 import src.client.Server;
+import src.services.Utils;
 
 /**
  *
@@ -42,7 +42,15 @@ public class GetEventsTask extends TimerTask
     @Override
     public void run() {
         if (gameName != null) {
-            List<Event> events = Server.getInstance().getAllEvents(lastEventId);
+            List<Event> events = null;
+            try {
+                events = Server.getInstance().getAllEvents(lastEventId);
+            }
+            catch (Exception ex) {
+                Utils.ShowError(board, "An error occured while connecting to the server. The Game Is Over. Sorry.");
+                board.GameFinished();
+                return;
+            }
             if (events == null || events.isEmpty())
                 return;
             
@@ -53,7 +61,14 @@ public class GetEventsTask extends TimerTask
                 {
                     case ServerEvents.GameStart:
                         // game started
+                        try {
                         board.initUI(Server.getInstance().getPlayersDetails(gameName));
+                        }
+                        catch (Exception ex) {
+                            Utils.ShowError(board, "An error occured while connecting to the server. The Game Is Over. Sorry.");
+                            board.GameFinished();
+                            return;
+                        }
                         break;
                     case ServerEvents.GameOver:
                         // game ended
@@ -154,8 +169,15 @@ public class GetEventsTask extends TimerTask
                             e.printStackTrace();
                         }
                         
+                        try {
                         Server.getInstance().setDiceRollResults(event.getEventID(), diceThrows[0],
                                 diceThrows[1]);
+                        }
+                        catch (Exception ex) {
+                            Utils.ShowError(board, "An error occured while connecting to the server. The Game Is Over. Sorry.");
+                            board.GameFinished();
+                            return;
+                        }
 
                         break;
                     case ServerEvents.DiceRoll:
@@ -210,7 +232,13 @@ public class GetEventsTask extends TimerTask
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
-                        Server.getInstance().buy(event.getEventID(), result[0]);
+                        try {
+                            Server.getInstance().buy(event.getEventID(), result[0]);
+                        } catch (Exception ex) {
+                            Utils.ShowError(board, "An error occured while connecting to the server. The Game Is Over. Sorry.");
+                            board.GameFinished();
+                            return;
+                        }
                         break;
                     case ServerEvents.PromptPlayerToBuyHouse:
                         // Prompt Player to Buy House
@@ -236,7 +264,13 @@ public class GetEventsTask extends TimerTask
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
-                        Server.getInstance().buy(event.getEventID(), buyHouseResult[0]);
+                        try {
+                            Server.getInstance().buy(event.getEventID(), buyHouseResult[0]);
+                        } catch (Exception ex) {
+                            Utils.ShowError(board, "An error occured while connecting to the server. The Game Is Over. Sorry.");
+                            board.GameFinished();
+                            return;
+                        }
                         break;
                     case ServerEvents.AssetBought:
                         // Asset bought message

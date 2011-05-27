@@ -8,6 +8,7 @@ package src.monopolyUI;
 import java.util.TimerTask;
 import javax.swing.JLabel;
 import src.client.Server;
+import src.services.Utils;
 
 /**
  *
@@ -26,7 +27,14 @@ public class WaitingForPlayersTask extends TimerTask
     @Override
     public void run() {
         if (gameName != null) {
-            int missing = Server.getInstance().getGameDetails(gameName).getWaitingForPlayersNumber();
+            int missing;
+            
+            try {
+                missing = Server.getInstance().getGameDetails(gameName).getWaitingForPlayersNumber();
+            } catch (Exception ex) {
+                return;
+            }
+
             waitingForPlayersLabel.setText("Waiting For " + missing + " Players To Join The Game '" + gameName + "'");
         }
     }
