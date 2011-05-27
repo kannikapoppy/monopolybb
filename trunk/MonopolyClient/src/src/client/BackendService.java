@@ -35,35 +35,35 @@ public class BackendService {
         monopolyGamePortType = new MonopolyGame().getMonopolyGameHttpSoap11Endpoint();
     }
 
-    public String getGameBoardXML() {
+    public String getGameBoardXML() throws Exception {
         return monopolyGamePortType.getGameBoardXML().getReturn().getValue();
     }
 
-    public String getGameBoardSchema() {
+    public String getGameBoardSchema() throws Exception {
         return monopolyGamePortType.getGameBoardSchema().getReturn().getValue();
     }
 
-    public boolean startGame(String name, int humanPlayers, int computerPlayers, boolean useAutomaticDiceRollCheckBox) {
+    public boolean startGame(String name, int humanPlayers, int computerPlayers, boolean useAutomaticDiceRollCheckBox) throws Exception {
         MonopolyResult result = monopolyGamePortType.startGame(name, humanPlayers, computerPlayers, useAutomaticDiceRollCheckBox);
         return !hasError(result);
     } 
 
-    public List<String> getWaitingGames() {
+    public List<String> getWaitingGames() throws Exception {
         GetWaitingGamesResponse result = monopolyGamePortType.getWaitingGames();
         return result != null ? result.getReturn() : Collections.EMPTY_LIST;
     }
 
-    public List<String> getActiveGames() {
+    public List<String> getActiveGames() throws Exception {
         GetActiveGamesResponse result = monopolyGamePortType.getActiveGames();
         return result != null ? result.getReturn() : Collections.EMPTY_LIST;
     }
 
-    public List<Event> getAllEvents(int lastEventID) {
+    public List<Event> getAllEvents(int lastEventID) throws Exception {
         EventArrayResult result = monopolyGamePortType.getAllEvents(lastEventID);
         return result != null ? result.getResults() : Collections.EMPTY_LIST;
     }
 
-    public int joinGame (String gameName, String playerName) {
+    public int joinGame (String gameName, String playerName) throws Exception {
         IDResult result = monopolyGamePortType.joinGame(gameName, playerName);
         if (hasError(result)) {
             return -1;
@@ -72,13 +72,13 @@ public class BackendService {
         }
     }
 
-    public boolean setDiceRollResults (int playerId, int eventId, int firstDice, int secondDice) {
+    public boolean setDiceRollResults (int playerId, int eventId, int firstDice, int secondDice) throws Exception {
         MonopolyResult result = monopolyGamePortType.setDiceRollResults(playerId, eventId,
                 firstDice, secondDice);
         return !hasError(result);
     }
 
-    public boolean buy (int playerId, int eventId, boolean buy) {
+    public boolean buy (int playerId, int eventId, boolean buy) throws Exception {
         MonopolyResult result = monopolyGamePortType.buy(playerId, eventId, buy);
         return !hasError(result);
     }
@@ -92,7 +92,7 @@ public class BackendService {
         }
     }
 
-    public List<PlayerDetails> getPlayersDetails(String gameName) {
+    public List<PlayerDetails> getPlayersDetails(String gameName) throws Exception {
         List<PlayerDetails> players = new LinkedList<PlayerDetails>();
         PlayerDetailsResult result = monopolyGamePortType.getPlayersDetails(gameName);
         if (hasError(result)) {
@@ -112,7 +112,7 @@ public class BackendService {
 
     }
 
-    public GameDetails getGameDetails (String gameName) {
+    public GameDetails getGameDetails (String gameName) throws Exception {
         GameDetailsResult result = monopolyGamePortType.getGameDetails(gameName);
         if (hasError(result)) {
             return null;
@@ -126,7 +126,7 @@ public class BackendService {
         }
     }
 
-    public boolean Resign(int playerID)
+    public boolean Resign(int playerID) throws Exception
     {
         MonopolyResult result = monopolyGamePortType.resign(playerID);
         return !hasError(result);

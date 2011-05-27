@@ -25,6 +25,7 @@ import objectmodel.GameBoard;
 import org.xml.sax.SAXException;
 import objectmodel.PlayerDetails;
 import src.client.Server;
+import src.services.Utils;
 
 /**
  * This class represent the entire visual board
@@ -113,8 +114,18 @@ public class Board extends JPanel {
         // init layout
         this.setLayout(new GridBagLayout());
 
-        String boardXML = Server.getInstance().getGameBoardXML();
-        String boardSchema = Server.getInstance().getGameBoardSchema();
+        String boardXML = null;
+        String boardSchema = null;
+
+        try {
+            boardXML = Server.getInstance().getGameBoardXML();
+            boardSchema = Server.getInstance().getGameBoardSchema();
+        } catch (Exception ex) {
+            Utils.ShowError(this, "An error occured while connecting to the server. The Game Is Over. Sorry.");
+            GameFinished();
+            return;
+        }
+
         JAXBContext jContext;
         GameBoard gameBoard = null;
         try

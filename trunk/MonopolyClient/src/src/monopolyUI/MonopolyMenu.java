@@ -5,8 +5,8 @@ import java.util.List;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.ConnectException;
 
-import src.monopolyUI.Board;
 import src.client.Server;
 import src.services.Utils;
 
@@ -33,13 +33,28 @@ public class MonopolyMenu extends JMenuBar
         fileMenu.add(newGameMenu);
         newGameMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                final List<String> waitingGames = Server.getInstance().getWaitingGames();
+                List<String> waitingGames;
+                try {
+                    waitingGames = Server.getInstance().getWaitingGames();
+                } catch (Exception ex) {
+                    Utils.ShowError(parentComponenet, "An error occured while connecting to the server.");
+                    return;
+                }
+
                 if (waitingGames.isEmpty())
                 {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run()
                     {
-                        if (!Server.getInstance().getActiveGames().isEmpty())
+                        boolean areThereRunningGames;
+                        try {
+                            areThereRunningGames = !Server.getInstance().getActiveGames().isEmpty();
+                        } catch (Exception ex) {
+                            Utils.ShowError(parentComponenet, "An error occured while connecting to the server.");
+                            return;
+                        }
+
+                        if (areThereRunningGames)
                         {
                             Utils.ShowError(parentComponenet, GAME_IN_PROGRESS_ERROR_MSG);
                             return;
@@ -134,8 +149,18 @@ public class MonopolyMenu extends JMenuBar
                             "Would You Like To Automate Dice Roll ?",
                             "Automate Dice Roll", JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE);
-                        boolean success = Server.getInstance().startNewGame(gameName, humanPlayers,
+
+                        boolean success;
+
+                        try {
+                             success = Server.getInstance().startNewGame(gameName, humanPlayers,
                                 machinePlayers, automateRollDice);
+                        } catch (Exception ex) {
+                            Utils.ShowError(parentComponenet, "An error occured while connecting to the server.");
+                            return;
+                        }
+
+
                         if (!success)
                         {
                             // show error message and suggest to try again
@@ -153,10 +178,11 @@ public class MonopolyMenu extends JMenuBar
                 else
                 {
                     // show join game window
+                    final String currentGame = waitingGames.get(0);
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run()
                         {
-                            PromptForUserName(waitingGames.get(0), newGameMenu);
+                            PromptForUserName(currentGame, newGameMenu);
                         }
                     });
                 }
@@ -189,7 +215,15 @@ public class MonopolyMenu extends JMenuBar
             else
                 break;
         }
-        int playerId = Server.getInstance().joinPlayer(gameName, playerName);
+        int playerId;
+
+        try {
+            playerId = Server.getInstance().joinPlayer(gameName, playerName);
+        } catch (Exception ex) {
+            Utils.ShowError(null, "An error occured while connecting to the server.");
+            return;
+        }
+
         if (playerId == -1)
         {
             // error occured, show message to try again with a different name
