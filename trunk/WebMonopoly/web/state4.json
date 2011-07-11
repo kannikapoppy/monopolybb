@@ -1,0 +1,58 @@
+{
+    "ver": 4,
+    "players": [
+        {
+            "id": 1,
+            "name": "Gad Ben Ari",
+            "location": 23,
+            "fonds": 120,
+            "assets":[
+                {"address": 11, "houses": 1},
+                {"address": 12},
+                {"address": 23, "houses": 3}
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Haim Tadmon",
+            "location": 36,
+            "fonds": 60,
+            "assets":[
+                {"address": 7},
+                {"address": 14}
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Lea Lior",
+            "location": 23,
+            "fonds": 180,
+            "assets":[
+                {"address": 4, "houses": 1},
+                {"address": 8, "houses": 1},
+                {"address": 29, "houses": 1}
+            ]
+        },
+        {
+            "id": 4,
+            "name": "Jodit Ben Yaakov",
+            "location": 33,
+            "fonds": 320,
+            "assets":[
+                {"address": 5}
+            ]
+        },
+        {
+            "id": 5,
+            "name": "Uzy Ben Knaan",
+            "fonds": 20,
+            "location": 24,
+            "assets":[
+                {"address": 16, "houses": 3},
+                {"address": 32, "houses": 2},
+                {"address": 35, "houses": 1}
+            ]
+        }
+    ],
+    "dices": true
+}

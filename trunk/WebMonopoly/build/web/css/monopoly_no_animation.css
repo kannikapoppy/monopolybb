@@ -1,0 +1,392 @@
+.hidden{
+    display:none;
+}
+
+#container{
+    height:100%;
+    width:100%;
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+#monopoly-frame{
+    top:0;
+    left:0;
+	height:99%;
+	width:99%;
+	position:absolute;
+	border:1px solid #000;
+	background:#CBE9DF url(images/main-bkg.png) no-repeat center center;
+    margin:0 auto;
+}	
+#monopoly-frame div.level0{
+	height:10%;
+	width:10%;
+	text-align:center;
+	position:absolute;
+}
+
+/* City background layer */
+
+ #cell1 div.level1{
+    background: url(images/start.png) no-repeat center center ;     
+ }
+.tel-aviv #cell5 div.level1{
+    background: url(images/habima.png) no-repeat center center ;
+}
+
+.tel-aviv #cell7 div.level1{
+    background: url(images/heichal.png) no-repeat center center ;
+}
+
+.tel-aviv #cell11 div.level1{
+    background: url(images/azrieli.png) no-repeat center center ;
+}
+
+.tel-aviv #cell17 div.level1{
+    background: url(images/bialic.png) no-repeat center center ;
+}
+
+.tel-aviv #cell23 div.level1{
+    background: url(images/dan-hotel.png) no-repeat center center ;
+}
+
+.tel-aviv #cell24 div.level1{
+    background: url(images/golda.png) no-repeat center center ;
+}
+
+
+.tel-aviv #cell27 div.level1{
+    background: url(images/iria.png) no-repeat center center ;
+}
+
+.tel-aviv #cell30 div.level1{
+    background: url(images/comverse.png) no-repeat center center ;
+}
+
+.tel-aviv #cell32 div.level1{
+    background: url(images/museum.png) no-repeat center center ;
+}
+
+.tel-aviv #cell35 div.level1{
+    background: url(images/orna.png) no-repeat center center ;
+}
+
+#monopoly-frame div.level1{
+    height:100%;
+    width:100%;
+	border:1px solid #000;
+	display:block;
+    text-indent:-5000em;
+
+    -webkit-background-size: 100% 100%!important;
+    -moz-background-size:  100% 100%!important;
+    -o-background-size: 100% 100%!important;
+    background-size:  100% 100%!important;
+}
+
+/* border of cells */
+
+.north {
+	border-bottom:1px solid #000;
+}
+
+.east {
+	border-left:1px solid #000;
+}
+
+.south {
+	border-top:1px solid #000;
+}
+
+.west {
+	border-right:1px solid #000;
+}
+
+.north,  .northeast, .northwest {
+    	top:0;
+}
+
+.east, .southeast, .northeast{
+	right:0;
+}
+
+.south, .southeast, .southwest {
+	bottom:0;
+}
+
+.west, .southwest, .northwest {
+    left:0;
+}
+
+/* position of cells */
+
+#cell1{
+	left:0;
+}
+#cell2{
+	left:10%;
+}
+#cell3{
+	left:20%;
+}
+#cell4{
+	left:30%;
+}
+#cell5{
+	left:40%;
+}
+#cell6{
+	left:50%;
+}
+#cell7{
+	left:60%;
+}
+#cell8{
+	left:70%;
+}
+#cell9{
+	left:80%;
+}
+#cell10{
+	left:90%;
+}
+
+#cell11{
+	top:10%;
+}
+#cell12{
+	top:20%;
+}
+#cell13{
+	top:30%;
+}
+#cell14{
+	top:40%;
+}
+#cell15{
+	top:50%;
+}
+#cell16{
+	top:60%;
+}
+#cell17{
+	top:70%;
+}
+#cell18{
+	top:80%;
+}
+#cell19{
+	top:90%;
+}
+
+#cell20{
+	right:10%;
+}
+#cell21{
+	right:20%;
+}
+#cell22{
+	right:30%;
+}
+#cell23{
+	right:40%;
+}
+#cell24{
+	right:50%;
+}
+#cell25{
+	right:60%;
+}
+#cell26{
+	right:70%;
+}
+#cell27{
+	right:80%;
+}
+#cell28{
+	right:90%;
+}
+#cell29{
+	top:80%;
+}
+#cell30{
+	top:70%;
+}
+#cell31{
+	top:60%;
+}
+#cell32{
+	top:50%;
+}
+#cell33{
+	top:40%;
+}
+#cell34{
+	top:30%;
+}
+#cell35{
+	top:20%;
+}
+
+#cell36{
+	top:10%;
+}
+
+/* player individual background color */
+
+.player1-asset{
+    background-color:#ffdcb5!important;
+}
+.player2-asset{
+    background-color:#fdffb5!important;
+}
+.player3-asset{
+    background-color:#f57886!important;
+}
+.player4-asset{
+    background-color:#e376f1!important;
+}
+.player5-asset{
+    background-color:#77c0ff!important;
+}
+.player6-asset{
+    background-color:#83ff77!important;
+}
+
+/* assets layer */
+
+/*.house1 div.level3,
+.house2 div.level3,
+.house3 div.level3{
+    background: transparent url(images/house1.png) no-repeat center;
+}*/
+
+.house1 div.level3{
+    background-image:url(images/house1.png);
+}
+
+.house2 div.level3{
+    background-image:url(images/house2.png);
+}
+
+.house3 div.level3{
+    background-image:url(images/house3.png);
+}
+
+div.level2{
+     height:100%;
+     -webkit-background-size: 100% 100%!important;
+     -moz-background-size:  100% 100%!important;
+     -o-background-size: 100% 100%!important;
+     background-size:  100% 100%!important;
+}
+ div.level3{
+     height:100%;
+     padding-top:30%;
+ }
+
+.player1 div.level3,
+.player2 div.level3,
+.player3 div.level3,
+.player4 div.level3,
+.player5 div.level3,
+.player6 div.level3{
+    width:32px;
+    height:32px;
+    position:relative;
+    background-repeat:no-repeat;
+}
+
+.player1{
+    background-image: url(images/player-1.png);
+}
+.player2{
+    background-image: url(images/player-2.png);
+}
+.player3{
+    background-image: url(images/player-3.png);
+}
+.player4{
+    background-image: url(images/player-4.png);
+}
+.player5{
+    background-image: url(images/player-5.png);
+}
+.player6{
+    background-image: url(images/player-6.png);
+}
+
+#playersLegend{
+    border:1px solid black;
+    top:15%;
+    right:15%;
+    position:absolute;
+    padding:10px;
+}
+
+#playersLegend ul{
+    padding:0;
+    margin:0;
+}
+
+#playersLegend li.player1,
+#playersLegend li.player2,
+#playersLegend li.player3,
+#playersLegend li.player4,
+#playersLegend li.player5,
+#playersLegend li.player6{
+    background:transparent url(images/player-1.png) no-repeat left center;
+    padding:6px 0 6px 34px;
+    list-style:none;
+}
+
+#playersLegend li.player2{
+    background-image:url(images/player-2.png);
+}
+#playersLegend li.player3{
+    background-image:url(images/player-3.png);
+}
+#playersLegend li.player4{
+    background-image:url(images/player-4.png);
+}
+#playersLegend li.player5{
+    background-image:url(images/player-5.png);
+}
+#playersLegend li.player6{
+    background-image:url(images/player-6.png);
+}
+
+.dialog{
+    border:1px solid black;
+    top:25%;
+    left:25%;
+    position:absolute;
+    padding:10px;
+    background:#fff;
+    width:50%;
+    height:50%;
+}
+
+.dialog .ft{
+    position:absolute;
+    bottom:0;
+    padding:10px;
+    text-align:right;
+    width:90%;
+}
+
+#questDialog{
+    background:#fff url(images/question.png) no-repeat 20px 20px;
+}
+
+#dicesDialog{
+    background:#fff url(images/dices.png) no-repeat 20px 20px;
+}
+
+.dialog div.question{
+    margin-left: 150px;
+    font-size:150%;
+    padding:20px;
+}

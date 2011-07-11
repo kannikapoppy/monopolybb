@@ -1,0 +1,47 @@
+{
+    "ver": 0,
+    "players": [
+        {
+            "id": 1,
+            "name": "Gad Ben Ari",
+            "location": 1,
+            "fonds": 120,
+            "assets":[]
+        },
+        {
+            "id": 2,
+            "name": "Haim Tadmon",
+            "location": 1,
+            "fonds": 60,
+            "assets":[]
+        },
+        {
+            "id": 3,
+            "name": "Lea Lior",
+            "location": 1,
+            "fonds": 180,
+            "assets":[]
+        },
+        {
+            "id": 4,
+            "name": "Jodit Ben Yaakov",
+            "location": 1,
+            "fonds": 320,
+            "assets":[]
+        },
+        {
+            "id": 5,
+            "name": "Uzy Ben Knaan",
+            "fonds": 20,
+            "location": 1,
+            "assets":[]
+        }
+    ],
+
+    "dialog":{
+        "id": 132653,
+        "question": "Do you want to buy this property?",
+        "option1": "Yes",
+        "option2": "No, thank you"
+    }
+}
