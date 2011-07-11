@@ -1,0 +1,51 @@
+{
+    "ver": 1,
+    "players": [
+        {
+            "id": 1,
+            "name": "Gad Ben Ari",
+            "location": 4,
+            "fonds": 100,
+            "assets":[
+                {"address": 11, "houses": 1}
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Haim Tadmon",
+            "location": 6,
+            "fonds": 90,
+            "assets":[
+                {"address": 7}
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Lea Lior",
+            "location": 3,
+            "fonds": 280,
+            "assets":[
+                {"address": 4, "houses": 1},
+                {"address": 8, "houses": 1}
+            ]
+        },
+        {
+            "id": 4,
+            "name": "Jodit Ben Yaakov",
+            "location": 3,
+            "fonds": 310,
+            "assets":[]
+        },
+        {
+            "id": 5,
+            "name": "Uzy Ben Knaan",
+            "fonds": 40,
+            "location": 5,
+            "assets":[
+                {"address": 16, "houses": 3}
+            ]
+        }
+    ]
+    
+
+}
