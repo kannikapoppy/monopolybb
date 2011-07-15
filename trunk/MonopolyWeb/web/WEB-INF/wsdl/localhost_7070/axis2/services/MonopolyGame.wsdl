@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://monopoly" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax23="http://monopoly/xsd" xmlns:ax21="http://results.monopoly/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://monopoly">
+    <wsdl:documentation>MonopolyGame</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax22="http://results.monopoly/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://monopoly">
+            <xs:import namespace="http://results.monopoly/xsd"/>
+            <xs:element name="startGame">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gameName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="humanPlayers" type="xs:int"/>
+                        <xs:element minOccurs="0" name="computerizedPlayers" type="xs:int"/>
+                        <xs:element minOccurs="0" name="useAutomaticDiceRoll" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="startGameResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:MonopolyResult"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setDiceRollResults">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="playerID" type="xs:int"/>
+                        <xs:element minOccurs="0" name="eventID" type="xs:int"/>
+                        <xs:element minOccurs="0" name="dice1" type="xs:int"/>
+                        <xs:element minOccurs="0" name="dice2" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setDiceRollResultsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:MonopolyResult"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resign">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="playerID" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resignResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:MonopolyResult"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="joinGame">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gameName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="playerName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="joinGameResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:IDResult"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getWaitingGamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPlayersDetails">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gameName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPlayersDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:PlayerDetailsResult"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGameDetails">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="gameName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGameDetailsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:GameDetailsResult"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGameBoardXMLResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getGameBoardSchemaResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllEvents">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="eventID" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllEventsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:EventArrayResult"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getActiveGamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="buy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="playerID" type="xs:int"/>
+                        <xs:element minOccurs="0" name="eventID" type="xs:int"/>
+                        <xs:element minOccurs="0" name="buy" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="buyResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:MonopolyResult"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema xmlns:ax24="http://monopoly/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://results.monopoly/xsd">
+            <xs:import namespace="http://monopoly/xsd"/>
+            <xs:complexType name="MonopolyResult">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="error" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="errorMessage" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="IDResult">
+                <xs:complexContent>
+                    <xs:extension base="ax21:MonopolyResult">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="result" type="xs:int"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:complexType name="PlayerDetailsResult">
+                <xs:complexContent>
+                    <xs:extension base="ax21:MonopolyResult">
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="isActive" nillable="true" type="xs:boolean"/>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="isHumans" nillable="true" type="xs:boolean"/>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="money" nillable="true" type="xs:int"/>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="names" nillable="true" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:complexType name="GameDetailsResult">
+                <xs:complexContent>
+                    <xs:extension base="ax21:MonopolyResult">
+                        <xs:sequence>
+                            <xs:element minOccurs="0" name="isAutomaticDiceRoll" type="xs:boolean"/>
+                            <xs:element minOccurs="0" name="joinedHumanPlayers" type="xs:int"/>
+                            <xs:element minOccurs="0" name="status" nillable="true" type="xs:string"/>
+                            <xs:element minOccurs="0" name="totalComputerPlayers" type="xs:int"/>
+                            <xs:element minOccurs="0" name="totalHumanPlayers" type="xs:int"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:complexType name="EventArrayResult">
+                <xs:complexContent>
+                    <xs:extension base="ax21:MonopolyResult">
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="results" nillable="true" type="ax24:Event"/>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://monopoly/xsd">
+            <xs:complexType name="Event">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="boardSquareID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="eventID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="eventMessage" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="eventType" type="xs:int"/>
+                    <xs:element minOccurs="0" name="firstDiceResult" type="xs:int"/>
+                    <xs:element minOccurs="0" name="gameName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="nextBoardSquareID" type="xs:int"/>
+                    <xs:element minOccurs="0" name="paymemtFromUser" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="paymentAmount" type="xs:int"/>
+                    <xs:element minOccurs="0" name="paymentToOrFromTreasury" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="paymentToPlayerName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="playerMoved" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="playerName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="secondDiceResult" type="xs:int"/>
+                    <xs:element minOccurs="0" name="timeoutCount" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="resignRequest">
+        <wsdl:part name="parameters" element="ns:resign"/>
+    </wsdl:message>
+    <wsdl:message name="resignResponse">
+        <wsdl:part name="parameters" element="ns:resignResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getWaitingGamesRequest"/>
+    <wsdl:message name="getWaitingGamesResponse">
+        <wsdl:part name="parameters" element="ns:getWaitingGamesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="buyRequest">
+        <wsdl:part name="parameters" element="ns:buy"/>
+    </wsdl:message>
+    <wsdl:message name="buyResponse">
+        <wsdl:part name="parameters" element="ns:buyResponse"/>
+    </wsdl:message>
+    <wsdl:message name="joinGameRequest">
+        <wsdl:part name="parameters" element="ns:joinGame"/>
+    </wsdl:message>
+    <wsdl:message name="joinGameResponse">
+        <wsdl:part name="parameters" element="ns:joinGameResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getActiveGamesRequest"/>
+    <wsdl:message name="getActiveGamesResponse">
+        <wsdl:part name="parameters" element="ns:getActiveGamesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="startGameRequest">
+        <wsdl:part name="parameters" element="ns:startGame"/>
+    </wsdl:message>
+    <wsdl:message name="startGameResponse">
+        <wsdl:part name="parameters" element="ns:startGameResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setDiceRollResultsRequest">
+        <wsdl:part name="parameters" element="ns:setDiceRollResults"/>
+    </wsdl:message>
+    <wsdl:message name="setDiceRollResultsResponse">
+        <wsdl:part name="parameters" element="ns:setDiceRollResultsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getGameDetailsRequest">
+        <wsdl:part name="parameters" element="ns:getGameDetails"/>
+    </wsdl:message>
+    <wsdl:message name="getGameDetailsResponse">
+        <wsdl:part name="parameters" element="ns:getGameDetailsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getGameBoardXMLRequest"/>
+    <wsdl:message name="getGameBoardXMLResponse">
+        <wsdl:part name="parameters" element="ns:getGameBoardXMLResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getAllEventsRequest">
+        <wsdl:part name="parameters" element="ns:getAllEvents"/>
+    </wsdl:message>
+    <wsdl:message name="getAllEventsResponse">
+        <wsdl:part name="parameters" element="ns:getAllEventsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getPlayersDetailsRequest">
+        <wsdl:part name="parameters" element="ns:getPlayersDetails"/>
+    </wsdl:message>
+    <wsdl:message name="getPlayersDetailsResponse">
+        <wsdl:part name="parameters" element="ns:getPlayersDetailsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getGameBoardSchemaRequest"/>
+    <wsdl:message name="getGameBoardSchemaResponse">
+        <wsdl:part name="parameters" element="ns:getGameBoardSchemaResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="MonopolyGamePortType">
+        <wsdl:operation name="resign">
+            <wsdl:input message="ns:resignRequest" wsaw:Action="urn:resign"/>
+            <wsdl:output message="ns:resignResponse" wsaw:Action="urn:resignResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getWaitingGames">
+            <wsdl:input message="ns:getWaitingGamesRequest" wsaw:Action="urn:getWaitingGames"/>
+            <wsdl:output message="ns:getWaitingGamesResponse" wsaw:Action="urn:getWaitingGamesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="buy">
+            <wsdl:input message="ns:buyRequest" wsaw:Action="urn:buy"/>
+            <wsdl:output message="ns:buyResponse" wsaw:Action="urn:buyResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="joinGame">
+            <wsdl:input message="ns:joinGameRequest" wsaw:Action="urn:joinGame"/>
+            <wsdl:output message="ns:joinGameResponse" wsaw:Action="urn:joinGameResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveGames">
+            <wsdl:input message="ns:getActiveGamesRequest" wsaw:Action="urn:getActiveGames"/>
+            <wsdl:output message="ns:getActiveGamesResponse" wsaw:Action="urn:getActiveGamesResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="startGame">
+            <wsdl:input message="ns:startGameRequest" wsaw:Action="urn:startGame"/>
+            <wsdl:output message="ns:startGameResponse" wsaw:Action="urn:startGameResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="setDiceRollResults">
+            <wsdl:input message="ns:setDiceRollResultsRequest" wsaw:Action="urn:setDiceRollResults"/>
+            <wsdl:output message="ns:setDiceRollResultsResponse" wsaw:Action="urn:setDiceRollResultsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getGameDetails">
+            <wsdl:input message="ns:getGameDetailsRequest" wsaw:Action="urn:getGameDetails"/>
+            <wsdl:output message="ns:getGameDetailsResponse" wsaw:Action="urn:getGameDetailsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getGameBoardXML">
+            <wsdl:input message="ns:getGameBoardXMLRequest" wsaw:Action="urn:getGameBoardXML"/>
+            <wsdl:output message="ns:getGameBoardXMLResponse" wsaw:Action="urn:getGameBoardXMLResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllEvents">
+            <wsdl:input message="ns:getAllEventsRequest" wsaw:Action="urn:getAllEvents"/>
+            <wsdl:output message="ns:getAllEventsResponse" wsaw:Action="urn:getAllEventsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getPlayersDetails">
+            <wsdl:input message="ns:getPlayersDetailsRequest" wsaw:Action="urn:getPlayersDetails"/>
+            <wsdl:output message="ns:getPlayersDetailsResponse" wsaw:Action="urn:getPlayersDetailsResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getGameBoardSchema">
+            <wsdl:input message="ns:getGameBoardSchemaRequest" wsaw:Action="urn:getGameBoardSchema"/>
+            <wsdl:output message="ns:getGameBoardSchemaResponse" wsaw:Action="urn:getGameBoardSchemaResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="MonopolyGameSoap11Binding" type="ns:MonopolyGamePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="resign">
+            <soap:operation soapAction="urn:resign" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getWaitingGames">
+            <soap:operation soapAction="urn:getWaitingGames" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="joinGame">
+            <soap:operation soapAction="urn:joinGame" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="buy">
+            <soap:operation soapAction="urn:buy" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="startGame">
+            <soap:operation soapAction="urn:startGame" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveGames">
+            <soap:operation soapAction="urn:getActiveGames" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setDiceRollResults">
+            <soap:operation soapAction="urn:setDiceRollResults" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGameDetails">
+            <soap:operation soapAction="urn:getGameDetails" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGameBoardXML">
+            <soap:operation soapAction="urn:getGameBoardXML" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllEvents">
+            <soap:operation soapAction="urn:getAllEvents" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPlayersDetails">
+            <soap:operation soapAction="urn:getPlayersDetails" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGameBoardSchema">
+            <soap:operation soapAction="urn:getGameBoardSchema" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="MonopolyGameSoap12Binding" type="ns:MonopolyGamePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="resign">
+            <soap12:operation soapAction="urn:resign" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getWaitingGames">
+            <soap12:operation soapAction="urn:getWaitingGames" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="joinGame">
+            <soap12:operation soapAction="urn:joinGame" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="buy">
+            <soap12:operation soapAction="urn:buy" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="startGame">
+            <soap12:operation soapAction="urn:startGame" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveGames">
+            <soap12:operation soapAction="urn:getActiveGames" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setDiceRollResults">
+            <soap12:operation soapAction="urn:setDiceRollResults" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGameDetails">
+            <soap12:operation soapAction="urn:getGameDetails" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGameBoardXML">
+            <soap12:operation soapAction="urn:getGameBoardXML" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllEvents">
+            <soap12:operation soapAction="urn:getAllEvents" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPlayersDetails">
+            <soap12:operation soapAction="urn:getPlayersDetails" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGameBoardSchema">
+            <soap12:operation soapAction="urn:getGameBoardSchema" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="MonopolyGameHttpBinding" type="ns:MonopolyGamePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="resign">
+            <http:operation location="MonopolyGame/resign"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="resign"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="resign"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getWaitingGames">
+            <http:operation location="MonopolyGame/getWaitingGames"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getWaitingGames"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getWaitingGames"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="joinGame">
+            <http:operation location="MonopolyGame/joinGame"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="joinGame"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="joinGame"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="buy">
+            <http:operation location="MonopolyGame/buy"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="buy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="buy"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="startGame">
+            <http:operation location="MonopolyGame/startGame"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="startGame"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="startGame"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getActiveGames">
+            <http:operation location="MonopolyGame/getActiveGames"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getActiveGames"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getActiveGames"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setDiceRollResults">
+            <http:operation location="MonopolyGame/setDiceRollResults"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="setDiceRollResults"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="setDiceRollResults"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGameDetails">
+            <http:operation location="MonopolyGame/getGameDetails"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getGameDetails"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getGameDetails"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGameBoardXML">
+            <http:operation location="MonopolyGame/getGameBoardXML"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getGameBoardXML"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getGameBoardXML"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllEvents">
+            <http:operation location="MonopolyGame/getAllEvents"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getAllEvents"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getAllEvents"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPlayersDetails">
+            <http:operation location="MonopolyGame/getPlayersDetails"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getPlayersDetails"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getPlayersDetails"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getGameBoardSchema">
+            <http:operation location="MonopolyGame/getGameBoardSchema"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getGameBoardSchema"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getGameBoardSchema"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="MonopolyGame">
+        <wsdl:port name="MonopolyGameHttpSoap11Endpoint" binding="ns:MonopolyGameSoap11Binding">
+            <soap:address location="http://localhost:7070/axis2/services/MonopolyGame.MonopolyGameHttpSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="MonopolyGameHttpSoap12Endpoint" binding="ns:MonopolyGameSoap12Binding">
+            <soap12:address location="http://localhost:7070/axis2/services/MonopolyGame.MonopolyGameHttpSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="MonopolyGameHttpEndpoint" binding="ns:MonopolyGameHttpBinding">
+            <http:address location="http://localhost:7070/axis2/services/MonopolyGame.MonopolyGameHttpEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
