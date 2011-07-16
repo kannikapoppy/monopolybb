@@ -3,10 +3,11 @@
   <services/>
   <clients>
     <client name="MonopolyGame">
-      <wsdl-url>http://localhost:8080/axis2/services/MonopolyGame?wsdl</wsdl-url>
-      <local-wsdl-file>localhost_8080/axis2/services/MonopolyGame.wsdl</local-wsdl-file>
+      <wsdl-url>http://localhost:7070/axis2/services/MonopolyGame?wsdl</wsdl-url>
+      <local-wsdl-file>localhost_7070/axis2/services/MonopolyGame.wsdl</local-wsdl-file>
       <package-name forceReplace="true">comm</package-name>
       <catalog-file>catalog.xml</catalog-file>
+      <use-dispatch>true</use-dispatch>
       <wsimport-options>
         <wsimport-option>
           <wsimport-option-name>extension</wsimport-option-name>
@@ -18,7 +19,7 @@
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>wsdlLocation</wsimport-option-name>
-          <wsimport-option-value>http://localhost:8080/axis2/services/MonopolyGame?wsdl</wsimport-option-value>
+          <wsimport-option-value>http://localhost:7070/axis2/services/MonopolyGame?wsdl</wsimport-option-value>
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>xendorsed</wsimport-option-name>
