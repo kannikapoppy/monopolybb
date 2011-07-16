@@ -92,6 +92,7 @@ GAME.monopoly = function($){
     var players = [], // hold reference to all players
         occupiedCellsMap = [], // which cells are occupied - to calculate position in cell
         legend,
+        wait_dialog,
         question_dialog,
         message_dialog,
         error_dialog,
@@ -99,7 +100,15 @@ GAME.monopoly = function($){
         join_dialog,
         dices_dialog,
         pendingAjaxCall,
-        pendingAnimations = 0;
+        pendingAnimations = 0,
+        waitingForPlayers = false;
+
+        // updatePlayer
+        updateCells = function(n, cell)
+        {
+            $.("#cell" + cell.id + " div.level1").css({"background": "url(" + cell.img + ") no-repeat top left"});
+            $.("#cell" + cell.id + " div.level2").html(cell.title);
+        },
 
         // updatePlayer
         updatePlayer = function(n, player){
@@ -161,10 +170,15 @@ GAME.monopoly = function($){
 
         },
 
-        create_game = function(create){
-            create_dialog.find(".message").text(create.message).end()
-                .find(".error").text(create.error).end();
-            showDialog(create_dialog, true);
+        updateWaitDialog = function(dialog)
+        {
+            wait_dialog.find(".message").text(dialog.message).end();
+        }
+
+        prompt_dialog = function(dialog, promptDialog){
+            promptDialog.find(".message").text(dialog.message).end()
+                .find(".error").text(dialog.error).end();
+            showDialog(promptDialog, true);
         }
 
         show_error = function(failed)
@@ -196,12 +210,21 @@ GAME.monopoly = function($){
         },
 
         // handle server update
-        handleServerUpdate = function(o){
-            alert("here");
+        handleServerUpdate = function(o)
+        {
+            if (waitingForPlayers)
+            {
+                if (!o.wait)
+                {
+                    showDialog(wait_dialog, false);
+                    waitingForPlayers = false;
+                }
+            }
 //            var i;
-
             //console.log("ver " + o.ver);
             pendingAjaxCall = null;
+            var setTimer = true;
+            var updateTime = GAME.UPDATE_INTERVAL;
             //pendingAnimations = 1;
 
             // reset previous state
@@ -221,23 +244,45 @@ GAME.monopoly = function($){
                 if(o.failed)
                 {
                     show_error(o.failed);
+                    setTimer = false;
                 }
                 else if (o.create)
                 {
-                    create_game(o.create);
+                    prompt_dialog(o.create, create_dialog);
+                    setTimer = false;
                 }
                 else if(o.join)
                 {
-                    join_game(o.join);
+                    prompt_dialog(o.join, join_dialog);
+                    setTimer = false;
                 }
                 else if(o.wait)
                 {
-
+                    if (!waitingForPlayers)
+                    {
+                        updateWaitDialog(o.wait);
+                        showDialog(wait_dialog, true);
+                        waitingForPlayers = true;
+                    }
+                    else
+                    {
+                        updateWaitDialog(o.wait);
+                    }
+                    updateTime = 1000;
+                }
+                else if(o.board)
+                {
+                    $.each(o.board, updateCells);
                 }
                 else
                 {
-                    setTimeout(updateState, GAME.UPDATE_INTERVAL);
+                    //setTimeout(updateState, GAME.UPDATE_INTERVAL);
                     //update();
+                }
+
+                if (setTimer)
+                {
+                    setTimeout(updateState, updateTime);
                 }
 //                if (o.dialog){
 //                     ask(o.dialog);
@@ -249,6 +294,16 @@ GAME.monopoly = function($){
             //});
            // _registerAmimation(-1);
          },
+
+//         handlePrompt = function(o, status)
+//         {
+//             alert("boom");
+//            if(o.join)
+//            {
+//                alert("here");
+//                prompt_dialog(o.join, join_dialog);
+//            }
+//         },
          
         // ask server for updates
         updateState = function()
@@ -274,7 +329,6 @@ GAME.monopoly = function($){
     return {
         init:function(){
             var i;
-            
             // setup 3 layers inside each cube
             $('#monopoly-frame>div').addClass("level0").html("<div class='level1'><div class='level2'><div class='level3'></div></div></div>");
 
@@ -283,21 +337,38 @@ GAME.monopoly = function($){
             legend.appendTo($("#monopoly-frame"));
 
             // create a dialog for errors
-            error_dialog = $("<div id='errorDialog' class='dialog hidden'><p><div class='error'></p></div></div>");
+            error_dialog = $("<div id='errorDialog' class='dialog hidden'><div class='dialogMessage'><div class='error'></div></div></div>");
             error_dialog.appendTo($("#monopoly-frame"));
 
             // create a dialog for game creation
-            create_dialog = $("<div id='createDialog' class='dialog hidden'><p><div class='message'></div><br/><div class='error'></div></p><div class='options'><table><tr><td>Game Name</td><td><input type='text' id='game_name' /></td></tr><tr><td>Number of players</td><td><input type='text' id='players_num' /></td></tr><tr><td>Number of human players</td><td><input type='text' id='humans_num' /></td></tr><tr><td>Automate Dice?</td><td><input type='checkbox' id='auto_dice' value='True' /></td></tr><tr><td><button id='create'>Create Game</button></td></tr></table></div></div>");
+            create_dialog = $("<div id='createDialog' class='dialog hidden'><div class='dialogMessage'><div class='message'></div><br/><div class='error'></div><div class='options'><table><tr><td>Game Name</td><td><input type='text' id='gameName' /></td></tr><tr><td>Number of players</td><td><input type='text' id='playersNum' /></td></tr><tr><td>Number of human players</td><td><input type='text' id='humansNum' /></td></tr><tr><td>Automate Dice?</td><td><input type='checkbox' id='autoDice' value='True' /></td></tr><tr><td><button id='create'>Create Game</button></td></tr></table></div></div></div>");
             create_dialog.appendTo($("#monopoly-frame"));
-            $("#create").click(function(){
+            $("#create").click(function()
+            {
+                showDialog(create_dialog, false);
                 $.post(GAME.AJAX_URL, $.param({action: GAME.ACTION.CREATE,
-                    game_name: $("#game_name").val() ,
-                    players_num: $("#players_num").val(),
-                    humans_num: $("#humans_num").val(),
-                    auto_dice: $("#auto_dice").val()}));
-                setTimeout(updateState, 500);
-                showDialog(dices_dialog, false);
+                    gameName: $("#gameName").val() ,
+                    playersNum: $("#playersNum").val(),
+                    humansNum: $("#humansNum").val(),
+                    autoDice: $("#autoDice").val()}),
+                    handleServerUpdate);
+                //setTimeout(updateState, 500);
+                
             });
+
+            // create a dialog for joining a game
+            join_dialog = $("<div id='joinDialog' class='dialog hidden'><div class='dialogMessage'><div class='message'></div><br/><div class='error'></div><div class='options'><table><tr><td>Player Name</td><td><input type='text' id='playerName' /></td></tr><tr><td><button id='join'>Join</button></td></tr></table></div></div></div>");
+            join_dialog.appendTo($("#monopoly-frame"));
+            $("#join").click(function()
+            {
+                showDialog(join_dialog, false);
+                $.post(GAME.AJAX_URL, $.param({action: GAME.ACTION.JOIN, playerName: $("#playerName").val()}), handleServerUpdate);
+                //setTimeout(updateState, 500);
+            });
+
+            // create a dialog for waiting on players to join
+            wait_dialog = $("<div id='waitDialog' class='dialog hidden'><div class='dialogMessage'><div class='message'></div></div></div></div>");
+            wait_dialog.appendTo($("#monopoly-frame"));
 
             // create a dialog for later server questions
             question_dialog = $("<div id='questDialog' class='dialog hidden'><div class='question'></div><div class='ft'><button id='btn1'>option1</button><button id='btn2'>option2</button></div></div>");
@@ -324,7 +395,7 @@ GAME.monopoly = function($){
                 // Disable caching of AJAX responses
                 cache: false
             });
-
+            
             // start checking for state update
             updateState();
         },
@@ -343,22 +414,3 @@ GAME.monopoly = function($){
 
 // on document ready - call init
 jQuery(GAME.monopoly.init);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

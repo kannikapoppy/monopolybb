@@ -5,18 +5,37 @@
 
 package monopoly;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletContext;
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import objectmodel.Asset;
+import objectmodel.CellBase;
+import objectmodel.City;
+import objectmodel.GameBoard;
+import objectmodel.PlayerDetails;
+import org.xml.sax.SAXException;
 import  src.client.*;
 
-/**
- *
- * @author Benda
- */
 public class WebClient
 {
 
-    private static final String GAME_IN_PROGRESS_ERROR_MSG = "A game is in progress and the server supports only one conccurent game";
-    private static final String SERVER_CONNECTION_ERROR_MSG = "An error has occured while connecting to the server";
+    public static final String GAME_IN_PROGRESS_ERROR_MSG = "A game is in progress and the server supports only one conccurent game";
+    public static final String SERVER_CONNECTION_ERROR_MSG = "An error has occured while connecting to the server";
 
     public enum  ClientState
     {
@@ -32,6 +51,38 @@ public class WebClient
     private String playerName;
     private String gameName;
     private String serverMessage;
+    private String waitingText = "";
+    private java.util.Timer getAllEventsTimer;
+    private java.util.Timer usersLeftTimer;
+    private List<PlayerDetails> players;
+    private GameBoard gameBoard;
+    private ServletContext context;
+    private LinkedList<String> messages;
+    private int pendingEventID;
+
+    public int getPendingEventID() {
+        return pendingEventID;
+    }
+
+    public void setPendingEventID(int pendingEventID) {
+        this.pendingEventID = pendingEventID;
+    }
+
+    public void setContext(ServletContext context) {
+        this.context = context;
+    }
+
+    public ServletContext getContext() {
+        return context;
+    }
+
+    public String getWaitingText() {
+        return waitingText;
+    }
+
+    public void setWaitingText(String waitingText) {
+        this.waitingText = waitingText;
+    }
 
     public String getPlayerName() {
         return playerName;
@@ -52,6 +103,20 @@ public class WebClient
     public WebClient()
     {
         clientState = ClientState.Init;
+        messages = new LinkedList<String>();
+    }
+
+    public void setConnectionFailed()
+    {
+        serverMessage = SERVER_CONNECTION_ERROR_MSG;
+        clientState = ClientState.Failed;
+        closeConnection();
+    }
+
+    public void closeConnection()
+    {
+        getAllEventsTimer.cancel();
+        usersLeftTimer.cancel();
     }
 
     public int initClient()
@@ -63,8 +128,7 @@ public class WebClient
         }
         catch (Exception ex)
         {
-            serverMessage = SERVER_CONNECTION_ERROR_MSG;
-            clientState = ClientState.Failed;
+            setConnectionFailed();
             return -1;
         }
 
@@ -77,8 +141,7 @@ public class WebClient
             }
             catch (Exception ex)
             {
-                serverMessage = SERVER_CONNECTION_ERROR_MSG;
-                clientState = ClientState.Failed;
+                setConnectionFailed();
                 return -1;
             }
 
@@ -111,15 +174,15 @@ public class WebClient
             try
             {
                 numPlayers = Integer.parseInt(numPlayersStr);
-                if (numPlayers <= 0 || numPlayers > 6)
+                if (numPlayers < Utils.MIN_PLAYERS || numPlayers > Utils.MAX_PLAYERS)
                 {
-                    serverMessage = "The number of players must be a number between 1-6";
+                    serverMessage = "The number of players must be a number between 2-6";
                     return -2;
                 }
             }
             catch (NumberFormatException ex)
             {
-                serverMessage = "The number of players must be a number between 1-6";
+                serverMessage = "The number of players must be a number between 2-6";
                 return -2;
             }
 
@@ -127,15 +190,15 @@ public class WebClient
             try
             {
                 numHumans = Integer.parseInt(numHumansStr);
-                if (numHumans < 0 || numHumans > 6)
+                if (numHumans < Utils.MIN_HUMANS || numHumans > Utils.MAX_HUMANS || numHumans > numPlayers)
                 {
-                    serverMessage = "The number of human players must be a number between 0-6";
+                    serverMessage = "The number of human players must be a number between 1-6 and must be less than the number of players";
                     return -2;
                 }
             }
             catch (NumberFormatException ex)
             {
-                serverMessage = "The number of human players must be a number between 0-6";
+                serverMessage = "The number of human players must be a number between 1-6 and must be less than the number of players";
                 return -2;
             }
 
@@ -148,8 +211,7 @@ public class WebClient
             }
             catch (Exception ex)
             {
-                serverMessage = SERVER_CONNECTION_ERROR_MSG;
-                clientState = ClientState.Failed;
+                setConnectionFailed();
                 return -1;
             }
 
@@ -190,8 +252,7 @@ public class WebClient
         }
         catch (Exception ex)
         {
-            serverMessage = SERVER_CONNECTION_ERROR_MSG;
-            clientState = ClientState.Failed;
+            setConnectionFailed();
             return -1;
         }
 
@@ -206,13 +267,219 @@ public class WebClient
             this.playerName = playerName;
             // timer to show how many players are missing
             Server.getInstance().setPlayerId(playerId);
-            //getAllEventsTimer = Server.getInstance().startPolling("Events Timer",
-            //            new GetEventsTask(gameName, this, playerName), 0, 1);
-            //clientState = ClientState.WaitingStart;
-            //usersLeftTimer = Server.getInstance().startPolling("Waiting For Players Timer",
-            //            new WaitingForPlayersTask(gameName,waitingForPlayersLabel), 0, 1);
+            getAllEventsTimer = Server.getInstance().startPolling("Events Timer",
+                        new GetEventsTask(gameName, this, playerName), 0, 1);
+            clientState = ClientState.WaitingStart;
+            usersLeftTimer = Server.getInstance().startPolling("Waiting For Players Timer",
+                        new WaitingForPlayersTask(gameName, this), 0, 1);
         }
         
         return 0;
+    }
+
+    public void initUI(final List<PlayerDetails> players)
+    {
+        this.players = players;
+        usersLeftTimer.cancel();
+
+        String boardXML = null;
+        String boardSchema = null;
+
+        try {
+            boardXML = Server.getInstance().getGameBoardXML();
+            boardSchema = Server.getInstance().getGameBoardSchema();
+        } catch (Exception ex) {
+            setConnectionFailed();
+            return;
+        }
+
+        JAXBContext jContext;
+        gameBoard = null;
+        try
+        {
+            jContext = JAXBContext.newInstance("objectmodel", objectmodel.ObjectFactory.class.getClassLoader());
+            Unmarshaller unmarshaller = jContext.createUnmarshaller() ;
+            SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+            InputStream xsdIs = new ByteArrayInputStream(boardSchema.getBytes("UTF-8"));
+            StreamSource sourceStrm = new StreamSource(xsdIs);
+            Schema schema = null;
+            try {
+                schema = schemaFactory.newSchema(sourceStrm);
+            } catch (SAXException ex) {
+                Logger.getLogger(WebClient.class.getName()).log(Level.SEVERE, null, ex);
+                setConnectionFailed();
+            }
+            if (schema != null)
+            {
+                unmarshaller.setSchema(schema);
+                unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
+            }
+            InputStream xmlIs = new ByteArrayInputStream(boardXML.getBytes("UTF-8"));
+            gameBoard = (GameBoard)unmarshaller.unmarshal(xmlIs);
+        }
+        catch (JAXBException ex)
+        {
+            Logger.getLogger(WebClient.class.getName()).log(Level.SEVERE, null, ex);
+            setConnectionFailed();
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            Logger.getLogger(WebClient.class.getName()).log(Level.SEVERE, null, e);
+            setConnectionFailed();
+        }
+
+        addMessageToClient(Utils.GenerateBoardJSON(gameBoard, context));
+        addMessageToClient(Utils.GeneratePlayersJSON(players, context));
+
+        clientState = ClientState.Running;
+    }
+
+    public void addMessageToClient(String message)
+    {
+        messages.addLast(message);
+    }
+
+    public String getMessageToClient()
+    {
+        String message = "";
+
+        if (messages.size() > 0)
+        {
+            message = messages.getFirst();
+        }
+
+        return message;
+    }
+
+    public int getPlayerIDByName(String playerName)
+    {
+        for(int i=0; i < players.size(); i++)
+        {
+            if (players.get(i).getName().compareTo(playerName) ==0)
+                return i+1;
+        }
+        return 0;
+    }
+
+    public int sendDiceRollToServer(String dice1Str, String dice2Str)
+    {
+        int dice1,dice2;
+        try
+        {
+            dice1 = Integer.parseInt(dice1Str);
+            dice2 = Integer.parseInt(dice2Str);
+        }
+        catch (Exception exp)
+        {
+            serverMessage = "Enter valid dice numbers (1-6)!";
+            addMessageToClient(Utils.GenerateThrowDiceRequest(context, true));
+            return -2;
+        }
+
+        try
+        {
+            Server.getInstance().setDiceRollResults(pendingEventID, dice1, dice2);
+        }
+        catch (Exception ex) {
+            setConnectionFailed();
+            return -1;
+        }
+
+        return 0;
+    }
+
+    public int sendBuyReplyToServer(String buyReplyStr)
+    {
+        boolean buyReply = (buyReplyStr.compareToIgnoreCase(Utils.POSITIVE_BUY_REPLY) == 0);
+        
+        try
+        {
+            Server.getInstance().buy(pendingEventID, buyReply);
+        }
+        catch (Exception ex)
+        {
+            setConnectionFailed();
+            return -1;
+        }
+        return 0;
+    }
+
+    public PlayerDetails GetPlayerDetails(String playerName)
+    {
+        PlayerDetails retValue = null;
+        for (PlayerDetails p : players)
+        {
+            if (p.getName().compareTo(playerName) == 0)
+            {
+                retValue = p;
+                break;
+            }
+        }
+        return retValue;
+    }
+
+    public void setPlayerJailStatus(String playerName, boolean inJail)
+    {
+        PlayerDetails player = GetPlayerDetails(playerName);
+        player.setInJail(inJail);
+    }
+
+    public void setAssetOwner(String playerName, Integer boardSquareID)
+    {
+        PlayerDetails player = GetPlayerDetails(playerName);
+        CellBase currentPosition = getCellBase(boardSquareID);
+        if (currentPosition instanceof Asset)
+        {
+            ((Asset)currentPosition).setOwner(player);
+        }
+        else
+        {
+            ((City)currentPosition).setOwner(player);
+        }
+    }
+
+    public CellBase getCellBase(int currentPositionID)
+    {
+        for (CellBase cell : gameBoard.getCellBase())
+        {
+            if(cell.getID() == currentPositionID)
+                return cell;
+        }
+
+        return null;
+    }
+
+    public void SetHouseBuilt(String playerName, Integer boardSquareID)
+    {
+        PlayerDetails player = GetPlayerDetails(playerName);
+        final City city = (City)getCellBase(boardSquareID);
+        city.IncrementNumberOfHouses();
+    }
+
+    public void TransferMoneyFromUserToUser(String from, String to, int amountPaid)
+    {
+        PlayerDetails fromPlayer = GetPlayerDetails(from);
+        PlayerDetails toPlayer = GetPlayerDetails(to);
+        fromPlayer.SubtractAmount(amountPaid);
+        toPlayer.AddAmount(amountPaid);
+
+        addMessageToClient(Utils.GenerateUpdatePlayerBalanceMessage(context, getPlayerIDByName(from), fromPlayer.getAmount()));
+        addMessageToClient(Utils.GenerateUpdatePlayerBalanceMessage(context, getPlayerIDByName(to), toPlayer.getAmount()));
+    }
+
+    public void TransferMoneyToBank(String from, int amountPaid)
+    {
+        PlayerDetails fromPlayer = GetPlayerDetails(from);
+        fromPlayer.SubtractAmount(amountPaid);
+
+        addMessageToClient(Utils.GenerateUpdatePlayerBalanceMessage(context, getPlayerIDByName(from), fromPlayer.getAmount()));
+    }
+
+    public void TransferMoneyFromBank(String to, int amountPaid)
+    {
+        PlayerDetails toPlayer = GetPlayerDetails(to);
+        toPlayer.AddAmount(amountPaid);
+
+        addMessageToClient(Utils.GenerateUpdatePlayerBalanceMessage(context, getPlayerIDByName(to), toPlayer.getAmount()));
     }
 }
