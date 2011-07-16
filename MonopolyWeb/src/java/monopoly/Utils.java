@@ -21,6 +21,7 @@ import objectmodel.PlayerDetails;
  */
 public class Utils
 {
+    public static final String MESSAGE_PLACEHOLDER = "%MESSAGE_PLACEHOLDER%";
     public static final String ERROR_PLACEHOLDER = "%ERROR_PLACEHOLDER%";
     public static final String WAITING_PLACEHOLDER = "%WAIT_PLACEHOLDER%";
 
@@ -41,6 +42,10 @@ public class Utils
 
     public static final String WINNER_PLACEHOLDER = "%WINNER_PLACEHOLDER%";
     public static final String LOST_MESSAGE_PLACEHOLDER = "%LOST_MESSAGE_PLACEHOLDER%";
+    public static final String DICE1_PLACEHOLDER = "%DICE1_PLACEHOLDER%";
+    public static final String DICE2_PLACEHOLDER = "%DICE2_PLACEHOLDER%";
+    public static final String FROM_CELL_PLACEHOLDER = "%FROM_CELL_PLACEHOLDER%";
+    public static final String TO_CELL_PLACEHOLDER = "%TO_CELL_PLACEHOLDER%";
 
     public static final String ACTION_CREATE = "create";
     public static final String ACTION_JOIN = "join";
@@ -197,43 +202,72 @@ public class Utils
     }
 
     static String GenerateSetPlayerTurnMessage(ServletContext context, int playerID) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String turnSetMessage = GetResourceAsString(context, "/json/set_turn.json");
+        turnSetMessage = turnSetMessage.replace(PLAYER_ID_PLACEHOLDER, Integer.toString(playerID));
+        return turnSetMessage;
     }
 
     static String GenerateThrowDiceRequest(ServletContext context, boolean displayError) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String rollRequest = GetResourceAsString(context, "/json/request_dice.json");
+        if (displayError)
+            rollRequest = rollRequest.replace(ERROR_PLACEHOLDER, "Dices values range between 1-6");
+        else
+            rollRequest = rollRequest.replace(ERROR_PLACEHOLDER, "");
+        return rollRequest;
     }
 
     static String GenerateSendDiceValueMessage(ServletContext context, Integer firstDiceResult, Integer secondDiceResult) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String setDiceMessage = GetResourceAsString(context, "/json/set_dice.json");
+        setDiceMessage = setDiceMessage.replace(DICE1_PLACEHOLDER, Integer.toString(firstDiceResult));
+        setDiceMessage = setDiceMessage.replace(DICE2_PLACEHOLDER, Integer.toString(secondDiceResult));
+        return setDiceMessage;
     }
 
     static String GenerateMovePlayerMessage(ServletContext context, int playerID, Integer fromCellID, Integer toCellID) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String playerMoveMessage = GetResourceAsString(context, "/json/move_player.json");
+        playerMoveMessage = playerMoveMessage.replace(PLAYER_ID_PLACEHOLDER, Integer.toString(playerID));
+        playerMoveMessage = playerMoveMessage.replace(FROM_CELL_PLACEHOLDER, Integer.toString(fromCellID));
+        playerMoveMessage = playerMoveMessage.replace(TO_CELL_PLACEHOLDER, Integer.toString(toCellID));
+        return playerMoveMessage;
     }
 
     static String GenerateBuyAssetRequest(ServletContext context, CellBase landCell) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String buyRequest = GetResourceAsString(context, "/json/request_buy.json");
+        buyRequest = buyRequest.replace(CELL_TITLE_PLACEHOLDER, landCell.getName());
+        return buyRequest;
     }
 
     static String GenerateBuildHouseRequest(ServletContext context, CellBase landCellToBuildHouse) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String buildRequest = GetResourceAsString(context, "/json/request_build.json");
+        buildRequest = buildRequest.replace(CELL_TITLE_PLACEHOLDER, landCellToBuildHouse.getName());
+        return buildRequest;
     }
 
     static String GenerateAssetBoughtMessage(ServletContext context, int playerID, Integer boughtCellID) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String boughtAssetMessage = GetResourceAsString(context, "/json/set_bought.json");
+        boughtAssetMessage = boughtAssetMessage.replace(PLAYER_ID_PLACEHOLDER, Integer.toString(playerID));
+        boughtAssetMessage = boughtAssetMessage.replace(CELL_ID_PLACEHOLDER, Integer.toString(boughtCellID));
+        return boughtAssetMessage;
     }
 
     static String GenerateHouseBuiltMessage(ServletContext context, int playerID, Integer boardSquareID) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String addHouseMessage = GetResourceAsString(context, "/json/add_house.json");
+        addHouseMessage = addHouseMessage.replace(PLAYER_ID_PLACEHOLDER, Integer.toString(playerID));
+        addHouseMessage = addHouseMessage.replace(CELL_ID_PLACEHOLDER, Integer.toString(boardSquareID));
+        return addHouseMessage;
     }
 
     static String GenerateGeneralMessage(ServletContext context, String messageType, String messageValue) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String generalMessage = GetResourceAsString(context, "/json/set_message.json");
+        generalMessage = generalMessage.replace(MESSAGE_PLACEHOLDER, messageValue);
+        return generalMessage;
     }
 
     static String GenerateUpdatePlayerBalanceMessage(ServletContext context, int playerID, int amount) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String updateBalanceMessage = GetResourceAsString(context, "/json/add_house.json");
+        updateBalanceMessage = updateBalanceMessage.replace(PLAYER_ID_PLACEHOLDER, Integer.toString(playerID));
+        updateBalanceMessage = updateBalanceMessage.replace(PLAYER_MONEY_PLACEHOLDER, Integer.toString(amount));
+        return updateBalanceMessage;
     }
 
     static String GetResourceAsString(ServletContext context, String resourcePath)

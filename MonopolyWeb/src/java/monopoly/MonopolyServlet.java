@@ -97,10 +97,13 @@ public class MonopolyServlet extends HttpServlet
             }
             else if(client.getClientState() == WebClient.ClientState.WaitingStart)
             {
+                client.updateWaitMessage();
+                client.updateNewEvents();
                 replyWaiting();
             }
             else if(client.getClientState() == WebClient.ClientState.Running)
             {
+                client.updateNewEvents();
                 sendReplyToClient(client.getServerMessage());
             }
             else

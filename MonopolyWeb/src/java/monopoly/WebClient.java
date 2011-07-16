@@ -52,8 +52,7 @@ public class WebClient
     private String gameName;
     private String serverMessage;
     private String waitingText = "";
-    private java.util.Timer getAllEventsTimer;
-    private java.util.Timer usersLeftTimer;
+    private ServerEventsHandler eventsHandler;
     private List<PlayerDetails> players;
     private GameBoard gameBoard;
     private ServletContext context;
@@ -110,13 +109,6 @@ public class WebClient
     {
         serverMessage = SERVER_CONNECTION_ERROR_MSG;
         clientState = ClientState.Failed;
-        closeConnection();
-    }
-
-    public void closeConnection()
-    {
-        getAllEventsTimer.cancel();
-        usersLeftTimer.cancel();
     }
 
     public int initClient()
@@ -267,11 +259,11 @@ public class WebClient
             this.playerName = playerName;
             // timer to show how many players are missing
             Server.getInstance().setPlayerId(playerId);
-            getAllEventsTimer = Server.getInstance().startPolling("Events Timer",
-                        new GetEventsTask(gameName, this, playerName), 0, 1);
+            //getAllEventsTimer = Server.getInstance().startPolling("Events Timer",
+            eventsHandler =  new ServerEventsHandler(gameName, this, playerName);
             clientState = ClientState.WaitingStart;
-            usersLeftTimer = Server.getInstance().startPolling("Waiting For Players Timer",
-                        new WaitingForPlayersTask(gameName, this), 0, 1);
+            //usersLeftTimer = Server.getInstance().startPolling("Waiting For Players Timer",
+            //            new WaitingForPlayersTask(gameName, this), 0, 1);
         }
         
         return 0;
@@ -280,7 +272,6 @@ public class WebClient
     public void initUI(final List<PlayerDetails> players)
     {
         this.players = players;
-        usersLeftTimer.cancel();
 
         String boardXML = null;
         String boardSchema = null;
@@ -481,5 +472,27 @@ public class WebClient
         toPlayer.AddAmount(amountPaid);
 
         addMessageToClient(Utils.GenerateUpdatePlayerBalanceMessage(context, getPlayerIDByName(to), toPlayer.getAmount()));
+    }
+
+    public void updateWaitMessage()
+    {
+        if (gameName != null)
+        {
+            int missing;
+
+            try {
+                missing = Server.getInstance().getGameDetails(gameName).getWaitingForPlayersNumber();
+            } catch (Exception ex) {
+                setConnectionFailed();
+                return;
+            }
+
+            setWaitingText("Waiting For " + missing + " Players To Join The Game '" + gameName + "'");
+        }
+    }
+
+    public void updateNewEvents()
+    {
+        eventsHandler.getNewEvents();
     }
 }
