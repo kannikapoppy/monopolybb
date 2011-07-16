@@ -1,0 +1,7 @@
+{
+    "ver": 0,
+    "wait":{
+        "id": 1,
+        "message":"%WAIT_PLACEHOLDER%"
+    }
+}

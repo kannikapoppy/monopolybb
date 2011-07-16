@@ -1,0 +1,8 @@
+    "cell%CELL_ID_PLACEHOLDER%":
+    {
+        "id": %CELL_ID_PLACEHOLDER%,
+        "title": "%CELL_TITLE_PLACEHOLDER%",
+        "img": "%CELL_IMG_PLACEHOLDER%",
+        "houses": %CELL_HOUSES_PLACEHOLDER%,
+        "owner": %CELL_OWNER_PLACEHOLDER%
+    }

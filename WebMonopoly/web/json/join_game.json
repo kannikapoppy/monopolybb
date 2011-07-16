@@ -1,0 +1,8 @@
+{
+    "ver": 0,
+    "join":{
+        "id": 3,
+        "message": "Enter the player name",
+        "error": " %ERROR_PLACEHOLDER%"
+    }
+}

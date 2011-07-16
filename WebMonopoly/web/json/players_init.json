@@ -1,0 +1,12 @@
+{
+    "ver": 0,
+    "players":
+    [
+        %PLAYER1_PLACEHOLDER%,
+        %PLAYER2_PLACEHOLDER%,
+        %PLAYER3_PLACEHOLDER%,
+        %PLAYER4_PLACEHOLDER%,
+        %PLAYER5_PLACEHOLDER%,
+        %PLAYER6_PLACEHOLDER%
+    ]
+}

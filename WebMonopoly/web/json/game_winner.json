@@ -1,0 +1,7 @@
+{
+    "ver": 0,
+    "winner":{
+        "id": 1,
+        "message": "%WINNER_PLACEHOLDER% has won the game!"
+    }
+}
