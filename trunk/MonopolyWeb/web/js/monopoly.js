@@ -100,14 +100,14 @@ GAME.monopoly = function($){
         join_dialog,
         dices_dialog,
         pendingAjaxCall,
-        pendingAnimations = 0,
-        waitingForPlayers = false;
+        pendingAnimations = 0;
+    var waitingForPlayers = false;
 
         // updatePlayer
         updateCells = function(n, cell)
         {
-            $.("#cell" + cell.id + " div.level1").css({"background": "url(" + cell.img + ") no-repeat top left"});
-            $.("#cell" + cell.id + " div.level2").html(cell.title);
+            /*$.("#cell" + cell.id + " div.level1").css({"background": "url(" + cell.img + ") no-repeat top left"});
+            $.("#cell" + cell.id + " div.level2").html(cell.title);*/
         },
 
         // updatePlayer
@@ -173,19 +173,19 @@ GAME.monopoly = function($){
         updateWaitDialog = function(dialog)
         {
             wait_dialog.find(".message").text(dialog.message).end();
-        }
+        },
 
         prompt_dialog = function(dialog, promptDialog){
             promptDialog.find(".message").text(dialog.message).end()
                 .find(".error").text(dialog.error).end();
             showDialog(promptDialog, true);
-        }
+        },
 
         show_error = function(failed)
         {
             error_dialog.find(".error").text(failed.message).end();
             showDialog(error_dialog, true);
-        }
+        },
 
         //display a dialog and ask a question
         ask = function(quest){
@@ -212,6 +212,9 @@ GAME.monopoly = function($){
         // handle server update
         handleServerUpdate = function(o)
         {
+            var setTimer = true;
+            var updateInterval = GAME.UPDATE_INTERVAL;
+            
             if (waitingForPlayers)
             {
                 if (!o.wait)
@@ -223,8 +226,7 @@ GAME.monopoly = function($){
 //            var i;
             //console.log("ver " + o.ver);
             pendingAjaxCall = null;
-            var setTimer = true;
-            var updateTime = GAME.UPDATE_INTERVAL;
+            
             //pendingAnimations = 1;
 
             // reset previous state
@@ -268,7 +270,7 @@ GAME.monopoly = function($){
                     {
                         updateWaitDialog(o.wait);
                     }
-                    updateTime = 1000;
+                    updateInterval = 1000;
                 }
                 else if(o.board)
                 {
@@ -282,7 +284,7 @@ GAME.monopoly = function($){
 
                 if (setTimer)
                 {
-                    setTimeout(updateState, updateTime);
+                    setTimeout(updateState, updateInterval);
                 }
 //                if (o.dialog){
 //                     ask(o.dialog);
@@ -414,3 +416,5 @@ GAME.monopoly = function($){
 
 // on document ready - call init
 jQuery(GAME.monopoly.init);
+
+
