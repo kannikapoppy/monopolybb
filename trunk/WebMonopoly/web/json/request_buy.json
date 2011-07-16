@@ -1,0 +1,7 @@
+{
+    "ver": 0,
+    "buy":
+    {
+        "message": "Would you like to buy %CELL_TITLE_PLACEHOLDER%?"
+    }
+}

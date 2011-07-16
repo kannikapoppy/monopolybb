@@ -1,0 +1,8 @@
+{
+    "ver": 0,
+    "dices_set":
+    {
+        "dice1": "%DICE1_PLACEHOLDER%",
+        "dice2": "%DICE2_PLACEHOLDER%"
+    }
+}
