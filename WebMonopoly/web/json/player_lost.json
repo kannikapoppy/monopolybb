@@ -2,7 +2,7 @@
     "ver": 0,
     "lost":{
         "id": 1,
-        "player": "player%PLAYER_ID_PLACEHOLDER%",
+        "player": %PLAYER_ID_PLACEHOLDER%,
         "message": "%LOST_MESSAGE_PLACEHOLDER%"
     }
 }

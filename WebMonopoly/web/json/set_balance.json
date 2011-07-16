@@ -1,0 +1,7 @@
+{
+    "ver": 0,
+    "balance":{
+        "player": %PLAYER_ID_PLACEHOLDER%,
+        "money": %PLAYER_MONEY_PLACEHOLDER%
+    }
+}
