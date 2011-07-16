@@ -21,28 +21,26 @@ public class MonopolyServlet extends HttpServlet
 {
     public static final int SERVER_FAILED = -1;
     public static final String CONTENT_TYPE_JSON = "application/json";
-    private static int i = 0;
+    private HttpServletRequest currentRequest;
+    private HttpServletResponse currentResponse;
+    private WebClient client;
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+         String action = request.getParameter("action");
+        currentRequest = request;
+        currentResponse = response;
+        HandleAction(action);
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        //String action = request.getParameter("action");
-        replyServerFailed("hello", request, response);
-//        WebClient client = getClient(request, true);
-//        if(client.getClientState() == WebClient.ClientState.Init)
-//        {
-//            if(client.initClient() == SERVER_FAILED)
-//                replyServerFailed(client.getServerMessage(), request, response);
-//        }
-//        if(client.getClientState() == WebClient.ClientState.Creating)
-//        {
-//
-//        }
+        String action = request.getParameter("action");
+        currentRequest = request;
+        currentResponse = response;
+        HandleAction(action);//, request, response);
 //        RequestDispatcher dispatcher;
 //        response.setContentType(CONTENT_TYPE_JSON);
 //        response.setHeader("pragma-", "no-cache");
@@ -51,51 +49,123 @@ public class MonopolyServlet extends HttpServlet
 //        i = ++i % 5;
     }
 
-    private void HandleAction(String action, HttpServletResponse response) throws ServletException, IOException
+    private void HandleAction(String action) throws ServletException, IOException
     {
+        client = getClient(true);
+        client.setContext(getServletContext());
+
         if (action.compareTo(Utils.ACTION_CREATE) == 0)
         {
-            
+            String gameName = currentRequest.getParameter("gameName");
+            String playersNum = currentRequest.getParameter("playersNum");
+            String humansNum = currentRequest.getParameter("humansNum");
+            String autoDice = currentRequest.getParameter("autoDice");
+            int status = client.createGame(gameName, playersNum, humansNum, autoDice);
+            if (status == SERVER_FAILED)
+                replyServerFailed(client.getServerMessage());
+            else if (status < 0)
+                replyServerPrompt("/json/create_game.json", true);
+            else
+                replyServerPrompt("/json/join_game.json", false);
         }
         else if (action.compareTo(Utils.ACTION_JOIN) == 0)
         {
-
+            String playerName = currentRequest.getParameter("playerName");
+            int status = client.joinGame(playerName);
+            if (status == SERVER_FAILED)
+                replyServerFailed(client.getServerMessage());
+            else if (status < 0)
+                replyServerPrompt("/json/join_game.json", true);
+            else
+                replyWaiting();
         }
-        else
+        else if (action.compareTo(Utils.GET_STATE) == 0)
         {
-
+            // not initiated yet
+            if(client.getClientState() == WebClient.ClientState.Init)
+            {
+                if(client.initClient() == SERVER_FAILED)
+                    replyServerFailed(client.getServerMessage());
+            }
+            if(client.getClientState() == WebClient.ClientState.Creating)
+            {
+                replyServerPrompt("/json/create_game.json", false);
+            }
+            else if(client.getClientState() == WebClient.ClientState.Joining)
+            {
+                replyServerPrompt("/json/join_game.json", false);
+            }
+            else if(client.getClientState() == WebClient.ClientState.WaitingStart)
+            {
+                replyWaiting();
+            }
+            else if(client.getClientState() == WebClient.ClientState.Running)
+            {
+                sendReplyToClient(client.getServerMessage());
+            }
+            else
+            {
+                replyServerFailed(WebClient.SERVER_CONNECTION_ERROR_MSG);
+            }
         }
     }
 
-    private void replyServerFailed(String errorMessage, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    private void replyServerFailed(String errorMessage) throws ServletException, IOException
     {
         //RequestDispatcher dispatcher;
         
         //request.setAttribute("error_message", errorMessage);
         InputStream stream = getServletContext().getResourceAsStream("/json/server_failed.json");
         String contentStr = Utils.convertStreamToString(stream);
+        stream.close();
         contentStr = contentStr.replace(Utils.ERROR_PLACEHOLDER, errorMessage);
-        sendReplyToClient(contentStr, request, response);
+        sendReplyToClient(contentStr);
 
         //dispatcher = getServletContext().getRequestDispatcher("/json/server_failed.json");
         //dispatcher.forward(request, response);
     }
 
-    private void sendReplyToClient(String replyContent, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    private void replyServerPrompt(String jsonFile, boolean showError) throws ServletException, IOException
     {
-        response.setContentType(CONTENT_TYPE_JSON);
-        response.setHeader("pragma-", "no-cache");
-        response.setContentLength(replyContent.length());
-        response.getWriter().print(replyContent);
+        InputStream stream = getServletContext().getResourceAsStream(jsonFile);
+        String contentStr = Utils.convertStreamToString(stream);
+        stream.close();
+        
+        if (client.getServerMessage() != null && showError)
+            contentStr = contentStr.replace(Utils.ERROR_PLACEHOLDER, client.getServerMessage());
+        else
+            contentStr = contentStr.replace(Utils.ERROR_PLACEHOLDER, "");
+
+        sendReplyToClient(contentStr);
     }
 
-    private WebClient getClient(HttpServletRequest request, boolean shouldCreate)
+    private void replyWaiting()  throws ServletException, IOException
     {
-        WebClient webClient = (WebClient)request.getSession().getAttribute("client");
+        InputStream stream = getServletContext().getResourceAsStream("/json/waiting.json");
+        String contentStr = Utils.convertStreamToString(stream);
+        stream.close();
+        contentStr = contentStr.replace(Utils.WAITING_PLACEHOLDER, client.getWaitingText());
+
+        sendReplyToClient(contentStr);
+    }
+
+    private void sendReplyToClient(String replyContent) throws ServletException, IOException
+    {
+        currentResponse.setContentType(CONTENT_TYPE_JSON);
+        currentResponse.setHeader("pragma-", "no-cache");
+        currentResponse.setStatus(currentResponse.SC_OK);
+        currentResponse.setContentLength(replyContent.length());
+        currentResponse.getWriter().print(replyContent);
+        currentResponse.flushBuffer();
+    }
+
+    private WebClient getClient(boolean shouldCreate)
+    {
+        WebClient webClient = (WebClient)currentRequest.getSession().getAttribute("client");
         if(webClient == null && shouldCreate)
         {
             webClient = new WebClient();
-            request.getSession(true).setAttribute("client", webClient);
+            currentRequest.getSession(true).setAttribute("client", webClient);
         }
         return webClient;
     }

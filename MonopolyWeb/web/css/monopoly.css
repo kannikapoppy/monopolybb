@@ -32,7 +32,7 @@
  #cell1 div.level1{
     background: url(images/start.png) no-repeat center center ;     
  }
-/*.tel-aviv #cell5 div.level1{
+.tel-aviv #cell5 div.level1{
     background: url(images/habima.png) no-repeat center center ;
 }
 
@@ -72,7 +72,7 @@
 .tel-aviv #cell35 div.level1{
     background: url(images/orna.png) no-repeat center center ;
 }
-*/
+
 
 #monopoly-frame div.level1{
     height:100%;
@@ -378,7 +378,9 @@
 
 #questDialog,
 #createDialog,
-#errorDialog{
+#errorDialog,
+#joinDialog,
+#waitDialog{
     background:#fff url(images/question.png) no-repeat 20px 20px;
 }
 
@@ -386,7 +388,8 @@
     background:#fff url(images/dices.png) no-repeat 20px 20px;
 }
 
-.dialog div.question{
+.dialog div.question,
+.dialog div.dialogMessage{
     margin-left: 150px;
     font-size:150%;
     padding:20px;
