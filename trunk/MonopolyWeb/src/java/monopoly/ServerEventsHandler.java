@@ -7,7 +7,6 @@ package monopoly;
 
 import comm.Event;
 import java.util.List;
-import java.util.TimerTask;
 import objectmodel.CellBase;
 import objectmodel.ServerEvents;
 import src.client.Server;
@@ -16,7 +15,7 @@ import src.client.Server;
  *
  * @author Benda & Eizenman
  */
-public class GetEventsTask extends TimerTask
+public class ServerEventsHandler
 {
     private static final String BUY_CELL_WINDOW_TITLE = "Buy Asset Option";
     private static final String BUY_CELL_QUESTION_PREFIX = "Would you like to buy ";
@@ -29,15 +28,15 @@ public class GetEventsTask extends TimerTask
     private String playerName;
     private WebClient client;
 
-    public GetEventsTask(String gameName, WebClient client, String playerName) {
+    public ServerEventsHandler(String gameName, WebClient client, String playerName) {
         this.gameName = gameName;
         this.client = client;
         this.playerName = playerName;
     }
 
-    @Override
-    public void run() {
-        if (gameName != null) {
+    public void getNewEvents() {
+        if (gameName != null)
+        {
             List<Event> events = null;
             try {
                 events = Server.getInstance().getAllEvents(lastEventId);
@@ -67,7 +66,6 @@ public class GetEventsTask extends TimerTask
                         break;
                     case ServerEvents.GameOver:
                         // game ended
-                        client.closeConnection();
                         client.addMessageToClient(Utils.GenerateGameOverMessage(client.getContext()));
                         break;
                     case ServerEvents.GameWinner:
