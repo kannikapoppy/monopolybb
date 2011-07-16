@@ -264,7 +264,7 @@ public class Utils
     }
 
     static String GenerateUpdatePlayerBalanceMessage(ServletContext context, int playerID, int amount) {
-        String updateBalanceMessage = GetResourceAsString(context, "/json/add_house.json");
+        String updateBalanceMessage = GetResourceAsString(context, "/json/set_balance.json");
         updateBalanceMessage = updateBalanceMessage.replace(PLAYER_ID_PLACEHOLDER, Integer.toString(playerID));
         updateBalanceMessage = updateBalanceMessage.replace(PLAYER_MONEY_PLACEHOLDER, Integer.toString(amount));
         return updateBalanceMessage;
