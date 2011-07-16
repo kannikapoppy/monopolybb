@@ -20,8 +20,8 @@
     </target>
     <target name="wsimport-client-MonopolyGame" depends="wsimport-init">
         <mkdir dir="${build.generated.dir}/jax-wsCache/MonopolyGame"/>
-        <property name="wsdl-MonopolyGame" location="xml-resources/web-service-references/MonopolyGame/wsdl/localhost_8080/axis2/services/MonopolyGame.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/MonopolyGame" destdir="${build.generated.dir}/jax-wsCache/MonopolyGame" wsdl="${wsdl-MonopolyGame}" catalog="catalog.xml" extension="true" verbose="true" wsdlLocation="http://localhost:8080/axis2/services/MonopolyGame?wsdl" xendorsed="true" package="comm">
+        <property name="wsdl-MonopolyGame" location="xml-resources/web-service-references/MonopolyGame/wsdl/localhost_7070/axis2/services/MonopolyGame.wsdl"/>
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/MonopolyGame" destdir="${build.generated.dir}/jax-wsCache/MonopolyGame" wsdl="${wsdl-MonopolyGame}" catalog="catalog.xml" extension="true" verbose="true" wsdlLocation="http://localhost:7070/axis2/services/MonopolyGame?wsdl" xendorsed="true" package="comm">
             <depends file="${wsdl-MonopolyGame}"/>
             <produces dir="${build.generated.dir}/jax-wsCache/MonopolyGame"/>
         </wsimport>
