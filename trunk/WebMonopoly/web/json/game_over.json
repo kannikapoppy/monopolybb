@@ -1,0 +1,7 @@
+{
+    "ver": 0,
+    "game_over":{
+        "id": 1,
+        "message": "GAME OVER"
+    }
+}

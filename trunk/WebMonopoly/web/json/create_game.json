@@ -1,0 +1,8 @@
+{
+    "ver": 0,
+    "create":{
+        "id": 1,
+        "message": "Enter the game details:",
+        "error": " %ERROR_PLACEHOLDER%"
+    }
+}

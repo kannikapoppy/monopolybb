@@ -1,0 +1,9 @@
+    "player%PLYAER_ID_PLACEHOLDER%":
+    {
+        "id": %PLAYER_ID_PLACEHOLDER%,
+        "name": "%PLAYER_NAME_PLACEHOLDER%",
+        "money": %PLAYER_MONEY_PLACEHOLDER%,
+        "playing": "%PLAYER_IN_GAME_PLACEHOLDER%",
+        "position": %PLAYER_POSITION_PLACEHOLDER%,
+        "inJail": "%PLAYER_IN_JAIL_PLACEHOLDER%"
+    }
