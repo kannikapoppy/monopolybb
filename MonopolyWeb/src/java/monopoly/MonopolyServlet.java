@@ -31,7 +31,15 @@ public class MonopolyServlet extends HttpServlet
          String action = request.getParameter("action");
         currentRequest = request;
         currentResponse = response;
-        HandleAction(action);
+
+        try
+        {
+            HandleAction(action);
+        }
+        catch (Exception exp)
+        {
+            replyServerFailed(WebClient.SERVER_CONNECTION_ERROR_MSG);
+        }
     }
 
     @Override
@@ -40,7 +48,15 @@ public class MonopolyServlet extends HttpServlet
         String action = request.getParameter("action");
         currentRequest = request;
         currentResponse = response;
-        HandleAction(action);//, request, response);
+
+        try
+        {
+            HandleAction(action);
+        }
+        catch (Exception exp)
+        {
+            replyServerFailed(WebClient.SERVER_CONNECTION_ERROR_MSG);
+        }
 //        RequestDispatcher dispatcher;
 //        response.setContentType(CONTENT_TYPE_JSON);
 //        response.setHeader("pragma-", "no-cache");
@@ -104,7 +120,7 @@ public class MonopolyServlet extends HttpServlet
             else if(client.getClientState() == WebClient.ClientState.Running)
             {
                 client.updateNewEvents();
-                sendReplyToClient(client.getServerMessage());
+                sendReplyToClient(client.getMessageToClient());
             }
             else
             {
