@@ -1,4 +1,3 @@
-    "player%PLYAER_ID_PLACEHOLDER%":
     {
         "id": %PLAYER_ID_PLACEHOLDER%,
         "name": "%PLAYER_NAME_PLACEHOLDER%",
