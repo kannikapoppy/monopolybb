@@ -106,37 +106,37 @@ public class Utils
             if (cell.getType().compareTo("City") == 0)
             {
                 City city = (City) cell;
-                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "/css/images/" + city.getCountry().getName() + ".png");
+                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/" + city.getCountry().getName().replace(" ", "%20") + ".png");
                 currentCellDesc = currentCellDesc.replace(CELL_HOUSES_PLACEHOLDER, Integer.toString(city.GetNumberOfHouses()));
             }
             else if (cell.getType().compareTo("Go") == 0)
             {
-                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "/css/images/start.png");
+                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/start.png");
             }
             else if (cell.getType().compareTo("Service") == 0)
             {
                 Asset asset = (Asset) cell;
-                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "/css/images/" + asset.getGroup().getName() + ".png");
+                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/" + asset.getGroup().getName() + ".png");
             }
             else if (cell.getType().compareTo("Community Chest") == 0)
             {
-                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "/css/images/Community Chest.gif");
+                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/Community Chest.gif".replace(" ", "%20"));
             }
             else if (cell.getType().compareTo("Chance") == 0)
             {
-                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "/css/images/Chance.gif");
+                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/Chance.gif");
             }
             else if (cell.getType().compareTo("Jail") == 0)
             {
-                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "/css/images/Jail.gif");
+                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/Jail.gif");
             }
             else if (cell.getType().compareTo("Parking") == 0)
             {
-                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "/css/images/Parking.gif");
+                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/Parking.gif");
             }
             else if (cell.getType().compareTo("GotoJail") == 0)
             {
-                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "/css/images/GotoJail.gif");
+                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/GotoJail.gif");
             }
 
             boardJSON = boardJSON.replace(CELL_PLACEHOLDER.replace("#", Integer.toString(i +1)), currentCellDesc);

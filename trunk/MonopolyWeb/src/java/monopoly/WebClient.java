@@ -336,7 +336,7 @@ public class WebClient
 
         if (messages.size() > 0)
         {
-            message = messages.getFirst();
+            message = messages.removeFirst();
         }
 
         return message;

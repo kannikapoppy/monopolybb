@@ -32,7 +32,7 @@
  #cell1 div.level1{
     background: url(images/start.png) no-repeat center center ;     
  }
-.board #cell5 div.level1{
+/*.board #cell5 div.level1{
     background: url(images/habima.png) no-repeat center center ;
 }
 
@@ -71,7 +71,7 @@
 
 .board #cell35 div.level1{
     background: url(images/orna.png) no-repeat center center ;
-}
+}*/
 
 
 #monopoly-frame div.level1{
@@ -79,12 +79,40 @@
     width:100%;
 	border:1px solid #000;
 	display:block;
-    text-indent:-5000em;
+    /*text-indent:-5000em;*/
 
     -webkit-background-size: 100% 100%!important;
     -moz-background-size:  100% 100%!important;
     -o-background-size: 100% 100%!important;
     background-size:  100% 100%!important;
+}
+
+#monopoly-frame div.title{
+    top: 0;
+    left: 50;
+    height: 10%;
+    width: 100%;
+    font-size: 14;
+    font-weight: bold;
+    color: black;
+}
+
+#monopoly-frame div.top{
+    top: 10%;
+    height: 30%;
+    width: 100%;
+}
+
+#monopoly-frame div.center{
+    top: 40%;
+    height: 30%;
+    width: 100%;
+}
+
+#monopoly-frame div.bottom{
+    top: 70%;
+    height: 30%;
+    width: 100%;
 }
 
 /* border of cells */
@@ -259,35 +287,35 @@
 /* assets layer */
 
 
-.house1 div.level2,
-.house2 div.level2,
-.house3 div.level2{
+.house1 div.center,
+.house2 div.center,
+.house3 div.center{
     background: transparent url(images/house1.png) no-repeat center top;
 }
 
-.house2 div.level2{
+.house2 div.center{
     background-image:url(images/house2.png);
 }
 
-.house3 div.level2{
+.house3 div.center{
     background-image:url(images/house3.png);
 }
 
- div.level2{
-     height:100%;
+ div.center{
+     /*height:100%;*/
      -webkit-background-size: 100% 100%!important;
      -moz-background-size:  100% 100%!important;
      -o-background-size: 100% 100%!important;
      background-size:  100% 100%!important;
 }
- div.level3{
+/* div.level3{
      height:100%;
      padding-top:30%;
  }
 
 #cell1  div.level3{
     padding-top:10%;
-}
+}*/
 
 #player1,
 #player2,
@@ -380,7 +408,8 @@
 #createDialog,
 #errorDialog,
 #joinDialog,
-#waitDialog{
+#waitDialog
+#messageDialog{
     background:#fff url(images/question.png) no-repeat 20px 20px;
 }
 
