@@ -3,6 +3,6 @@
     "bought":
     {
         "id": %PLAYER_ID_PLACEHOLDER%,
-        "cell": "%CELL_ID_PLACEHOLDER%
+        "cell": %CELL_ID_PLACEHOLDER%
     }
 }

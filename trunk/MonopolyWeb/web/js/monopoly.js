@@ -324,10 +324,12 @@ GAME.monopoly = function($){
             }
             else if(o.winner)
             {
+                setTimer = false;
                 show_message(o.winner);
             }
             else if(o.lost)
             {
+                setTimer = false;
                 show_message(o.lost);
                 players[o.lost.player-1].reset(); // remove player from board
             }
@@ -339,6 +341,7 @@ GAME.monopoly = function($){
             }
             else if(o.dices)
             {
+                setTimer = false;
                 throwDices(o.dices);
             }
             else if(o.dices_set)
@@ -357,6 +360,7 @@ GAME.monopoly = function($){
             }
             else if(o.info)
             {
+                setTimer = false;
                 show_message(o.info);
             }
             else if(o.balance)
