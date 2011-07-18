@@ -32,47 +32,6 @@
  #cell1 div.level1{
     background: url(images/start.png) no-repeat center center ;     
  }
-/*.board #cell5 div.level1{
-    background: url(images/habima.png) no-repeat center center ;
-}
-
-.board #cell7 div.level1{
-    background: url(images/heichal.png) no-repeat center center ;
-}
-
-.board #cell11 div.level1{
-    background: url(images/azrieli.png) no-repeat center center ;
-}
-
-.board #cell17 div.level1{
-    background: url(images/bialic.png) no-repeat center center ;
-}
-
-.board #cell23 div.level1{
-    background: url(images/dan-hotel.png) no-repeat center center ;
-}
-
-.board #cell24 div.level1{
-    background: url(images/golda.png) no-repeat center center ;
-}
-
-
-.board #cell27 div.level1{
-    background: url(images/iria.png) no-repeat center center ;
-}
-
-.board #cell30 div.level1{
-    background: url(images/comverse.png) no-repeat center center ;
-}
-
-.board #cell32 div.level1{
-    background: url(images/museum.png) no-repeat center center ;
-}
-
-.board #cell35 div.level1{
-    background: url(images/orna.png) no-repeat center center ;
-}*/
-
 
 #monopoly-frame div.level1{
     height:100%;
@@ -445,4 +404,12 @@
 
 .playing{
     font-style: italic;
+}
+
+#resign
+{
+    width: 30px;
+    top:25%;
+    left:18%;
+    position:absolute;
 }
