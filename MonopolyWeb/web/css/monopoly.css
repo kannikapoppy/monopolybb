@@ -385,6 +385,25 @@
     background-image:url(images/player-6.png);
 }
 
+.diceFrame
+{
+    left: 15%;
+    top: 15%;
+    width: 5%;
+    height: 7%;
+    position:absolute;
+    background-image:url(images/die6.gif);
+    -webkit-background-size: 100% 100%!important;
+    -moz-background-size:  100% 100%!important;
+    -o-background-size: 100% 100%!important;
+    background-size:  100% 100%!important;
+}
+
+#dice2
+{
+    left: 20%;
+}
+
 .dialog{
     border:1px solid black;
     top:25%;
@@ -422,4 +441,8 @@
     margin-left: 150px;
     font-size:150%;
     padding:20px;
+}
+
+.playing{
+    font-style: italic;
 }

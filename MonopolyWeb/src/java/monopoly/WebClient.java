@@ -194,7 +194,7 @@ public class WebClient
                 return -2;
             }
 
-            boolean automateRollDice = (autoDiceStr.compareTo("True") == 0);
+            boolean automateRollDice = (autoDiceStr.compareTo("1") == 0);
             boolean success;
 
             try
