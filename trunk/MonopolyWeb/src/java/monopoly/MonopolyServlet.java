@@ -95,6 +95,23 @@ public class MonopolyServlet extends HttpServlet
             else
                 replyWaiting();
         }
+        else if(action.compareTo(Utils.ACTION_BUY) == 0)
+        {
+            String buyReply = currentRequest.getParameter("answer");
+            int status = client.sendBuyReplyToServer(buyReply);
+            if (status == SERVER_FAILED)
+            {
+                replyServerFailed(client.getServerMessage());
+            }
+        }
+        else if(action.compareTo(Utils.ACTION_DICES) == 0)
+        {
+            String dice1 = currentRequest.getParameter("cube1");
+            String dice2 = currentRequest.getParameter("cube2");
+            int status = client.sendDiceRollToServer(dice1, dice2);
+            if (status == SERVER_FAILED)
+                replyServerFailed(client.getServerMessage());
+        }
         else if (action.compareTo(Utils.GET_STATE) == 0)
         {
             // not initiated yet
