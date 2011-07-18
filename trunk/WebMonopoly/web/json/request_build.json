@@ -2,6 +2,8 @@
     "ver": 0,
     "build":
     {
-        "message": "Would you like to build a house at %CELL_TITLE_PLACEHOLDER%?"
+        "question": "Would you like to build a house at %CELL_TITLE_PLACEHOLDER%?",
+        "option1": "Yes",
+        "option2": "No"
     }
 }

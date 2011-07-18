@@ -2,8 +2,7 @@
     "ver": 0,
     "move":
     {
-        "player": %PLAYER_ID_PLACEHOLDER%,
-        "from": %FROM_CELL_PLACEHOLDER%,
-        "to": %TO_CELL_PLACEHOLDER%
+        "id": %PLAYER_ID_PLACEHOLDER%,
+        "position": %TO_CELL_PLACEHOLDER%
     }
 }
