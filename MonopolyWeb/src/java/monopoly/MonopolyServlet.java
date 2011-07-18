@@ -112,6 +112,10 @@ public class MonopolyServlet extends HttpServlet
             if (status == SERVER_FAILED)
                 replyServerFailed(client.getServerMessage());
         }
+        else if(action.compareTo(Utils.RESIGN) == 0)
+        {
+            client.resignFromGame();
+        }
         else if (action.compareTo(Utils.GET_STATE) == 0)
         {
             // not initiated yet

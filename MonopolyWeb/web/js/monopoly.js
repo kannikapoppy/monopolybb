@@ -17,7 +17,8 @@ GAME.ACTION = {
     GET_BOARD: "board",
     GET_STATE:  "state",
     BUY_ANSWER: "buy",
-    CLIENT_DICES: "dices"
+    CLIENT_DICES: "dices",
+    RESIGN: "resign"
 };
 
 GAME.UPDATE_INTERVAL = 500; // how often we check for state update (in milisec)
@@ -311,6 +312,7 @@ GAME.monopoly = function($){
 
                 $.each(o.players, updatePlayer);
                 $.each(o.players, updateLegend);
+                $("#resign").removeClass("hidden");
 
                 // register for a "one time" event
                 //$("#monopoly-frame").one(GAME.MOVEMENT_DONE , updateState);
@@ -428,6 +430,14 @@ GAME.monopoly = function($){
             var i;
             // setup 3 layers inside each cube
             $('#monopoly-frame>div').addClass("level0").html("<div class='level1'><div class='title'/><div class='top'/><div class='center'/><div class='bottom'/></div>");
+
+            var resignButton = $('<div id="resign" class="hidden"><button id="leave">Resign</button></div>');
+            resignButton.appendTo($("#monopoly-frame"));
+            $("#leave").click(function()
+            {
+                alert("Goodbye!");
+                 $.post(GAME.AJAX_URL, $.param({action: GAME.ACTION.RESIGN}));
+            });
 
             var dicePanel = $('<div id="dice1" class="diceFrame"/><div id="dice2" class="diceFrame"/>');
             dicePanel.appendTo($("#monopoly-frame"));

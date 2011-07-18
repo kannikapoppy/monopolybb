@@ -53,6 +53,7 @@ public class Utils
     public static final String ACTION_DICES = "dices";
     public static final String ACTION_BUY = "buy";
     public static final String GET_STATE = "state";
+    public static final String RESIGN = "resign";
 
     public static final int MAX_PLAYERS = 6;
     public static final int MIN_PLAYERS = 2;

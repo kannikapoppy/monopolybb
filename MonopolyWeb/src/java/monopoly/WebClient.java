@@ -495,4 +495,19 @@ public class WebClient
     {
         eventsHandler.getNewEvents();
     }
+
+    void resignFromGame() {
+        if(clientState == ClientState.Running)
+        {
+            try {
+                Server.getInstance().Resign();
+            } catch (Exception ex)
+            {
+                Logger.getLogger(WebClient.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            serverMessage = "You have left the game";
+            clientState = ClientState.Failed;
+        }
+    }
 }
