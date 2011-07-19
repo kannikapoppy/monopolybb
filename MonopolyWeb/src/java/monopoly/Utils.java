@@ -59,6 +59,8 @@ public class Utils
     public static final int MIN_PLAYERS = 2;
     public static final int MAX_HUMANS = 6;
     public static final int MIN_HUMANS = 1;
+    public static final int DICE_MAX = 6;
+    public static final int DICE_MIN = 1;
 
     public static final String POSITIVE_BUY_REPLY = "yes";
 
@@ -121,11 +123,11 @@ public class Utils
             }
             else if (cell.getType().compareTo("Community Chest") == 0)
             {
-                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/Community Chest.gif".replace(" ", "%20"));
+                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/Community Chest.png".replace(" ", "%20"));
             }
             else if (cell.getType().compareTo("Chance") == 0)
             {
-                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/Chance.gif");
+                currentCellDesc = currentCellDesc.replace(CELL_IMG_PLACEHOLDER, "css/images/Chance.png");
             }
             else if (cell.getType().compareTo("Jail") == 0)
             {

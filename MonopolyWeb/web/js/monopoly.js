@@ -43,6 +43,9 @@ GAME.MOVEMENT_DONE = "movementdone"; // event movementdone is fiered after all a
         var assetClassName = "player" + this.id + "-asset";
         // remove assets
         $("." + assetClassName).removeClass(assetClassName).removeClass("house3").removeClass("house2").removeClass("house1");
+        $("#playersLegend .player" + this.id + " #money").html("0");
+        this.element.addClass("hidden");
+        this.alive = false;
     };
 
     GAME.Player.prototype.isAlive = function(){
@@ -60,11 +63,13 @@ GAME.MOVEMENT_DONE = "movementdone"; // event movementdone is fiered after all a
                 GAME.monopoly.registerAmimation(-1);
             };
 
-            if(oState.playing == "yes")
-            {
-                $("#monopoly-frame #player" + this.id).removeClass("hidden");
-                this.alive = true;
-            }
+        if(oState.playing == "yes")
+        {
+            $("#monopoly-frame #player" + this.id).removeClass("hidden");
+            this.alive = true;
+        }
+
+
         /*$.each(oState.assets, function(){
             $("#cell" + this.address).addClass("player" + player.id + "-asset");
             if (this.houses){
@@ -72,15 +77,42 @@ GAME.MOVEMENT_DONE = "movementdone"; // event movementdone is fiered after all a
             }
         });*/
         var boardPosition = oState.position + 1;
+        var previousCell = this.cell;
 
         // is there someone allready parked on our cell? if so, add a small offset
         occupiedCellsMap = GAME.monopoly.getOccupiedCellsMap ();
         parkingCount = occupiedCellsMap[boardPosition] ? occupiedCellsMap[boardPosition] : 0;
+
+        var previousParkingCount = occupiedCellsMap[previousCell] ? occupiedCellsMap[previousCell] : 0;
+        occupiedCellsMap[previousCell] = previousParkingCount - 1;
+
         occupiedCellsMap[boardPosition] = parkingCount + 1;
 
         targetCell =  $("#cell" + boardPosition);
         position  = targetCell.position();
-        this.element.css({top: position.top + (targetCell.height() / 2), left: position.left + (targetCell.width() / 2) + (parkingCount * 10) - 20});
+        this.element.css({top: position.top + (targetCell.height() / 3), left: position.left + (targetCell.width() / 2) + (parkingCount * 10) - 20});
+        this.cell = boardPosition;
+
+        // if other players are on the same cell
+        if (previousParkingCount > 1)
+        {
+            // re-organize the players on the previous cell
+            var i;
+            var counter = 0;
+            var previousCellElement = $("#cell" + previousCell);
+            var previousPosition = previousCellElement.position();
+            for (i = 0; i < GAME.MAX_PLAYERS; i++)
+            {
+                if (GAME.monopoly.getPlayers()[i])
+                {
+                    if (GAME.monopoly.getPlayers()[i].cell == previousCell)
+                    {
+                        GAME.monopoly.getPlayers()[i].element.css({top: previousPosition.top + (previousCellElement.height() / 3), left: previousPosition.left + (previousCellElement.width() / 2) + (counter * 10) - 20});
+                        counter = counter + 1;
+                    }
+                }
+            }
+        }
         /*if(this.cell !== boardPosition){
             GAME.monopoly.registerAmimation(1);
             while (this.cell !== boardPosition){
@@ -197,9 +229,12 @@ GAME.monopoly = function($){
                          },
                          200,
                          function(){
-                            if (!isOn){
+                            if (!isOn)
+                            {
                                 dialogWrap.addClass("hidden");    
                             }
+                            else
+                                dialogWrap.removeClass("hidden");
                          }
                      );
 
@@ -239,7 +274,7 @@ GAME.monopoly = function($){
 
         //display a throw dices dialog
         throwDices = function(oState){
-            dices_dialog.find("#cube1").val("").end().find("#cube2").val("").end().find(".error").val(oState.error).end();
+            dices_dialog.find("#cube1").val("").end().find("#cube2").val("").end().find(".error").text(oState.error).end();
             showDialog(dices_dialog, true);
         },
 
@@ -275,18 +310,18 @@ GAME.monopoly = function($){
 
             if(o.failed)
             {
-                show_error(o.failed);
                 setTimer = false;
+                show_error(o.failed);
             }
             else if (o.create)
             {
-                prompt_dialog(o.create, create_dialog);
                 setTimer = false;
+                prompt_dialog(o.create, create_dialog);
             }
             else if(o.join)
             {
-                prompt_dialog(o.join, join_dialog);
                 setTimer = false;
+                prompt_dialog(o.join, join_dialog);
             }
             else if(o.wait)
             {
@@ -381,9 +416,23 @@ GAME.monopoly = function($){
             }
             else if(o.house)
             {
+                var houseElement = $("#cell" + o.house.cell + " div.bottom");
+                if(houseElement.hasClass("house1"))
+                {
+                    houseElement.removeClass("house1").addClass("house2");
+                }
+                if(houseElement.hasClass("house2"))
+                {
+                    houseElement.removeClass("house2").addClass("house3");
+                }
+                else // no house yet, add the first house
+                {
+                    houseElement.addClass("house1");
+                }
             }
             else if(o.bought)
             {
+                $("#cell" + (o.bought.cell + 1)).addClass("player" + o.bought.id + "-asset");
             }
 
             if (setTimer)
@@ -393,16 +442,6 @@ GAME.monopoly = function($){
 
             //_registerAmimation(-1);
          },
-
-//         handlePrompt = function(o, status)
-//         {
-//             alert("boom");
-//            if(o.join)
-//            {
-//                alert("here");
-//                prompt_dialog(o.join, join_dialog);
-//            }
-//         },
          
         // ask server for updates
         updateState = function()
@@ -473,8 +512,6 @@ GAME.monopoly = function($){
                     humansNum: $("#humansNum").val(),
                     autoDice: $("#createDialog input:checked").length}),
                     handleServerUpdate);
-                //setTimeout(updateState, 500);
-                
             });
 
             // create a dialog for joining a game
@@ -484,7 +521,6 @@ GAME.monopoly = function($){
             {
                 showDialog(join_dialog, false);
                 $.post(GAME.AJAX_URL, $.param({action: GAME.ACTION.JOIN, playerName: $("#playerName").val()}), handleServerUpdate);
-                //setTimeout(updateState, 500);
             });
 
             // create a dialog for waiting on players to join
@@ -498,13 +534,12 @@ GAME.monopoly = function($){
             $("#btn2").click(postBuyReply("no"));
 
             // create a dialog for manual dices input
-            dices_dialog = $("<div id='dicesDialog' class='dialog hidden'><div class='question'>Please throw the dices" +
+            dices_dialog = $("<div id='dicesDialog' class='dialog hidden'><div class='question'><div class='message'>Please throw the dices</div>" +
                       "<br><div class='error'></div><br>" +
                       "<div><input type='text' id='cube1' /><input type='text' id='cube2' /></div></div><div class='ft'><button id='btn3'>OK</button></div></div>");
             dices_dialog.appendTo($("#monopoly-frame"));
             $("#btn3").click(function(){
-                $.post(GAME.AJAX_URL, $.param({action: GAME.ACTION.CLIENT_DICES, cube1: $("#cube1").val() ,cube2: $("#cube2").val()}));
-                setTimeout(updateState, 500);
+                $.post(GAME.AJAX_URL, $.param({action: GAME.ACTION.CLIENT_DICES, cube1: $("#cube1").val() ,cube2: $("#cube2").val()}), handleServerUpdate);
                 showDialog(dices_dialog, false);
             });
 
@@ -528,6 +563,11 @@ GAME.monopoly = function($){
 
         getOccupiedCellsMap : function() {
             return occupiedCellsMap;
+        },
+
+        getPlayers : function()
+        {
+            return players;
         }
 
     };
