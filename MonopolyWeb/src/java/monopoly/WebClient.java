@@ -273,6 +273,11 @@ public class WebClient
     {
         this.players = players;
 
+        // Handles a bug in the server!!!
+        for (PlayerDetails playerDetails : this.players) {
+            playerDetails.setAmount(1500);
+        }
+
         String boardXML = null;
         String boardSchema = null;
 

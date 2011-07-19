@@ -21,7 +21,7 @@ GAME.ACTION = {
     RESIGN: "resign"
 };
 
-GAME.UPDATE_INTERVAL = 500; // how often we check for state update (in milisec)
+GAME.UPDATE_INTERVAL = 200; // how often we check for state update (in milisec)
 GAME.MAX_PLAYERS = 6; // support 2 to 6 players
 GAME.MOVEMENT_DONE = "movementdone"; // event movementdone is fiered after all anomations are done
 
@@ -374,7 +374,8 @@ GAME.monopoly = function($){
             {
                 // TODO: remove previous turn
                 // indicate it's o.turn.player's turn!
-                $("#playersLegend .player" + o.turn.player + " div.playerName").addClass("playing");
+                $("#playersLegend #playerName").removeClass("playing");
+                $("#playersLegend .player" + o.turn.id + " #playerName").addClass("playing");
             }
             else if(o.dices)
             {

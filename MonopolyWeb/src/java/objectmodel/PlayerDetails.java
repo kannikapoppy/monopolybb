@@ -36,6 +36,10 @@ public class PlayerDetails {
         return amount;
     }
 
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
     public boolean isIsActive() {
         return isActive;
     }
