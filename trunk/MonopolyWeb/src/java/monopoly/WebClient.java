@@ -366,6 +366,12 @@ public class WebClient
             addMessageToClient(Utils.GenerateThrowDiceRequest(context, true));
             return -2;
         }
+        if (dice1 > Utils.DICE_MAX || dice1 < Utils.DICE_MIN || dice2 > Utils.DICE_MAX || dice2 < Utils.DICE_MIN)
+        {
+            serverMessage = "Enter valid dice numbers (1-6)!";
+            addMessageToClient(Utils.GenerateThrowDiceRequest(context, true));
+            return -2;
+        }
 
         try
         {

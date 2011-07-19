@@ -246,17 +246,21 @@
 /* assets layer */
 
 
-.house1 div.center,
-.house2 div.center,
-.house3 div.center{
+.house1,
+.house2,
+.house3{
     background: transparent url(images/house1.png) no-repeat center top;
+    -webkit-background-size: 100% 100%!important;
+     -moz-background-size:  100% 100%!important;
+     -o-background-size: 100% 100%!important;
+     background-size:  100% 100%!important;
 }
 
-.house2 div.center{
+.house2{
     background-image:url(images/house2.png);
 }
 
-.house3 div.center{
+.house3{
     background-image:url(images/house3.png);
 }
 
@@ -382,13 +386,20 @@
     width:90%;
 }
 
-#questDialog,
 #createDialog,
-#errorDialog,
-#joinDialog,
-#waitDialog
-#messageDialog{
+#joinDialog{
+    background:#fff url(images/Monopoly.jpg) no-repeat 20px 20px;
+}
+
+#questDialog
+{
     background:#fff url(images/question.png) no-repeat 20px 20px;
+}
+
+#errorDialog,
+#waitDialog,
+#messageDialog{
+    background:#fff url(images/message.png) no-repeat 20px 20px;
 }
 
 #dicesDialog{
@@ -412,4 +423,8 @@
     top:25%;
     left:18%;
     position:absolute;
+}
+
+.error{
+    color: red;
 }

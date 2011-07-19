@@ -88,11 +88,11 @@ public class ServerEventsHandler
                         playerName = event.getPlayerName().getValue();
                         playerID = client.getPlayerIDByName(playerName);
                         client.addMessageToClient(Utils.GenerateSetPlayerTurnMessage(client.getContext(), playerID));
-                        //board.SetPlayingUser(event.getPlayerName().getValue());
 
                         if (event.getPlayerName().getValue().compareTo(this.playerName) != 0)
                             return;
 
+                        client.setPendingEventID(event.getEventID());
                         client.addMessageToClient(Utils.GenerateThrowDiceRequest(client.getContext(), false));
                         break;
                     case ServerEvents.DiceRoll:
