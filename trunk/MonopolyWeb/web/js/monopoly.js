@@ -422,7 +422,7 @@ GAME.monopoly = function($){
                 {
                     houseElement.removeClass("house1").addClass("house2");
                 }
-                if(houseElement.hasClass("house2"))
+                else if(houseElement.hasClass("house2"))
                 {
                     houseElement.removeClass("house2").addClass("house3");
                 }
