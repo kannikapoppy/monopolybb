@@ -58,19 +58,13 @@
 
 #monopoly-frame div.top{
     top: 10%;
-    height: 30%;
-    width: 100%;
-}
-
-#monopoly-frame div.center{
-    top: 40%;
-    height: 30%;
+    height: 45%;
     width: 100%;
 }
 
 #monopoly-frame div.bottom{
-    top: 70%;
-    height: 30%;
+    top: 55%;
+    height: 45%;
     width: 100%;
 }
 
