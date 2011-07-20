@@ -413,11 +413,11 @@ GAME.monopoly = function($){
             else if(o.build)
             {
                 setTimer = false;
-                ask(o.buy);
+                ask(o.build);
             }
             else if(o.house)
             {
-                var houseElement = $("#cell" + o.house.cell + " div.bottom");
+                var houseElement = $("#cell" + (o.house.cell + 1) + " div.bottom");
                 if(houseElement.hasClass("house1"))
                 {
                     houseElement.removeClass("house1").addClass("house2");
@@ -469,7 +469,7 @@ GAME.monopoly = function($){
         init:function(){
             var i;
             // setup 3 layers inside each cube
-            $('#monopoly-frame>div').addClass("level0").html("<div class='level1'><div class='title'/><div class='top'/><div class='center'/><div class='bottom'/></div>");
+            $('#monopoly-frame>div').addClass("level0").html("<div class='level1'><div class='title'/><div class='top'/><div class='bottom'/></div>");
 
             var resignButton = $('<div id="resign" class="hidden"><button id="leave">Resign</button></div>');
             resignButton.appendTo($("#monopoly-frame"));
